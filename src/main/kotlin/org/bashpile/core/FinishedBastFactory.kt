@@ -16,6 +16,7 @@ import org.bashpile.core.bast.expressions.VariableReferenceBastNode
 import org.bashpile.core.engine.Subshell
 
 
+typealias PreambelsBastNodePair = Pair<List<BastNode>, BastNode>
 /**
  * Takes a freshly created Bashpile Abstract Syntax Tree from [org.bashpile.core.antlr.AstConvertingVisitor] and
  * performs a series of transformations on it to prepare it for rendering with [BastNode.render].
@@ -28,7 +29,7 @@ class FinishedBastFactory {
         logger.info("Mermaid graph ---------------- initial: {}", root.mermaidGraph())
 
         // unnest
-        val unnestedBast = root.unnestSubshells()
+        val unnestedBast = root.unnestSubshells().second
         logger.info("Mermaid graph ----- subshells unnested: {}", unnestedBast.mermaidGraph())
 
         // loosen
@@ -66,9 +67,10 @@ class FinishedBastFactory {
      * @see /documentation/contributing/unnest.md
      */
     @VisibleForTesting
-    internal fun BastNode.unnestSubshells(): BastNode {
+    internal fun BastNode.unnestSubshells(): PreambelsBastNodePair {
+        // TODO recurse into children, bubble preambles up to first statement node
         var unnestedCount = 0
-        val unnestedStatements = children.flatMap { statementNode ->
+        val unnestedStatements: List<PreambelsBastNodePair> = children.map { statementNode ->
             // the recursion is hidden in .allNodes(), it's linear from there
             val nestedSubshells = statementNode.allDescendants().filter {
                 it is Subshell && it !is ArithmeticBastNode // Arithmetic nodes render correctly if nested
@@ -84,9 +86,9 @@ class FinishedBastFactory {
                     child = ShellStringBastNode(nestedSubshell.children)
                 )
             }
-            variableDeclarationBastNodes + statementNode
+            Pair(variableDeclarationBastNodes, statementNode)
         }
-        return replaceChildren(unnestedStatements)
+        return Pair(listOf(), replaceChildren(unnestedStatements.flatMap { it.first + it.second }))
     }
 
     /** @return A loosened version of the input tree */
