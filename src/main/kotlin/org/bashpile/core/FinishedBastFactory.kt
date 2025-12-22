@@ -13,10 +13,11 @@ import org.bashpile.core.bast.statements.ShellLineBastNode
 import org.bashpile.core.bast.statements.VariableDeclarationBastNode
 import org.bashpile.core.engine.TypeEnum.UNKNOWN
 import org.bashpile.core.bast.expressions.VariableReferenceBastNode
+import org.bashpile.core.bast.statements.StatementBastNode
 import org.bashpile.core.engine.Subshell
+import kotlin.math.max
 
 
-typealias PreambelsBastNodePair = Pair<List<BastNode>, BastNode>
 /**
  * Takes a freshly created Bashpile Abstract Syntax Tree from [org.bashpile.core.antlr.AstConvertingVisitor] and
  * performs a series of transformations on it to prepare it for rendering with [BastNode.render].
@@ -29,7 +30,7 @@ class FinishedBastFactory {
         logger.info("Mermaid graph ---------------- initial: {}", root.mermaidGraph())
 
         // unnest
-        val unnestedBast = root.unnestSubshells().second
+        val unnestedBast = root.unnestSubshells()
         logger.info("Mermaid graph ----- subshells unnested: {}", unnestedBast.mermaidGraph())
 
         // loosen
@@ -67,28 +68,32 @@ class FinishedBastFactory {
      * @see /documentation/contributing/unnest.md
      */
     @VisibleForTesting
-    internal fun BastNode.unnestSubshells(): PreambelsBastNodePair {
-        // TODO recurse into children, bubble preambles up to first statement node
+    internal fun BastNode.unnestSubshells(): BastNode {
         var unnestedCount = 0
-        val unnestedStatements: List<PreambelsBastNodePair> = children.map { statementNode ->
-            // the recursion is hidden in .allNodes(), it's linear from there
-            val nestedSubshells = statementNode.allDescendants().filter {
-                it is Subshell && it !is ArithmeticBastNode // Arithmetic nodes render correctly if nested
-            }.filter { subshells ->
-                subshells.parents().any { it is Subshell }
-            }
-            val variableDeclarationBastNodes = nestedSubshells.map { nestedSubshell ->
-                val id = "__bp_var${unnestedCount++}"
-                nestedSubshell.mutatingReplaceWith(VariableReferenceBastNode(id, UNKNOWN))
-                VariableDeclarationBastNode(
-                    id,
-                    UNKNOWN,
-                    child = ShellStringBastNode(nestedSubshell.children)
-                )
-            }
-            Pair(variableDeclarationBastNodes, statementNode)
+        this.nestedSubshells().forEach { nestedSubshell ->
+            val id = "__bp_var${unnestedCount++}"
+            nestedSubshell.mutatingReplaceWith(VariableReferenceBastNode(id, UNKNOWN))
+            val decl = VariableDeclarationBastNode(id, UNKNOWN,
+                    child = ShellStringBastNode(nestedSubshell.children))
+            // insertVariableDeclaration(nestedSubshell.closestParentStatementIndex - 1)
+            nestedSubshell.parents().first { it is StatementBastNode }.addBefore(decl)
         }
-        return Pair(listOf(), replaceChildren(unnestedStatements.flatMap { it.first + it.second }))
+        return this
+    }
+
+    private fun BastNode.nestedSubshells(): List<BastNode> {
+        return this.allDescendants().filter {
+            it is Subshell && it !is ArithmeticBastNode // Arithmetic nodes render correctly if nested
+        }.filter { subshells ->
+            subshells.parents().any { it is Subshell }
+        }
+    }
+
+    private fun BastNode.addBefore(toAdd: BastNode) {
+        require(this.parent != null)
+        val thisIndex = this.parent!!.children.indexOf(this)
+        val index = max(thisIndex - 1, 0)
+        this.parent!!.mutableChildren.add(index, toAdd)
     }
 
     /** @return A loosened version of the input tree */

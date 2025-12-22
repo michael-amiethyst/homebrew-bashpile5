@@ -16,7 +16,8 @@ import java.util.function.Predicate
  * The root is created by the [AstConvertingVisitor].
  */
 abstract class BastNode(
-    private val mutableChildren: MutableList<BastNode>,
+    // TODO encapsulate again
+    public val mutableChildren: MutableList<BastNode>,
     val id: String? = null,
     /** The type at creation time (e.g. for literals).  See [callStack] for variable types. */
     private val majorType: TypeEnum = UNKNOWN

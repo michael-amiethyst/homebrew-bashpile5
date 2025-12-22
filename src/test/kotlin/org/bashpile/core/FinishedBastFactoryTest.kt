@@ -63,7 +63,7 @@ class FinishedBastFactoryTest {
 
         val unnestedRoot = with(fixture) {
             log.info("Mermaid Graph before unnest: {}", root.mermaidGraph())
-            val unnested = root.unnestSubshells().second
+            val unnested = root.unnestSubshells()
             log.info("Mermaid Graph after unnest: {}", unnested.mermaidGraph())
             unnested
         }
@@ -94,7 +94,7 @@ class FinishedBastFactoryTest {
 
         val unnestedRoot: BastNode = with(fixture) {
             log.info("Mermaid Graph before unnest: {}", root.mermaidGraph())
-            val unnested: BastNode = root.unnestSubshells().second
+            val unnested: BastNode = root.unnestSubshells()
             log.info("Mermaid Graph after unnest: {}", unnested.mermaidGraph())
             unnested
         }

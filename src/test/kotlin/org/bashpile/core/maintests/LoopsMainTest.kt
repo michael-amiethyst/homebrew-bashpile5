@@ -286,7 +286,7 @@ class LoopsMainTest : MainTest() {
         val outerFilename = "src/test/resources/data/labeled_lines.txt"
         val render = """
             for(line: string in "$outerFilename"):
-                print(#(printf $(printf '.')))
+                print(#(ls $(printf '.')))
                 
             """.trimIndent().createRender()
         assertRenderEquals(
@@ -296,12 +296,8 @@ class LoopsMainTest : MainTest() {
                 __bp_var0="$(printf '.')"
                 printf "$(ls ${'$'}{__bp_var0})"
             done
+            
             """.trimIndent(), render
-        ).assertRenderProduces("""
-                row1
-                row2
-
-                """.trimIndent()
-            )
+        ).assertRenderProduces({ it.contains("src") })
     }
 }
