@@ -281,6 +281,8 @@ class LoopsMainTest : MainTest() {
             )
     }
 
+    // TODO 0.20.0 - write test with nested Subshells in an inner for-for loop (double nested)
+    // TODO 0.20.0 - write test with multiple nested Subshells in an inner for-for loop (double nested)
     @Test
     fun foreach_fileLine_withNestedSubshells_works() {
         val outerFilename = "src/test/resources/data/labeled_lines.txt"
