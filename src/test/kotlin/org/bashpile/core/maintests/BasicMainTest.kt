@@ -5,21 +5,15 @@ import org.bashpile.core.Main
 import org.bashpile.core.Main.Companion.SHEBANG_HEADER
 import org.bashpile.core.SCRIPT_SUCCESS
 import org.bashpile.core.antlr.AstConvertingVisitor.Companion.STRICT_HEADER
-import org.bashpile.core.engine.RenderOptions.Companion.UNQUOTED
-import java.io.InputStream
-import kotlin.test.Test
-import kotlin.test.assertEquals
-import kotlin.test.assertFailsWith
-import kotlin.test.assertNotEquals
-import kotlin.test.assertTrue
+import kotlin.test.*
 
 /**
  * Tests Clikt and [Main._getBast], does not test logging.
  * See SystemTest for logger framework related tests (e.g. for `-vv` option).
  */
-class BasicMainTest {
+class BasicMainTest: MainTest() {
 
-    val fixture = Main()
+    override val testName = "BasicTest"
 
     @Test
     fun main_withoutScript_printsHelp() {
@@ -70,80 +64,78 @@ class BasicMainTest {
 
     @Test
     fun getBast_printBool_works() {
-        val script: InputStream = "print(true)".byteInputStream()
-        assertEquals(STRICT_HEADER + """
+        val render = "print(true)".createRender()
+        assertRenderEquals("""
             printf "true"
             
-            """.trimIndent(), fixture._getBast(script).render(UNQUOTED)
+            """.trimIndent(), render
         )
     }
 
     @Test
     fun getBast_printBool_withParens_works() {
-        val bpScript: InputStream = "print(((true)))".byteInputStream()
-        assertEquals(STRICT_HEADER + """
+        val render = "print(((true)))".createRender()
+        assertRenderEquals("""
             printf "true"
             
-            """.trimIndent(), fixture._getBast(bpScript).render(UNQUOTED)
+            """.trimIndent(), render
         )
     }
 
     @Test
     fun getBast_printString_tripleConcat_works() {
-        val bpScript: InputStream = """
-            print("Hello" + " " + "Bashpile!")""".trimIndent().byteInputStream()
-        assertEquals(STRICT_HEADER + """
+        val render = """
+            print("Hello" + " " + "Bashpile!")""".trimIndent().createRender()
+        assertRenderEquals("""
             printf "Hello Bashpile!"
             
-            """.trimIndent(), fixture._getBast(bpScript).render(UNQUOTED)
+            """.trimIndent(), render
         )
     }
 
     @Test
     fun getBast_printString_tripleConcat_withParen_works() {
-        val bpScript: InputStream = """
-            print((("Hello" + " " + "Bashpile!")))""".trimIndent().byteInputStream()
-        assertEquals(STRICT_HEADER + """
+        val render = """
+            print((("Hello" + " " + "Bashpile!")))""".trimIndent().createRender()
+        assertRenderEquals("""
             printf "Hello Bashpile!"
             
-            """.trimIndent(), fixture._getBast(bpScript).render(UNQUOTED)
+            """.trimIndent(), render
         )
     }
 
     @Test
     fun getBast_printString_tripleConcat_withMoreParens_works() {
-        val bpScript: InputStream = """
-            print(((("Hello" + " " + "Bashpile!" ) + "  It's " + "awesome!")))""".trimIndent().byteInputStream()
-        assertEquals(STRICT_HEADER + """
+        val render = """
+            print(((("Hello" + " " + "Bashpile!" ) + "  It's " + "awesome!")))""".trimIndent().createRender()
+        assertRenderEquals("""
             printf "Hello Bashpile!  It's awesome!"
             
-            """.trimIndent(), fixture._getBast(bpScript).render(UNQUOTED)
+            """.trimIndent(), render
         )
     }
 
     @Test
     fun getBast_printFloat_works() {
-        val bpScript: InputStream = "print(1.0)".byteInputStream()
-        assertEquals(STRICT_HEADER + """
+        val render = "print(1.0)".createRender()
+        assertRenderEquals("""
             printf "%s" "1.0"
             
-            """.trimIndent(), fixture._getBast(bpScript).render(UNQUOTED)
+            """.trimIndent(), render
         )
     }
 
     @Test
     fun getBast_printFloat_plusString_fails() {
-        val bpScript: InputStream = "print(1.0 + \" apples please\")".byteInputStream()
         assertFailsWith<UnsupportedOperationException> {
-            fixture._getBast(bpScript).render(UNQUOTED)
+            "print(1.0 + \" apples please\")".createRender()
         }
     }
 
     @Test
     fun getBast_printString_plusBool_fails() {
-        val bpScript: InputStream = "print(\"You can't handle the \" + true)".byteInputStream()
         assertFailsWith<UnsupportedOperationException> {
-            fixture._getBast(bpScript).render(UNQUOTED)
+            "print(\"You can't handle the \" + true)".createRender()
         }
     }
 }

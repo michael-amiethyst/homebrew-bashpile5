@@ -1,6 +1,6 @@
 package org.bashpile.core.bast.expressions.literals
 
-import org.bashpile.core.TypeEnum
+import org.bashpile.core.engine.TypeEnum
 import org.bashpile.core.bast.BastNode
 
 class SubshellStartTerminalBastNode : TerminalBastNode( "${'$'}{", TypeEnum.STRING), Literal {

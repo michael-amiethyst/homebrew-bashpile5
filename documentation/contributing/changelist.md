@@ -20,3 +20,4 @@
 * 0.18.1 - fixes for OSX filename, Makefile and smarter lookup of Bash startup scripts
 * 0.18.2 - Updates for Homebrew formula
 * 0.18.3 - More updates for Homebrew formula
+* 0.19.0 - Arguments and isSet/isNotSet

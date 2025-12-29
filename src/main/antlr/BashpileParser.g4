@@ -82,6 +82,7 @@ expression
     // other levels
     | shellString                       # shellStringExpression
     | looseShellString                  # looseShellStringExpression
+    | verbatimShellString               # verbatimShellStringExpression
     | Id OParen argumentList? CParen    # functionCallExpression
     | argumentsBuiltin                  # argumentsBuiltinExpression
     | ListOf (OParen CParen | OParen expression (Comma expression)* CParen)
@@ -95,7 +96,8 @@ types    : Boolean | Integer | Float | String | List | Map | Reference;
 
 // shellString, Bashpile's version of a subshell
 shellString        : HashOParen shellStringContents* CParen;
-looseShellString   : DoubleHashOParen shellStringContents* CParen;
+looseShellString   : LHashOParen shellStringContents* CParen;
+verbatimShellString: VHashOParen shellStringContents* CParen;
 shellStringContents: DollarOParen shellStringContents* CParen
                    | OParen shellStringContents* CParen
                    | ShellStringText
@@ -111,6 +113,6 @@ binaryPrimary: LessThan | LessThanOrEquals | MoreThan | MoreThanOrEquals | IsEqu
 combiningOperator: And | Or;
 
 // translates to $1, $2, etc
-argumentsBuiltin: Arguments OBracket (NumberValues | All) CBracket;
+argumentsBuiltin: Arguments OBracket (NumberValues | All | Splat) CBracket;
 
 listAccess: Id OBracket (Minus? NumberValues | All) CBracket;

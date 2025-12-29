@@ -1,9 +1,9 @@
 class Bashpile < Formula
   desc "The Bash Transpiler: Write in a modern language and run in a Bash5 shell!"
-  version "0.18.3"
+  version "0.19.0"
   homepage "https://github.com/michael-amiethyst/homebrew-core"
   license "MIT"
-  url "https://github.com/michael-amiethyst/homebrew-core", using: :git, branch: "main", tag: "0.18.3"
+  url "https://github.com/michael-amiethyst/homebrew-core", using: :git, branch: "main", tag: "0.19.0"
   head "https://github.com/michael-amiethyst/homebrew-core", using: :git, branch: "development"
 
   # foundational dependencies
@@ -11,6 +11,7 @@ class Bashpile < Formula
   depends_on "gradle@8" => :build
   depends_on "bc"
   depends_on "gnu-sed"
+  depends_on "kotlin@2"
   depends_on "openjdk@21"
   depends_on "bash"
 

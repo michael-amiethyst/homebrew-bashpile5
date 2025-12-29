@@ -1,10 +1,11 @@
 package org.bashpile.core.bast
 
 import org.bashpile.core.Main.Companion.callStack
-import org.bashpile.core.TypeEnum
-import org.bashpile.core.TypeEnum.UNKNOWN
-import org.bashpile.core.VariableTypeInfo
+import org.bashpile.core.engine.TypeEnum
+import org.bashpile.core.engine.TypeEnum.UNKNOWN
+import org.bashpile.core.engine.VariableTypeInfo
 import org.bashpile.core.antlr.AstConvertingVisitor
+import org.bashpile.core.engine.HolderNode
 import org.bashpile.core.engine.RenderOptions
 import java.util.function.Predicate
 
@@ -15,7 +16,7 @@ import java.util.function.Predicate
  * The root is created by the [AstConvertingVisitor].
  */
 abstract class BastNode(
-    protected val mutableChildren: MutableList<BastNode>,
+    private val mutableChildren: MutableList<BastNode>,
     val id: String? = null,
     /** The type at creation time (e.g. for literals).  See [callStack] for variable types. */
     private val majorType: TypeEnum = UNKNOWN
@@ -28,8 +29,6 @@ abstract class BastNode(
     val children: List<BastNode>
         // shallow copy
         get() = mutableChildren.toList()
-
-    private var mutable = false
 
     init {
         children.forEach { it.parent = this }
@@ -95,11 +94,22 @@ abstract class BastNode(
     }
 
     /** All nodes in this subtree */
-    fun all(): Set<BastNode> {
+    fun allDescendants(): Set<BastNode> {
         val childrenSet: MutableSet<BastNode> = mutableSetOf(this)
         childrenSet.addAll(children)
-        childrenSet.addAll(children.flatMap { it.all() })
+        childrenSet.addAll(children.flatMap { it.allDescendants() })
         return childrenSet
+    }
+
+    /**
+     * Like getting [children] but flattens any [HolderNode]s. It ignores [HolderNode]s in favor of their children.
+     */
+    fun immediateImportantDescendants(): List<BastNode> {
+        var ret = mutableChildren
+        while (ret.any { it is HolderNode }) {
+            ret = ret.flatMap { it.mutableChildren }.toMutableList()
+        }
+        return ret
     }
 
     /** Returns true if any node in this subtree matches [condition] */
@@ -107,22 +117,8 @@ abstract class BastNode(
         return condition.test(this) || children.filter { it.any(condition) }.isNotEmpty()
     }
 
-    // mutation related methods
-
-    /** Makes this node mutable */
-    fun thaw(): BastNode {
-        mutable = true
-        return this
-    }
-
-    fun freeze(): BastNode {
-        mutable = false
-        return this
-    }
-
     /** Mutates the children list of parent */
-    fun replaceWith(replacement: BastNode): BastNode {
-        check (mutable) { "Cannot use mutating call on frozen node, call thaw() first" }
+    fun mutatingReplaceWith(replacement: BastNode): BastNode {
         check (parent != null) { "Cannot be called on root node" }
 
         replacement.parent = parent
@@ -132,7 +128,15 @@ abstract class BastNode(
         return parent!!
     }
 
+    fun mutatingAddBefore(toAdd: BastNode) {
+        require(this.parent != null)
+        val index = this.parent!!.children.indexOf(this)
+        this.parent!!.mutableChildren.add(index, toAdd)
+    }
+
+    ///////////////////////
     // extension methods
+    //////////////////////
 
     /** .trimIndent fails with $childRenders so we need to munge whitespace manually */
     protected fun String.trimScriptIndent(trim: String) = this.lines().filter { it.isNotBlank() }.map {
