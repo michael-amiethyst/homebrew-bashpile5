@@ -15,7 +15,6 @@ import org.bashpile.core.engine.TypeEnum.UNKNOWN
 import org.bashpile.core.bast.expressions.VariableReferenceBastNode
 import org.bashpile.core.bast.statements.StatementBastNode
 import org.bashpile.core.engine.Subshell
-import kotlin.math.max
 
 
 /**
@@ -70,17 +69,19 @@ class FinishedBastFactory {
     @VisibleForTesting
     internal fun BastNode.unnestSubshells(): BastNode {
         var unnestedCount = 0
+        // forEach runs serially so mutating operations are OK
         this.nestedSubshells().forEach { nestedSubshell ->
             val id = "__bp_var${unnestedCount++}"
             nestedSubshell.mutatingReplaceWith(VariableReferenceBastNode(id, UNKNOWN))
             val decl = VariableDeclarationBastNode(id, UNKNOWN,
                     child = ShellStringBastNode(nestedSubshell.children))
             // insertVariableDeclaration(nestedSubshell.closestParentStatementIndex - 1)
-            nestedSubshell.parents().first { it is StatementBastNode }.addBefore(decl)
+            nestedSubshell.parents().first { it is StatementBastNode }.mutatingAddBefore(decl)
         }
         return this
     }
 
+    /** Gets all descendants that are subshells in subshells */
     private fun BastNode.nestedSubshells(): List<BastNode> {
         return this.allDescendants().filter {
             it is Subshell && it !is ArithmeticBastNode // Arithmetic nodes render correctly if nested
@@ -89,10 +90,9 @@ class FinishedBastFactory {
         }
     }
 
-    private fun BastNode.addBefore(toAdd: BastNode) {
+    private fun BastNode.mutatingAddBefore(toAdd: BastNode) {
         require(this.parent != null)
-        val thisIndex = this.parent!!.children.indexOf(this)
-        val index = max(thisIndex - 1, 0)
+        val index = this.parent!!.children.indexOf(this)
         this.parent!!.mutableChildren.add(index, toAdd)
     }
 
