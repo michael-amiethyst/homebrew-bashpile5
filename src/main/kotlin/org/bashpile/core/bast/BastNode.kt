@@ -16,8 +16,7 @@ import java.util.function.Predicate
  * The root is created by the [AstConvertingVisitor].
  */
 abstract class BastNode(
-    // TODO encapsulate again
-    public val mutableChildren: MutableList<BastNode>,
+    private val mutableChildren: MutableList<BastNode>,
     val id: String? = null,
     /** The type at creation time (e.g. for literals).  See [callStack] for variable types. */
     private val majorType: TypeEnum = UNKNOWN
@@ -127,6 +126,12 @@ abstract class BastNode(
         val myGeneration = parent!!.mutableChildren
         myGeneration[myGeneration.indexOf(this)] = replacement
         return parent!!
+    }
+
+    fun mutatingAddBefore(toAdd: BastNode) {
+        require(this.parent != null)
+        val index = this.parent!!.children.indexOf(this)
+        this.parent!!.mutableChildren.add(index, toAdd)
     }
 
     ///////////////////////

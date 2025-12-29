@@ -90,12 +90,7 @@ class FinishedBastFactory {
         }
     }
 
-    private fun BastNode.mutatingAddBefore(toAdd: BastNode) {
-        require(this.parent != null)
-        val index = this.parent!!.children.indexOf(this)
-        this.parent!!.mutableChildren.add(index, toAdd)
-    }
-
+    // TODO 0.20.0 - fold this logic into LooseShellStringBastNode.render?
     /** @return A loosened version of the input tree */
     private fun BastNode.loosenShellStrings(): BastNode {
         // no recursion
