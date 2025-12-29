@@ -291,7 +291,7 @@ class LoopsMainTest : MainTest() {
             """.trimIndent().createRender()
         assertRenderEquals(
             """
-            cat "src/test/resources/data/labeled_lines.txt" | gsed -e 's/\r//g' | gsed -ze '/\n$/!s/$/\n$/g' | while IFS='' read -r line; do
+            cat "src/test/resources/data/labeled_lines.txt" | $sed -e 's/\r//g' | $sed -ze '/\n$/!s/$/\n$/g' | while IFS='' read -r line; do
                 declare __bp_var0
                 __bp_var0="$(printf '.')"
                 printf "$(ls ${'$'}{__bp_var0})"
