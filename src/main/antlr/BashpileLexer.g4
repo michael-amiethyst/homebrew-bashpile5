@@ -44,6 +44,7 @@ Case     : 'case';
 Pass     : 'pass';
 Arguments: 'arguments';
 All      : 'all';
+Splat    : 'splat';
 Exported : 'exported';
 Readonly : 'readonly';
 ListOf   : 'listOf';
@@ -131,16 +132,15 @@ StringEscapeSequence: '\\' . | '\\' Newline;
 
 // tokens for modes
 
-DoubleHashOParen : '##(' -> pushMode(SHELL_STRING);
-HashOParen       : '#(' -> pushMode(SHELL_STRING);
-DollarOParen     : '$(' -> pushMode(SHELL_STRING);
+LHashOParen  : 'l#(' -> pushMode(SHELL_STRING);
+VHashOParen  : 'v#(' -> pushMode(SHELL_STRING);
+HashOParen   : '#(' -> pushMode(SHELL_STRING);
+DollarOParen : '$(' -> pushMode(SHELL_STRING);
 
 // modes
 
 /** See https://github.com/sepp2k/antlr4-string-interpolation-examples/blob/master/with-duplication/StringLexer.g4 */
 mode SHELL_STRING;
-ShellStringDoubleHashOParen : '##(' -> type(DoubleHashOParen), pushMode(SHELL_STRING);
-ShellStringHashOParen    : '#(' -> type(HashOParen), pushMode(SHELL_STRING);
 ShellStringDollarOParen  : '$(' -> type(DollarOParen), pushMode(SHELL_STRING);
 ShellStringOParen        : '(' -> type(OParen), pushMode(SHELL_STRING);
 ShellStringText          : (~[\\\f()#$]

@@ -1,19 +1,21 @@
-package org.bashpile.core.bast.expressions
+package org.bashpile.core.bast.expressions.arithmetic
 
 import org.bashpile.core.bast.BastNode
-import org.bashpile.core.Subshell
-import org.bashpile.core.TypeEnum
 import org.bashpile.core.engine.RenderOptions
+import org.bashpile.core.engine.RenderOptions.Companion.ARITHMETIC
+import org.bashpile.core.engine.Subshell
+import org.bashpile.core.engine.TypeEnum.FLOAT
 
+/** See [IntegerArithmeticBastNode]. */
 class FloatArithmeticBastNode(children: List<BastNode> = listOf())
-    : ArithmeticBastNode(children, majorType = TypeEnum.FLOAT), Subshell {
-
+    : ArithmeticBastNode(children, majorType = FLOAT), Subshell
+{
     constructor(vararg child: BastNode) : this(child.toList())
 
     override fun render(options: RenderOptions): String {
+        val childRenders = children.map { it.render(ARITHMETIC) }.joinToString(" ")
+        val bcSubshell = if (!options.arithmeticContext) { "$(bc -l <<< \"$childRenders\")" } else { childRenders }
         // output of `bc` may have spaces
-        val childRenders = children.map { it.render(RenderOptions.UNQUOTED) }.joinToString(" ")
-        val bcSubshell = "$(bc -l <<< \"$childRenders\")"
         return if (options.quoted) { "\"$bcSubshell\"" } else { bcSubshell }
     }
 

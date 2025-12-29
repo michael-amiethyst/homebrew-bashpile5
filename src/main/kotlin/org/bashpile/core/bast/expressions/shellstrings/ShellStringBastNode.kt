@@ -1,11 +1,11 @@
-package org.bashpile.core.bast.expressions
+package org.bashpile.core.bast.expressions.shellstrings
 
 import org.bashpile.core.bast.BastNode
-import org.bashpile.core.Subshell
-import org.bashpile.core.TypeEnum
-import org.bashpile.core.TypeEnum.STRING
 import org.bashpile.core.bast.expressions.literals.TerminalBastNode
 import org.bashpile.core.engine.RenderOptions
+import org.bashpile.core.engine.Subshell
+import org.bashpile.core.engine.TypeEnum
+import org.bashpile.core.engine.TypeEnum.STRING
 
 /**
  * A Shell String is the Bashpile equivalent of a Bash subshell (i.e., $() syntax).  It represents an expression.
@@ -17,7 +17,7 @@ open class ShellStringBastNode(children: List<BastNode> = listOf(), majorType: T
     constructor(contents: String) : this(TerminalBastNode(contents, STRING).asList())
 
     override fun render(options: RenderOptions): String {
-        val childRenders = children.map { it.render(RenderOptions.UNQUOTED) }.joinToString("")
+        val childRenders = children.map { it.render(options) }.joinToString("")
         val subshell = if (options.ignoreOutput) {
             "($childRenders) >/dev/null 2>&1"
         } else { "$($childRenders)" }

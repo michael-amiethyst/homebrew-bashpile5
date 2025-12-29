@@ -1,10 +1,10 @@
 package org.bashpile.core.bast.expressions
 
-import org.bashpile.core.TypeEnum
 import org.bashpile.core.bast.BastNode
 import org.bashpile.core.engine.RenderOptions
 import org.bashpile.core.engine.RenderOptions.Companion.QUOTED
 import org.bashpile.core.engine.RenderOptions.Companion.UNQUOTED
+import org.bashpile.core.engine.TypeEnum
 
 /** See also [UnaryPrimaryBastNode] */
 class BinaryPrimaryBastNode(val left: BastNode, operator: String, val right: BastNode)

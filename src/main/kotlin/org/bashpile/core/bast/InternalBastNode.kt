@@ -1,7 +1,8 @@
 package org.bashpile.core.bast
 
-import org.bashpile.core.TypeEnum
-import org.bashpile.core.TypeEnum.UNKNOWN
+import org.bashpile.core.engine.HolderNode
+import org.bashpile.core.engine.TypeEnum
+import org.bashpile.core.engine.TypeEnum.UNKNOWN
 import org.bashpile.core.engine.RenderOptions
 
 
@@ -12,7 +13,7 @@ import org.bashpile.core.engine.RenderOptions
  */
 class InternalBastNode(
     children: List<BastNode> = listOf(), majorType: TypeEnum = UNKNOWN, val renderSeparator: String = "")
-    : BastNode(children.toMutableList(), majorType = majorType)
+    : BastNode(children.toMutableList(), majorType = majorType), HolderNode
 {
     /** Convenience constructor */
     constructor(vararg children: BastNode) : this(children.toList())

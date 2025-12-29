@@ -3,7 +3,7 @@ package org.bashpile.core.bast.statements
 import org.bashpile.core.Main.Companion.callStack
 import org.bashpile.core.SCRIPT_SUCCESS
 import org.bashpile.core.bast.BastNode
-import org.bashpile.core.TypeEnum.EMPTY
+import org.bashpile.core.engine.TypeEnum.EMPTY
 import org.bashpile.core.bast.expressions.VariableReferenceBastNode
 import org.bashpile.core.engine.RenderOptions
 import org.bashpile.core.runCommand
@@ -30,7 +30,7 @@ class ForeachFileLineLoopBashNode(
     }
 
     override fun replaceChildren(nextChildren: List<BastNode>): ForeachFileLineLoopBashNode {
-        return ForeachFileLineLoopBashNode(children.map { it.deepCopy() }, doubleQuotedFilepath, columns)
+        return ForeachFileLineLoopBashNode(nextChildren.map { it.deepCopy() }, doubleQuotedFilepath, columns)
     }
 
     override fun render(options: RenderOptions): String {

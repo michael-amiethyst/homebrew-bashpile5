@@ -68,6 +68,16 @@ Prerequisite: don't have the Homebrew version installed.  Run `brew uninstall ba
   * `one: string = "1"`
   * `(one as integer) + 1`
 * `varName = "reassign"` [reassignment statements](statements/reassignment-statements.md)
+* Subshells (`$()` syntax) are called [shell strings](expressions/shell-strings.md) and use a `#()` syntax
+  * To just pass inline Bash (similar to inline assembly in C/C++) use a verbatim shell string with `v#()` syntax
 * Automatic [strict mode](features/strict-mode.md) handling
-  * Opt out (e.g. for a 3rd party script) with `##(command line)` syntax
+  * This adds `set -euo pipefail` at the top of the file -- this makes the script fail fast in many ways
+  * Opt out (e.g. for a 3rd party script) with `l#(command line)` syntax (the l stands for loose)
 * [If-else if-else statements](statements/if-statements.md)
+* Argument handling
+  * `arguments[1]` -> `$1`
+  * `arguments[all]` -> `$@`
+    * Note that Bash treats $@ as a list, so print(arguments[all]) only prints the first argument
+  * `arguments[splat]` -> `$*`
+    * `print(arguments[splat])` prints all arguments as one would expect
+    * By default it will separate with a space, to change set IFS (e.g. set to a linebreak with `l#(IFS="\n")`)
