@@ -11,7 +11,7 @@ class Bashpile < Formula
   depends_on "gradle@8" => :build
   depends_on "bc"
   depends_on "gnu-sed"
-  depends_on "kotlin@2"
+  depends_on "kotlin"
   depends_on "openjdk@21"
   depends_on "bash"
 
