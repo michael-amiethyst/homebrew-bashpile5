@@ -19,7 +19,7 @@ class Bashpile < Formula
   # depends_on "gnu-getopt" # needed for OSX and FreeBSD, kept as generic dependency for consistency
 
   def install
-    system "./gradlew clean build -x test -x integrationTest -x nativeCompile"
+    system "./gradlew clean build -x test -x integrationTest -x nativeCompile --stacktrace"
     bin.install "build/bashpile"
   end
 
