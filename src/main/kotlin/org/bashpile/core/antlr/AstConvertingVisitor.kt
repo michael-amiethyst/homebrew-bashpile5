@@ -249,11 +249,17 @@ class AstConvertingVisitor: BashpileParserBaseVisitor<BastNode>() {
         val isNestedSubshell = bastChildren.size == 3
                 && bastChildren[0] is SubshellStartTerminalBastNode
                 && bastChildren[2] is ClosingParenthesisTerminalBastNode
+        // check for $(()) syntax
+        val isArithmatic = isNestedSubshell && bastChildren[1].children.size == 3
+                && bastChildren[1].children[0] is OpeningParenthesisTerminalBastNode
+                && bastChildren[1].children[2] is ClosingParenthesisTerminalBastNode
         return if (bastChildren.size == 1) {
             bastChildren[0]
+        } else if (isArithmatic) {
+            IntegerArithmeticBastNode(bastChildren[1])
         } else if (isNestedSubshell) {
             // middle child only
-            ShellStringBastNode(bastChildren.subList(1, 2))
+            ShellStringBastNode(bastChildren[1])
         } else {
             InternalBastNode(bastChildren)
         }
@@ -267,6 +273,7 @@ class AstConvertingVisitor: BashpileParserBaseVisitor<BastNode>() {
     override fun visitTerminal(node: TerminalNode): BastNode {
         return when (node.typeIndex()) {
             BashpileLexer.DollarOParen -> SubshellStartTerminalBastNode()
+            BashpileLexer.OParen -> OpeningParenthesisTerminalBastNode()
             BashpileLexer.CParen -> ClosingParenthesisTerminalBastNode()
             else -> TerminalBastNode(
                 node.text.replace("^newline$".toRegex(), "\n"),

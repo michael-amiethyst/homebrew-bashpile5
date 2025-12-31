@@ -14,6 +14,7 @@ import org.bashpile.core.engine.TypeEnum.STRING
 open class ShellStringBastNode(children: List<BastNode> = listOf(), majorType: TypeEnum = STRING)
     : BastNode(children.toMutableList(), majorType = majorType), Subshell
 {
+    constructor(vararg child: BastNode) : this(child.toList())
     constructor(contents: String) : this(TerminalBastNode(contents, STRING).asList())
 
     override fun render(options: RenderOptions): String {

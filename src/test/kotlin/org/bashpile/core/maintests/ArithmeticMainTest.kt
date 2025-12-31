@@ -180,19 +180,16 @@ class ArithmeticMainTest : MainTest() {
                 i: integer = 0
                 print( #($((${'$'}i))) as integer + 1)
                 print(i)""".trimIndent().createRender()
-        // TODO 0.20.0 -- unnest shouldn't "see" arithmatic
         assertRenderEquals(
             """
                 declare i
                 i=0
-                declare __bp_var0
-                __bp_var0="$((${'$'}i))"
-                printf "%s" "$(($(__bp_var0) + 1))"
+                printf "%s" "$(($((${'$'}i)) + 1))"
                 printf "%s" "${'$'}{i}"
 
             """.trimIndent(), render
         )
-        render.assertRenderProduces(test = {it.endsWith("10\n")})
+        render.assertRenderProduces("10\n")
     }
 
     @Test
