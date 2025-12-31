@@ -41,17 +41,21 @@ class ForeachFileLineLoopBashNode(
                 callStack.addVariableInfo(it.id!!, it.majorType(), EMPTY, readonly = true)
             }
 
-            val columnNamesJoined = columns.map { it.id }.joinToString(" ")
+            val lineVariableName = if (columns.size > 1) { "__bp_line" } else { columns[0].id!! }
+            val setLoopVariables = if (columns.size > 1) {
+                columns.mapIndexed { i, it -> """
+                    ${it.id}=$(printf "%s" "${'$'}__bp_line" | gawk --csv '{print $${i + 1}}');""".trimIndent()
+                }.joinToString(prefix = "    ", separator = " ", postfix = "\n")
+            } else { "" }
             val childRenderList = children.map { child ->
                 child.render(RenderOptions.UNQUOTED).lines().filter { it.isNotBlank() }.map {
                     "    $it"
                 }.joinToString("\n", postfix = "\n")
             }
             val childRenders = childRenderList.joinToString("").removeSuffix("\n")
-            val ifs = if (doubleQuotedFilepath.endsWith(".csv\"")) "," else ""
             return """
-                cat $doubleQuotedFilepath | ${mungeStream()} | while IFS='$ifs' read -r $columnNamesJoined; do
-                $childRenders
+                cat $doubleQuotedFilepath | ${mungeStream()} | while IFS='' read -r $lineVariableName; do
+                $setLoopVariables$childRenders
                 done
     
             """.trimScriptIndent("                ")
@@ -60,9 +64,10 @@ class ForeachFileLineLoopBashNode(
 
     private fun mungeStream(): String {
         // 1 (line) delete
-        val skipFirstLine = if (doubleQuotedFilepath.endsWith(".csv\"")) "-e '1d' " else ""
-        // remove all '\r'
-        val convertWindowsLineEndings = "-e 's/\\r//g'"
+        val skipFirstLine = if (columns.size > 1) "-e '1d' " else ""
+
+        // Convert '\r\n' to '\n'
+        val convertWindowsLineEndings = "-e 's/\\r\\n/\\n/g'"
 
         // -z causes '$' to means EOF, not end of line.
         // for files that do not end with a newline ('/\n$/!s') replace EOF with \n EOF

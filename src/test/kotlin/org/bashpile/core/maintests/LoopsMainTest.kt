@@ -4,7 +4,6 @@ import org.bashpile.core.bast.statements.ForeachFileLineLoopBashNode.Companion.s
 import kotlin.test.Test
 import kotlin.test.assertFailsWith
 
-// TODO 0.20.0 - replace 'read' CSV parsing with read going by line and then using something like: NAME=$(echo "$line" | gawk --csv '{print $1}')
 class LoopsMainTest : MainTest() {
 
     override val testName = "LoopsTest"
@@ -14,19 +13,20 @@ class LoopsMainTest : MainTest() {
         val renderedBash = """
             for(first: string, last: string, email: string, phone: string in "src/test/resources/data/example.csv"):
                 print(first + " " + last + " " + email + " " + phone + "\n")
-            """.trimIndent().createRender()
-        assertRenderEquals("""
-            cat "src/test/resources/data/example.csv" | $sed -e '1d' -e 's/\r//g' | $sed -ze '/\n$/!s/$/\n$/g' | while IFS=',' read -r first last email phone; do
+        """.trimIndent().createRender()
+        assertRenderEquals(
+            """
+            cat "src/test/resources/data/example.csv" | $sed -e '1d' -e 's/\r\n/\n/g' | $sed -ze '/\n$/!s/$/\n$/g' | while IFS='' read -r __bp_line; do
+                first=$(printf "%s" "${'$'}__bp_line" | gawk --csv '{print $1}'); last=$(printf "%s" "${'$'}__bp_line" | gawk --csv '{print $2}'); email=$(printf "%s" "${'$'}__bp_line" | gawk --csv '{print $3}'); phone=$(printf "%s" "${'$'}__bp_line" | gawk --csv '{print $4}');
                 printf "${'$'}{first} ${'$'}{last} ${'$'}{email} ${'$'}{phone}\n"
             done
             
-            """.trimIndent(), renderedBash
-        ).assertRenderProduces("""
+        """.trimIndent(), renderedBash).assertRenderProduces("""
             Alice Smith alice.smith@email.com 555-1234
             Bob Johnson bob.j@email.com 555-5678
             Charlie Williams c.williams@email.com 555-9012
             
-            """.trimIndent()
+        """.trimIndent()
         )
     }
 
@@ -44,13 +44,14 @@ class LoopsMainTest : MainTest() {
                 print("Updating phone # " + cellShort + " with values: lastName " + lastName + " cell " + cell + ".\n")
                 print("{ \"cellShort\": ${'$'}cellShort, \"lastName\": \"${'$'}lastName\" \"cell\": \"${'$'}cell\", " + \
                     "\"regionId\": \"${'$'}regionId\" }\n")
-            """.trimIndent().createRender()
+        """.trimIndent().createRender()
         assertRenderEquals("""
             declare -x HOST
             HOST="HOST_NAME"
             declare -x TOKEN
             TOKEN="OAUTH_TOKEN"
-            cat "src/test/resources/data/example_extended.csv" | $sed -e '1d' -e 's/\r//g' | $sed -ze '/\n$/!s/$/\n$/g' | while IFS=',' read -r firstName middleName lastName email landline cell; do
+            cat "src/test/resources/data/example_extended.csv" | $sed -e '1d' -e 's/\r\n/\n/g' | $sed -ze '/\n$/!s/$/\n$/g' | while IFS='' read -r __bp_line; do
+                firstName=$(printf "%s" "${'$'}__bp_line" | gawk --csv '{print $1}'); middleName=$(printf "%s" "${'$'}__bp_line" | gawk --csv '{print $2}'); lastName=$(printf "%s" "${'$'}__bp_line" | gawk --csv '{print $3}'); email=$(printf "%s" "${'$'}__bp_line" | gawk --csv '{print $4}'); landline=$(printf "%s" "${'$'}__bp_line" | gawk --csv '{print $5}'); cell=$(printf "%s" "${'$'}__bp_line" | gawk --csv '{print $6}');
                 declare -x cellShort
                 cellShort="$(printf "${'$'}cell" | cut -d " " -f 2)"
                 declare -x regionId
@@ -59,8 +60,7 @@ class LoopsMainTest : MainTest() {
                 printf "{ \"cellShort\": ${'$'}cellShort, \"lastName\": \"${'$'}lastName\" \"cell\": \"${'$'}cell\", \"regionId\": \"${'$'}regionId\" }\n"
             done
             
-            """.trimIndent(), renderedBash
-        ).assertRenderProduces("""
+        """.trimIndent(), renderedBash).assertRenderProduces("""
             Updating phone # 555-1235 with values: lastName Smith cell (555) 555-1235.
             { "cellShort": 555-1235, "lastName": "Smith" "cell": "(555) 555-1235", "regionId": "13" }
             Updating phone # 555-5679 with values: lastName Johnson cell (555) 555-5679.
@@ -68,7 +68,7 @@ class LoopsMainTest : MainTest() {
             Updating phone # 555-1701 with values: lastName Williams cell (555) 555-1701.
             { "cellShort": 555-1701, "lastName": "Williams" "cell": "(555) 555-1701", "regionId": "13" }
 
-            """.trimIndent()
+        """.trimIndent()
         )
     }
 
@@ -85,13 +85,14 @@ class LoopsMainTest : MainTest() {
                 regionId: exported integer = 13
                 print("Updating phone # " + cellShort + " with values: lastName " + lastName + " cell " + cell + ".\n")
                 print("{ \"cellShort\": ${'$'}cellShort, \"lastName\": \"${'$'}lastName\" \"cell\": \"${'$'}cell\", \"regionId\": \"${'$'}regionId\" }\n")
-            """.trimIndent().createRender()
+        """.trimIndent().createRender()
         assertRenderEquals("""
             declare -x HOST
             HOST="HOST_NAME"
             declare -x TOKEN
             TOKEN="OAUTH_TOKEN"
-            cat "src/test/resources/data/example_extended.csv" | $sed -e '1d' -e 's/\r//g' | $sed -ze '/\n$/!s/$/\n$/g' | while IFS=',' read -r firstName middleName lastName email landline cell; do
+            cat "src/test/resources/data/example_extended.csv" | $sed -e '1d' -e 's/\r\n/\n/g' | $sed -ze '/\n$/!s/$/\n$/g' | while IFS='' read -r __bp_line; do
+                firstName=$(printf "%s" "${'$'}__bp_line" | gawk --csv '{print $1}'); middleName=$(printf "%s" "${'$'}__bp_line" | gawk --csv '{print $2}'); lastName=$(printf "%s" "${'$'}__bp_line" | gawk --csv '{print $3}'); email=$(printf "%s" "${'$'}__bp_line" | gawk --csv '{print $4}'); landline=$(printf "%s" "${'$'}__bp_line" | gawk --csv '{print $5}'); cell=$(printf "%s" "${'$'}__bp_line" | gawk --csv '{print $6}');
                 declare -x cellShort
                 cellShort="$(printf "${'$'}cell" | cut -d " " -f 2)"
                 declare -x regionId
@@ -100,8 +101,7 @@ class LoopsMainTest : MainTest() {
                 printf "{ \"cellShort\": ${'$'}cellShort, \"lastName\": \"${'$'}lastName\" \"cell\": \"${'$'}cell\", \"regionId\": \"${'$'}regionId\" }\n"
             done
             
-            """.trimIndent(), renderedBash
-        ).assertRenderProduces("""
+        """.trimIndent(), renderedBash).assertRenderProduces("""
             Updating phone # 555-1235 with values: lastName Smith cell (555) 555-1235.
             { "cellShort": 555-1235, "lastName": "Smith" "cell": "(555) 555-1235", "regionId": "13" }
             Updating phone # 555-5679 with values: lastName Johnson cell (555) 555-5679.
@@ -109,7 +109,7 @@ class LoopsMainTest : MainTest() {
             Updating phone # 555-1701 with values: lastName Williams cell (555) 555-1701.
             { "cellShort": 555-1701, "lastName": "Williams" "cell": "(555) 555-1701", "regionId": "13" }
 
-            """.trimIndent()
+        """.trimIndent()
         )
     }
 
@@ -132,7 +132,8 @@ class LoopsMainTest : MainTest() {
             HOST="HOST_NAME"
             declare -x TOKEN
             TOKEN="OAUTH_TOKEN"
-            cat "src/test/resources/data/example_extended_windows_line_endings.csv" | $sed -e '1d' -e 's/\r//g' | $sed -ze '/\n$/!s/$/\n$/g' | while IFS=',' read -r firstName middleName lastName email landline cell; do
+            cat "src/test/resources/data/example_extended_windows_line_endings.csv" | $sed -e '1d' -e 's/\r\n/\n/g' | $sed -ze '/\n$/!s/$/\n$/g' | while IFS='' read -r __bp_line; do
+                firstName=$(printf "%s" "${'$'}__bp_line" | gawk --csv '{print $1}'); middleName=$(printf "%s" "${'$'}__bp_line" | gawk --csv '{print $2}'); lastName=$(printf "%s" "${'$'}__bp_line" | gawk --csv '{print $3}'); email=$(printf "%s" "${'$'}__bp_line" | gawk --csv '{print $4}'); landline=$(printf "%s" "${'$'}__bp_line" | gawk --csv '{print $5}'); cell=$(printf "%s" "${'$'}__bp_line" | gawk --csv '{print $6}');
                 declare -x cellShort
                 cellShort="$(printf "${'$'}cell" | cut -d " " -f 2)"
                 declare -x regionId
@@ -141,8 +142,7 @@ class LoopsMainTest : MainTest() {
                 printf "{ \"cellShort\": ${'$'}cellShort, \"lastName\": \"${'$'}lastName\" \"cell\": \"${'$'}cell\", \"regionId\": \"${'$'}regionId\" }\n"
             done
             
-            """.trimIndent(), renderedBash
-        ).assertRenderProduces("""
+        """.trimIndent(), renderedBash).assertRenderProduces("""
             Updating phone # 555-1235 with values: lastName Smith cell (555) 555-1235.
             { "cellShort": 555-1235, "lastName": "Smith" "cell": "(555) 555-1235", "regionId": "13" }
             Updating phone # 555-5679 with values: lastName Johnson cell (555) 555-5679.
@@ -150,7 +150,7 @@ class LoopsMainTest : MainTest() {
             Updating phone # 555-1701 with values: lastName Williams cell (555) 555-1701.
             { "cellShort": 555-1701, "lastName": "Williams" "cell": "(555) 555-1701", "regionId": "13" }
 
-            """.trimIndent()
+        """.trimIndent()
         )
     }
 
@@ -162,12 +162,11 @@ class LoopsMainTest : MainTest() {
                 print(line + "\n")
         """.trimIndent().createRender()
         assertRenderEquals("""
-            cat "$filename" | $sed -e 's/\r//g' | $sed -ze '/\n$/!s/$/\n$/g' | while IFS='' read -r line; do
+            cat "$filename" | $sed -e 's/\r\n/\n/g' | $sed -ze '/\n$/!s/$/\n$/g' | while IFS='' read -r line; do
                 printf "${'$'}{line}\n"
             done
             
-            """.trimIndent(), renderedBash
-        ).assertRenderProduces("""
+        """.trimIndent(), renderedBash).assertRenderProduces("""
             lorum
             ipsum
 
@@ -176,19 +175,18 @@ class LoopsMainTest : MainTest() {
     }
 
     @Test
-    fun foreach_fileLine_non_csv_no_trailing_newline_works() {
+    fun foreach_fileLine_no_trailing_newline_works() {
         val filename = "src/test/resources/data/plain_no_trailing_newline.txt"
         val renderedBash = """
             for(line: string in "$filename"):
                 print(line + "\n")
-            """.trimIndent().createRender()
+        """.trimIndent().createRender()
         assertRenderEquals("""
-            cat "$filename" | $sed -e 's/\r//g' | $sed -ze '/\n$/!s/$/\n$/g' | while IFS='' read -r line; do
+            cat "$filename" | $sed -e 's/\r\n/\n/g' | $sed -ze '/\n$/!s/$/\n$/g' | while IFS='' read -r line; do
                 printf "${'$'}{line}\n"
             done
             
-            """.trimIndent(), renderedBash
-        ).assertRenderProduces("""
+        """.trimIndent(), renderedBash).assertRenderProduces("""
             lorum
             ipsum
 
@@ -204,7 +202,7 @@ class LoopsMainTest : MainTest() {
                     scoped: string = "Hello World"
                     print(line + "\n")
                 print(scoped + "\n")
-                """.trimIndent().createRender()
+            """.trimIndent().createRender()
         }
     }
 
@@ -215,11 +213,11 @@ class LoopsMainTest : MainTest() {
             outerScope: string = "Hello Mars"
             for(line: string in "$filename"):
                 print(outerScope + "\n")
-            """.trimIndent().createRender().assertRenderProduces("""
-                Hello Mars
-                Hello Mars
+        """.trimIndent().createRender().assertRenderProduces("""
+            Hello Mars
+            Hello Mars
 
-                """.trimIndent()
+        """.trimIndent()
             )
     }
 
@@ -230,11 +228,11 @@ class LoopsMainTest : MainTest() {
             line: string = "Who's line is it Anyway?"
             for(line: string in "$filename"):
                 print(line + "\n")
-            """.trimIndent().createRender().assertRenderProduces("""
-                lorum
-                ipsum
+        """.trimIndent().createRender().assertRenderProduces("""
+            lorum
+            ipsum
 
-                """.trimIndent()
+        """.trimIndent()
             )
     }
 
@@ -248,15 +246,15 @@ class LoopsMainTest : MainTest() {
                 print(line + "\n")
                 for(line2: string in "$innerFilename"):
                     print(line2 + "\n")
-            """.trimIndent().createRender().assertRenderProduces("""
-                row1
-                lorum
-                ipsum
-                row2
-                lorum
-                ipsum
+        """.trimIndent().createRender().assertRenderProduces("""
+            row1
+            lorum
+            ipsum
+            row2
+            lorum
+            ipsum
 
-                """.trimIndent()
+        """.trimIndent()
             )
     }
 
@@ -270,15 +268,15 @@ class LoopsMainTest : MainTest() {
                 print(line + "\n")
                 for(line: string in "$innerFilename"):
                     print(line + "\n")
-            """.trimIndent().createRender().assertRenderProduces("""
-                row1
-                lorum
-                ipsum
-                row2
-                lorum
-                ipsum
+        """.trimIndent().createRender().assertRenderProduces("""
+            row1
+            lorum
+            ipsum
+            row2
+            lorum
+            ipsum
 
-                """.trimIndent()
+        """.trimIndent()
             )
     }
 
@@ -294,7 +292,7 @@ class LoopsMainTest : MainTest() {
             """.trimIndent().createRender()
         assertRenderEquals(
             """
-            cat "src/test/resources/data/labeled_lines.txt" | $sed -e 's/\r//g' | $sed -ze '/\n$/!s/$/\n$/g' | while IFS='' read -r line; do
+            cat "src/test/resources/data/labeled_lines.txt" | $sed -e 's/\r\n/\n/g' | $sed -ze '/\n$/!s/$/\n$/g' | while IFS='' read -r line; do
                 declare __bp_var0
                 __bp_var0="$(printf '.')"
                 printf "$(ls ${'$'}{__bp_var0})"
