@@ -36,7 +36,6 @@ class FinishedBastFactory {
     : String {
         if (parentNodeName.isEmpty()) {
             // initial case
-            mermaidNodeIds.clear()
             return "graph TD;" + mermaidGraph("root")
         } else {
             // terminating cose: no children
@@ -46,7 +45,7 @@ class FinishedBastFactory {
                 val nodeId = mermaidNodeIds.getOrDefault(nodeTypeName, Integer.valueOf(0))
                 val nodeName = nodeTypeName + nodeId
                 mermaidNodeIds[nodeTypeName] = nodeId + 1
-                mermaid += "$parentNodeName --> $nodeName;${child.mermaidGraph(nodeName)}"
+                mermaid += "$parentNodeName --> $nodeName;${child.mermaidGraph(nodeName, mermaidNodeIds)}"
             }
             return mermaid
         }
