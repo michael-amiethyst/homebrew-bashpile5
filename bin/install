@@ -4,8 +4,6 @@
 # There should be a soft link from $HOMEBREW_CELLAR/bashpile-local to your project root
 #
 
-# TODO 0.20.0 -- rewrite as Bashpile program.  Take arguments for head and verbose
-
 # uninstall
 brew uninstall bashpile || true
 

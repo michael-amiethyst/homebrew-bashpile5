@@ -280,25 +280,67 @@ class LoopsMainTest : MainTest() {
             )
     }
 
-    // TODO 0.20.0 - write test with nested Subshells in an inner for-for loop (double nested)
     // TODO 0.20.0 - write test with multiple nested Subshells in an inner for-for loop (double nested)
     @Test
     fun foreach_fileLine_withNestedSubshells_works() {
-        val outerFilename = "src/test/resources/data/labeled_lines.txt"
+        val outerFilename = "labeled_lines.txt"
         val render = """
+            cd src/test/resources/data
             for(line: string in "$outerFilename"):
-                print(#(ls $(printf '.')))
+                print(#(ls -m $(printf '.')) + "\n")
                 
             """.trimIndent().createRender()
         assertRenderEquals(
             """
-            cat "src/test/resources/data/labeled_lines.txt" | $sed -e 's/\r\n/\n/g' | $sed -ze '/\n$/!s/$/\n$/g' | while IFS='' read -r line; do
+            cd src/test/resources/data
+            cat "labeled_lines.txt" | $sed -e 's/\r\n/\n/g' | $sed -ze '/\n$/!s/$/\n$/g' | while IFS='' read -r line; do
                 declare __bp_var0
                 __bp_var0="$(printf '.')"
-                printf "$(ls ${'$'}{__bp_var0})"
+                printf "$(ls -m ${'$'}{__bp_var0})\n"
             done
             
             """.trimIndent(), render
-        ).assertRenderProduces({ it.contains("src") })
+        ).assertRenderProduces(
+            """
+            example.csv, example_extended.csv, example_extended_windows_line_endings.csv, 
+            labeled_lines.txt, plain.txt, plain_no_trailing_newline.txt
+            example.csv, example_extended.csv, example_extended_windows_line_endings.csv, 
+            labeled_lines.txt, plain.txt, plain_no_trailing_newline.txt
+            
+        """.trimIndent()
+        )
+    }
+
+    @Test
+    fun foreach_nested_withNestedSubshells_works() {
+        val outerFilename = "labeled_lines.txt"
+        val render = """
+            cd src/test/resources/data
+            for(line: string in "$outerFilename"):
+                for(line: string in "$outerFilename"):
+                    print(#(ls -m $(printf '.')) + "\n")
+                
+            """.trimIndent().createRender()
+        assertRenderEquals("""
+            cd src/test/resources/data
+            cat "labeled_lines.txt" | $sed -e 's/\r\n/\n/g' | $sed -ze '/\n$/!s/$/\n$/g' | while IFS='' read -r line; do
+                cat "labeled_lines.txt" | $sed -e 's/\r\n/\n/g' | $sed -ze '/\n$/!s/$/\n$/g' | while IFS='' read -r line; do
+                    declare __bp_var0
+                    __bp_var0="$(printf '.')"
+                    printf "$(ls -m ${'$'}{__bp_var0})\n"
+                done
+            done
+            
+        """.trimIndent(), render).assertRenderProduces("""
+            example.csv, example_extended.csv, example_extended_windows_line_endings.csv, 
+            labeled_lines.txt, plain.txt, plain_no_trailing_newline.txt
+            example.csv, example_extended.csv, example_extended_windows_line_endings.csv, 
+            labeled_lines.txt, plain.txt, plain_no_trailing_newline.txt
+            example.csv, example_extended.csv, example_extended_windows_line_endings.csv, 
+            labeled_lines.txt, plain.txt, plain_no_trailing_newline.txt
+            example.csv, example_extended.csv, example_extended_windows_line_endings.csv, 
+            labeled_lines.txt, plain.txt, plain_no_trailing_newline.txt
+            
+        """.trimIndent())
     }
 }
