@@ -44,7 +44,7 @@ class ForeachFileLineLoopBashNode(
             val lineVariableName = if (columns.size > 1) { "__bp_line" } else { columns[0].id!! }
             val setLoopVariables = if (columns.size > 1) {
                 columns.mapIndexed { i, it -> """
-                    ${it.id}=$(printf "%s" "${'$'}__bp_line" | gawk --csv '{print $${i + 1}}');""".trimIndent()
+                    ${it.id}=$(printf "%s" "${'$'}{__bp_line}" | gawk --csv '{print $${i + 1}}');""".trimIndent()
                 }.joinToString(prefix = "    ", separator = " ", postfix = "\n")
             } else { "" }
             val childRenderList = children.map { child ->

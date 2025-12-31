@@ -17,7 +17,7 @@ class LoopsMainTest : MainTest() {
         assertRenderEquals(
             """
             cat "src/test/resources/data/example.csv" | $sed -e '1d' -e 's/\r\n/\n/g' | $sed -ze '/\n$/!s/$/\n$/g' | while IFS='' read -r __bp_line; do
-                first=$(printf "%s" "${'$'}__bp_line" | gawk --csv '{print $1}'); last=$(printf "%s" "${'$'}__bp_line" | gawk --csv '{print $2}'); email=$(printf "%s" "${'$'}__bp_line" | gawk --csv '{print $3}'); phone=$(printf "%s" "${'$'}__bp_line" | gawk --csv '{print $4}');
+                first=$(printf "%s" "${'$'}{__bp_line}" | gawk --csv '{print $1}'); last=$(printf "%s" "${'$'}{__bp_line}" | gawk --csv '{print $2}'); email=$(printf "%s" "${'$'}{__bp_line}" | gawk --csv '{print $3}'); phone=$(printf "%s" "${'$'}{__bp_line}" | gawk --csv '{print $4}');
                 printf "${'$'}{first} ${'$'}{last} ${'$'}{email} ${'$'}{phone}\n"
             done
             
@@ -51,7 +51,7 @@ class LoopsMainTest : MainTest() {
             declare -x TOKEN
             TOKEN="OAUTH_TOKEN"
             cat "src/test/resources/data/example_extended.csv" | $sed -e '1d' -e 's/\r\n/\n/g' | $sed -ze '/\n$/!s/$/\n$/g' | while IFS='' read -r __bp_line; do
-                firstName=$(printf "%s" "${'$'}__bp_line" | gawk --csv '{print $1}'); middleName=$(printf "%s" "${'$'}__bp_line" | gawk --csv '{print $2}'); lastName=$(printf "%s" "${'$'}__bp_line" | gawk --csv '{print $3}'); email=$(printf "%s" "${'$'}__bp_line" | gawk --csv '{print $4}'); landline=$(printf "%s" "${'$'}__bp_line" | gawk --csv '{print $5}'); cell=$(printf "%s" "${'$'}__bp_line" | gawk --csv '{print $6}');
+                firstName=$(printf "%s" "${'$'}{__bp_line}" | gawk --csv '{print $1}'); middleName=$(printf "%s" "${'$'}{__bp_line}" | gawk --csv '{print $2}'); lastName=$(printf "%s" "${'$'}{__bp_line}" | gawk --csv '{print $3}'); email=$(printf "%s" "${'$'}{__bp_line}" | gawk --csv '{print $4}'); landline=$(printf "%s" "${'$'}{__bp_line}" | gawk --csv '{print $5}'); cell=$(printf "%s" "${'$'}{__bp_line}" | gawk --csv '{print $6}');
                 declare -x cellShort
                 cellShort="$(printf "${'$'}cell" | cut -d " " -f 2)"
                 declare -x regionId
@@ -92,7 +92,7 @@ class LoopsMainTest : MainTest() {
             declare -x TOKEN
             TOKEN="OAUTH_TOKEN"
             cat "src/test/resources/data/example_extended.csv" | $sed -e '1d' -e 's/\r\n/\n/g' | $sed -ze '/\n$/!s/$/\n$/g' | while IFS='' read -r __bp_line; do
-                firstName=$(printf "%s" "${'$'}__bp_line" | gawk --csv '{print $1}'); middleName=$(printf "%s" "${'$'}__bp_line" | gawk --csv '{print $2}'); lastName=$(printf "%s" "${'$'}__bp_line" | gawk --csv '{print $3}'); email=$(printf "%s" "${'$'}__bp_line" | gawk --csv '{print $4}'); landline=$(printf "%s" "${'$'}__bp_line" | gawk --csv '{print $5}'); cell=$(printf "%s" "${'$'}__bp_line" | gawk --csv '{print $6}');
+                firstName=$(printf "%s" "${'$'}{__bp_line}" | gawk --csv '{print $1}'); middleName=$(printf "%s" "${'$'}{__bp_line}" | gawk --csv '{print $2}'); lastName=$(printf "%s" "${'$'}{__bp_line}" | gawk --csv '{print $3}'); email=$(printf "%s" "${'$'}{__bp_line}" | gawk --csv '{print $4}'); landline=$(printf "%s" "${'$'}{__bp_line}" | gawk --csv '{print $5}'); cell=$(printf "%s" "${'$'}{__bp_line}" | gawk --csv '{print $6}');
                 declare -x cellShort
                 cellShort="$(printf "${'$'}cell" | cut -d " " -f 2)"
                 declare -x regionId
@@ -133,7 +133,7 @@ class LoopsMainTest : MainTest() {
             declare -x TOKEN
             TOKEN="OAUTH_TOKEN"
             cat "src/test/resources/data/example_extended_windows_line_endings.csv" | $sed -e '1d' -e 's/\r\n/\n/g' | $sed -ze '/\n$/!s/$/\n$/g' | while IFS='' read -r __bp_line; do
-                firstName=$(printf "%s" "${'$'}__bp_line" | gawk --csv '{print $1}'); middleName=$(printf "%s" "${'$'}__bp_line" | gawk --csv '{print $2}'); lastName=$(printf "%s" "${'$'}__bp_line" | gawk --csv '{print $3}'); email=$(printf "%s" "${'$'}__bp_line" | gawk --csv '{print $4}'); landline=$(printf "%s" "${'$'}__bp_line" | gawk --csv '{print $5}'); cell=$(printf "%s" "${'$'}__bp_line" | gawk --csv '{print $6}');
+                firstName=$(printf "%s" "${'$'}{__bp_line}" | gawk --csv '{print $1}'); middleName=$(printf "%s" "${'$'}{__bp_line}" | gawk --csv '{print $2}'); lastName=$(printf "%s" "${'$'}{__bp_line}" | gawk --csv '{print $3}'); email=$(printf "%s" "${'$'}{__bp_line}" | gawk --csv '{print $4}'); landline=$(printf "%s" "${'$'}{__bp_line}" | gawk --csv '{print $5}'); cell=$(printf "%s" "${'$'}{__bp_line}" | gawk --csv '{print $6}');
                 declare -x cellShort
                 cellShort="$(printf "${'$'}cell" | cut -d " " -f 2)"
                 declare -x regionId
@@ -280,7 +280,6 @@ class LoopsMainTest : MainTest() {
             )
     }
 
-    // TODO 0.20.0 - write test with multiple nested Subshells in an inner for-for loop (double nested)
     @Test
     fun foreach_fileLine_withNestedSubshells_works() {
         val outerFilename = "labeled_lines.txt"
@@ -340,6 +339,53 @@ class LoopsMainTest : MainTest() {
             labeled_lines.txt, plain.txt, plain_no_trailing_newline.txt
             example.csv, example_extended.csv, example_extended_windows_line_endings.csv, 
             labeled_lines.txt, plain.txt, plain_no_trailing_newline.txt
+            
+        """.trimIndent())
+    }
+
+    @Test
+    fun foreach_nested_withMultipleNestedSubshells_works() {
+        val outerFilename = "labeled_lines.txt"
+        val render = """
+            cd src/test/resources/data
+            for(line: string in "$outerFilename"):
+                print(#(ls -m $(printf '.') > /dev/null))
+                for(line: string in "$outerFilename"):
+                    print(#(ls -m $(printf '.')) + "\n")
+                    // this Bash makes sense to me, may God have mercy on my soul
+                    print(#(cat $(ls -all | head -4 | tail -1 | tr -s " " | cut -d " " -f 9 ) | head -1) + "\n")
+                
+            """.trimIndent().createRender()
+        assertRenderEquals(
+            """
+            cd src/test/resources/data
+            cat "labeled_lines.txt" | $sed -e 's/\r\n/\n/g' | $sed -ze '/\n$/!s/$/\n$/g' | while IFS='' read -r line; do
+                declare __bp_var0
+                __bp_var0="$(printf '.')"
+                printf "$(ls -m ${'$'}{__bp_var0} > /dev/null)"
+                cat "labeled_lines.txt" | $sed -e 's/\r\n/\n/g' | $sed -ze '/\n$/!s/$/\n$/g' | while IFS='' read -r line; do
+                    declare __bp_var1
+                    __bp_var1="$(printf '.')"
+                    printf "$(ls -m ${'$'}{__bp_var1})\n"
+                    declare __bp_var2
+                    __bp_var2="$(ls -all | head -4 | tail -1 | tr -s " " | cut -d " " -f 9 )"
+                    printf "$(cat ${'$'}{__bp_var2} | head -1)\n"
+                done
+            done
+            
+        """.trimIndent(), render).assertRenderProduces("""
+            example.csv, example_extended.csv, example_extended_windows_line_endings.csv, 
+            labeled_lines.txt, plain.txt, plain_no_trailing_newline.txt
+            FirstName,LastName,Email,Phone
+            example.csv, example_extended.csv, example_extended_windows_line_endings.csv, 
+            labeled_lines.txt, plain.txt, plain_no_trailing_newline.txt
+            FirstName,LastName,Email,Phone
+            example.csv, example_extended.csv, example_extended_windows_line_endings.csv, 
+            labeled_lines.txt, plain.txt, plain_no_trailing_newline.txt
+            FirstName,LastName,Email,Phone
+            example.csv, example_extended.csv, example_extended_windows_line_endings.csv, 
+            labeled_lines.txt, plain.txt, plain_no_trailing_newline.txt
+            FirstName,LastName,Email,Phone
             
         """.trimIndent())
     }
