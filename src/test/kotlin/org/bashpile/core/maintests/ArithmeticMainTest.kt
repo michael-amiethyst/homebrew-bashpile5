@@ -178,13 +178,13 @@ class ArithmeticMainTest : MainTest() {
     fun getBast_basicArithmatic_withShellString_works() {
         val render = """
                 i: integer = 0
-                print( #($((${'$'}i))) as integer + 1)
+                print( #($((i))) as integer + 1)
                 print(i)""".trimIndent().createRender()
         assertRenderEquals(
             """
                 declare i
                 i=0
-                printf "%s" "$(($((${'$'}i)) + 1))"
+                printf "%s" "$(($((i)) + 1))"
                 printf "%s" "${'$'}{i}"
 
             """.trimIndent(), render
@@ -261,17 +261,17 @@ class ArithmeticMainTest : MainTest() {
     fun getBast_floatingPointArithmatic_shellStringAndParenthesis_throws() {
         // ShellString is a... STRING
         assertFailsWith<UnsupportedOperationException> { """
-            print(#(expr 2 - 1) - (30 * .5))""".trimIndent().createRender()
+            print(#(printf "1") - (30 * .5))""".trimIndent().createRender()
         }
     }
 
     @Test
     fun getBast_floatingPointArithmatic_shellStringAndParenthesis_withTypecast_works() {
         val render = """
-            print(#(expr 2 - 1) as integer - (30 * .5))""".trimIndent().createRender()
+            print(#(printf "1") as integer - (30 * .5))""".trimIndent().createRender()
         assertRenderEquals("""
             declare __bp_var0
-            __bp_var0="$(expr 2 - 1)"
+            __bp_var0="$(printf "1")"
             printf "%s" "$(bc -l <<< "${'$'}{__bp_var0} - (30 * 0.5)")"
             
             """.trimIndent(), render
