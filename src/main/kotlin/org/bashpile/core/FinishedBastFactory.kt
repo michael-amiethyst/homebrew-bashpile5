@@ -2,24 +2,21 @@ package org.bashpile.core
 
 import com.google.common.annotations.VisibleForTesting
 import org.apache.logging.log4j.LogManager
-import org.bashpile.core.antlr.AstConvertingVisitor.Companion.ENABLE_STRICT
-import org.bashpile.core.antlr.AstConvertingVisitor.Companion.OLD_OPTIONS
 import org.bashpile.core.bast.BastNode
-import org.bashpile.core.bast.InternalBastNode
-import org.bashpile.core.bast.expressions.arithmetic.ArithmeticBastNode
-import org.bashpile.core.bast.expressions.shellstrings.LooseShellStringBastNode
-import org.bashpile.core.bast.expressions.shellstrings.ShellStringBastNode
-import org.bashpile.core.bast.statements.ShellLineBastNode
-import org.bashpile.core.bast.statements.VariableDeclarationBastNode
-import org.bashpile.core.engine.TypeEnum.UNKNOWN
 import org.bashpile.core.bast.expressions.VariableReferenceBastNode
+import org.bashpile.core.bast.expressions.arithmetic.ArithmeticBastNode
+import org.bashpile.core.bast.expressions.shellstrings.ShellStringBastNode
 import org.bashpile.core.bast.statements.StatementBastNode
+import org.bashpile.core.bast.statements.VariableDeclarationBastNode
 import org.bashpile.core.engine.Subshell
+import org.bashpile.core.engine.TypeEnum.UNKNOWN
 
 
 /**
+ * "We'll fix it in post!"  This is the equivalent of post-production.
+ *
  * Takes a freshly created Bashpile Abstract Syntax Tree from [org.bashpile.core.antlr.AstConvertingVisitor] and
- * performs a series of transformations on it to prepare it for rendering with [BastNode.render].
+ * performs transformations on it to prepare it for rendering with [BastNode.render].
  */
 class FinishedBastFactory {
 
@@ -31,11 +28,7 @@ class FinishedBastFactory {
         // unnest
         val unnestedBast = root.unnestSubshells()
         logger.info("Mermaid graph ----- subshells unnested: {}", unnestedBast.mermaidGraph())
-
-        // loosen
-        val looseBast = unnestedBast.loosenShellStrings()
-        logger.info("Mermaid graph - shell strings loosened: {}", looseBast.mermaidGraph())
-        return looseBast
+        return unnestedBast
     }
 
     @VisibleForTesting
@@ -88,23 +81,5 @@ class FinishedBastFactory {
         }.filter { subshells ->
             subshells.parents().any { it is Subshell }
         }
-    }
-
-    // TODO 0.20.0 - fold this logic into LooseShellStringBastNode.render?
-    /** @return A loosened version of the input tree */
-    private fun BastNode.loosenShellStrings(): BastNode {
-        // no recursion
-        val loosenedStatements = children.map {
-            val hasLooseShellStringBastNode = it.any { child -> child is LooseShellStringBastNode }
-            if (hasLooseShellStringBastNode) {
-                InternalBastNode(
-                    ShellLineBastNode("eval \"$${OLD_OPTIONS}\""),
-                    it,
-                    ShellLineBastNode(ENABLE_STRICT))
-            } else {
-                it
-            }
-        }
-        return replaceChildren(loosenedStatements)
     }
 }

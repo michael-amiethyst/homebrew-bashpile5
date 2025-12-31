@@ -4,6 +4,7 @@ import org.bashpile.core.bast.statements.ForeachFileLineLoopBashNode.Companion.s
 import kotlin.test.Test
 import kotlin.test.assertFailsWith
 
+// TODO 0.20.0 - replace 'read' CSV parsing with read going by line and then using something like: NAME=$(echo "$line" | gawk --csv '{print $1}')
 class LoopsMainTest : MainTest() {
 
     override val testName = "LoopsTest"
