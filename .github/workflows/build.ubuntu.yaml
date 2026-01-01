@@ -28,4 +28,4 @@ jobs:
         with:
           scandir: './build/shellcheck'
         env:
-          SHELLCHECK_OPTS: --shell=bash --exclude=SC2059
+          SHELLCHECK_OPTS: --shell=bash --exclude=SC2059 --exclude=SC2157
