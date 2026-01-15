@@ -8,7 +8,7 @@ class Bashpile < Formula
 
   # foundational dependencies
   depends_on "make" => :build
-  depends_on "gradle@8" => :build
+  depends_on "gradle@8" => :build # TODO feature/debug-comments -- change to Gradle9 for Kotlin Java version 25.0.1 bug
   depends_on "bc"
   depends_on "gnu-sed"
   depends_on "gsed"
