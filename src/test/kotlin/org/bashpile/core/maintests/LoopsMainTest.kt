@@ -4,6 +4,8 @@ import org.bashpile.core.bast.statements.ForeachFileLineLoopBashNode.Companion.s
 import kotlin.test.Test
 import kotlin.test.assertFailsWith
 
+// TODO 0.21.0 - Fix shellcheck errors here and for ShellStringTests
+//  command is `shellcheck --shell=bash --exclude=SC2059,SC2157,SC2327,SC2328 ./build/shellcheck/Loops* `
 class LoopsMainTest : MainTest() {
 
     override val testName = "LoopsTest"
@@ -349,9 +351,11 @@ class LoopsMainTest : MainTest() {
         val render = """
             cd src/test/resources/data
             for(line: string in "$outerFilename"):
-                print(#(ls -m $(printf '.') > /dev/null))
+                printf "%s" "${'$'}{line}" > /dev/null
+                print(#(ls -m "$(printf '.')" > /dev/null))
                 for(line: string in "$outerFilename"):
-                    print(#(ls -m $(printf '.')) + "\n")
+                    printf "%s" "${'$'}{line}" > /dev/null
+                    print(#(ls -m "$(printf '.')") + "\n")
                     // this Bash makes sense to me, may God have mercy on my soul
                     print(#(cat $(ls -all | head -4 | tail -1 | tr -s " " | cut -d " " -f 9 ) | head -1) + "\n")
                 
@@ -360,13 +364,15 @@ class LoopsMainTest : MainTest() {
             """
             cd src/test/resources/data
             cat "labeled_lines.txt" | $sed -e 's/\r\n/\n/g' | $sed -ze '/\n$/!s/$/\n$/g' | while IFS='' read -r line; do
+                printf "%s" "${'$'}{line}" > /dev/null
                 declare __bp_var0
                 __bp_var0="$(printf '.')"
-                printf "$(ls -m ${'$'}{__bp_var0} > /dev/null)"
+                printf "$(ls -m "${'$'}{__bp_var0}" > /dev/null)"
                 cat "labeled_lines.txt" | $sed -e 's/\r\n/\n/g' | $sed -ze '/\n$/!s/$/\n$/g' | while IFS='' read -r line; do
+                    printf "%s" "${'$'}{line}" > /dev/null
                     declare __bp_var1
                     __bp_var1="$(printf '.')"
-                    printf "$(ls -m ${'$'}{__bp_var1})\n"
+                    printf "$(ls -m "${'$'}{__bp_var1}")\n"
                     declare __bp_var2
                     __bp_var2="$(ls -all | head -4 | tail -1 | tr -s " " | cut -d " " -f 9 )"
                     printf "$(cat ${'$'}{__bp_var2} | head -1)\n"
