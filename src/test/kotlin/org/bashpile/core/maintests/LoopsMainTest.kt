@@ -48,12 +48,14 @@ class LoopsMainTest : MainTest() {
                     "\"regionId\": \"${'$'}regionId\" }\n")
         """.trimIndent().createRender()
         assertRenderEquals("""
+            # Real world example
             declare -x HOST
             HOST="HOST_NAME"
             declare -x TOKEN
             TOKEN="OAUTH_TOKEN"
             cat "src/test/resources/data/example_extended.csv" | $sed -e '1d' -e 's/\r\n/\n/g' | $sed -ze '/\n$/!s/$/\n$/g' | while IFS='' read -r __bp_line; do
                 firstName=$(printf "%s" "${'$'}{__bp_line}" | gawk --csv '{print $1}'); middleName=$(printf "%s" "${'$'}{__bp_line}" | gawk --csv '{print $2}'); lastName=$(printf "%s" "${'$'}{__bp_line}" | gawk --csv '{print $3}'); email=$(printf "%s" "${'$'}{__bp_line}" | gawk --csv '{print $4}'); landline=$(printf "%s" "${'$'}{__bp_line}" | gawk --csv '{print $5}'); cell=$(printf "%s" "${'$'}{__bp_line}" | gawk --csv '{print $6}');
+                # set progress status too
                 declare -x cellShort
                 cellShort="$(printf "${'$'}cell" | cut -d " " -f 2)"
                 declare -x regionId
@@ -89,12 +91,14 @@ class LoopsMainTest : MainTest() {
                 print("{ \"cellShort\": ${'$'}cellShort, \"lastName\": \"${'$'}lastName\" \"cell\": \"${'$'}cell\", \"regionId\": \"${'$'}regionId\" }\n")
         """.trimIndent().createRender()
         assertRenderEquals("""
+            # Real world example
             declare -x HOST
             HOST="HOST_NAME"
             declare -x TOKEN
             TOKEN="OAUTH_TOKEN"
             cat "src/test/resources/data/example_extended.csv" | $sed -e '1d' -e 's/\r\n/\n/g' | $sed -ze '/\n$/!s/$/\n$/g' | while IFS='' read -r __bp_line; do
                 firstName=$(printf "%s" "${'$'}{__bp_line}" | gawk --csv '{print $1}'); middleName=$(printf "%s" "${'$'}{__bp_line}" | gawk --csv '{print $2}'); lastName=$(printf "%s" "${'$'}{__bp_line}" | gawk --csv '{print $3}'); email=$(printf "%s" "${'$'}{__bp_line}" | gawk --csv '{print $4}'); landline=$(printf "%s" "${'$'}{__bp_line}" | gawk --csv '{print $5}'); cell=$(printf "%s" "${'$'}{__bp_line}" | gawk --csv '{print $6}');
+                # set progress status too
                 declare -x cellShort
                 cellShort="$(printf "${'$'}cell" | cut -d " " -f 2)"
                 declare -x regionId
@@ -130,12 +134,14 @@ class LoopsMainTest : MainTest() {
                 print("{ \"cellShort\": ${'$'}cellShort, \"lastName\": \"${'$'}lastName\" \"cell\": \"${'$'}cell\", \"regionId\": \"${'$'}regionId\" }\n")
         """.trimIndent().createRender()
         assertRenderEquals("""
+            # Real world example
             declare -x HOST
             HOST="HOST_NAME"
             declare -x TOKEN
             TOKEN="OAUTH_TOKEN"
             cat "src/test/resources/data/example_extended_windows_line_endings.csv" | $sed -e '1d' -e 's/\r\n/\n/g' | $sed -ze '/\n$/!s/$/\n$/g' | while IFS='' read -r __bp_line; do
                 firstName=$(printf "%s" "${'$'}{__bp_line}" | gawk --csv '{print $1}'); middleName=$(printf "%s" "${'$'}{__bp_line}" | gawk --csv '{print $2}'); lastName=$(printf "%s" "${'$'}{__bp_line}" | gawk --csv '{print $3}'); email=$(printf "%s" "${'$'}{__bp_line}" | gawk --csv '{print $4}'); landline=$(printf "%s" "${'$'}{__bp_line}" | gawk --csv '{print $5}'); cell=$(printf "%s" "${'$'}{__bp_line}" | gawk --csv '{print $6}');
+                # set progress status too
                 declare -x cellShort
                 cellShort="$(printf "${'$'}cell" | cut -d " " -f 2)"
                 declare -x regionId
@@ -373,6 +379,7 @@ class LoopsMainTest : MainTest() {
                     declare __bp_var1
                     __bp_var1="$(printf '.')"
                     printf "$(ls -m "${'$'}{__bp_var1}")\n"
+                    # this Bash makes sense to me, may God have mercy on my soul
                     declare __bp_var2
                     __bp_var2="$(ls -all | head -4 | tail -1 | tr -s " " | cut -d " " -f 9 )"
                     printf "$(cat ${'$'}{__bp_var2} | head -1)\n"
