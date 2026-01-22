@@ -23,6 +23,7 @@ statement
     | <assoc=right> (Id | listAccess) assignmentOperator expression Newline
                                                 # reassignmentStatement
     | Print OParen argumentList? CParen Newline # printStatement
+    | BashpileDoc Newline                       # bashpileDocStatement
     | Comment Newline                           # lineCommentStatement
     | expression Newline                        # expressionStatement
     | Newline                                   # blankStmt

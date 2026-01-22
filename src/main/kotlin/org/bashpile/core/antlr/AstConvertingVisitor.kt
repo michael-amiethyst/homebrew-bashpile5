@@ -86,6 +86,16 @@ class AstConvertingVisitor: BashpileParserBaseVisitor<BastNode>() {
         return ReassignmentBastNode(ctx.Id().text, visit(ctx.expression()))
     }
 
+    override fun visitBashpileDocStatement(ctx: BashpileParser.BashpileDocStatementContext): BastNode {
+        val trimmedText = ctx.text.trim()
+        val text = trimmedText.substring(4, trimmedText.length - 3).trim()
+            .split("\n")
+            .map { "# $it"}
+            .joinToString("\n")
+        val bar = "#".repeat(text.length)
+        return TerminalBastNode("$bar\n$text\n$bar\n", STRING)
+    }
+
     override fun visitLineCommentStatement(ctx: BashpileParser.LineCommentStatementContext): BastNode {
         val commentText = ctx.text.substring(3).trimStart() // ignore initial "//" and spaces
         return TerminalBastNode("# $commentText", STRING)

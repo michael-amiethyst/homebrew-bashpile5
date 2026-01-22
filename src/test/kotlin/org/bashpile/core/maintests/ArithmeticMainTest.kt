@@ -25,6 +25,22 @@ class ArithmeticMainTest : MainTest() {
     }
 
     @Test
+    fun getBast_basicArithmatic_withBashpileDoc_works() {
+        val render = """
+            /** Print */
+            print(1 + 1)""".trimIndent().createRender()
+        assertRenderEquals("""
+            #######
+            # Print
+            #######
+            printf "%s" "$((1 + 1))"
+            
+            """.trimIndent(), render
+        )
+        render.assertRenderProduces("2\n")
+    }
+
+    @Test
     fun getBast_basicArithmatic_subtraction_works() {
         val render = """
             print(1 - 1)""".trimIndent().createRender()
