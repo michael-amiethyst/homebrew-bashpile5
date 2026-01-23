@@ -317,9 +317,9 @@ class LoopsMainTest : MainTest() {
             """.trimIndent(), render
         ).assertRenderProduces(
             """
-            example.csv, example_extended.csv, example_extended_windows_line_endings.csv, 
+            example.csv, example_extended.csv, example_extended_windows_line_endings.csv,
             labeled_lines.txt, plain.txt, plain_no_trailing_newline.txt
-            example.csv, example_extended.csv, example_extended_windows_line_endings.csv, 
+            example.csv, example_extended.csv, example_extended_windows_line_endings.csv,
             labeled_lines.txt, plain.txt, plain_no_trailing_newline.txt
             
         """.trimIndent()
@@ -347,13 +347,13 @@ class LoopsMainTest : MainTest() {
             done
             
         """.trimIndent(), render).assertRenderProduces("""
-            example.csv, example_extended.csv, example_extended_windows_line_endings.csv, 
+            example.csv, example_extended.csv, example_extended_windows_line_endings.csv,
             labeled_lines.txt, plain.txt, plain_no_trailing_newline.txt
-            example.csv, example_extended.csv, example_extended_windows_line_endings.csv, 
+            example.csv, example_extended.csv, example_extended_windows_line_endings.csv,
             labeled_lines.txt, plain.txt, plain_no_trailing_newline.txt
-            example.csv, example_extended.csv, example_extended_windows_line_endings.csv, 
+            example.csv, example_extended.csv, example_extended_windows_line_endings.csv,
             labeled_lines.txt, plain.txt, plain_no_trailing_newline.txt
-            example.csv, example_extended.csv, example_extended_windows_line_endings.csv, 
+            example.csv, example_extended.csv, example_extended_windows_line_endings.csv,
             labeled_lines.txt, plain.txt, plain_no_trailing_newline.txt
             
         """.trimIndent())
@@ -395,16 +395,16 @@ class LoopsMainTest : MainTest() {
             done
             
         """.trimIndent(), render).assertRenderProduces("""
-            example.csv, example_extended.csv, example_extended_windows_line_endings.csv, 
+            example.csv, example_extended.csv, example_extended_windows_line_endings.csv,
             labeled_lines.txt, plain.txt, plain_no_trailing_newline.txt
             FirstName,LastName,Email,Phone
-            example.csv, example_extended.csv, example_extended_windows_line_endings.csv, 
+            example.csv, example_extended.csv, example_extended_windows_line_endings.csv,
             labeled_lines.txt, plain.txt, plain_no_trailing_newline.txt
             FirstName,LastName,Email,Phone
-            example.csv, example_extended.csv, example_extended_windows_line_endings.csv, 
+            example.csv, example_extended.csv, example_extended_windows_line_endings.csv,
             labeled_lines.txt, plain.txt, plain_no_trailing_newline.txt
             FirstName,LastName,Email,Phone
-            example.csv, example_extended.csv, example_extended_windows_line_endings.csv, 
+            example.csv, example_extended.csv, example_extended_windows_line_endings.csv,
             labeled_lines.txt, plain.txt, plain_no_trailing_newline.txt
             FirstName,LastName,Email,Phone
             
