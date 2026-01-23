@@ -4,6 +4,7 @@ import org.bashpile.core.Main
 import org.bashpile.core.antlr.AstConvertingVisitor.Companion.STRICT_HEADER
 import org.bashpile.core.engine.RenderOptions.Companion.UNQUOTED
 import org.bashpile.core.runCommand
+import org.junit.jupiter.api.Assumptions
 import java.nio.file.Files
 import java.nio.file.Paths
 import java.nio.file.StandardOpenOption
@@ -45,6 +46,11 @@ abstract class MainTest {
             StandardOpenOption.CREATE,
             StandardOpenOption.TRUNCATE_EXISTING)
         return renderedBash
+    }
+
+    protected fun String.assumeRender(test: Predicate<String>): String {
+        Assumptions.assumeTrue { test.test(this) }
+        return this
     }
 
     protected fun String.assertRenderProduces(expectedStdout: String?, expectedExitCode: Int = 0, arguments: List<String> = listOf()) {

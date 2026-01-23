@@ -17,7 +17,6 @@ class LoopsMainTest : MainTest() {
             for(first: string, last: string, email: string, phone: string in "src/test/resources/data/example.csv"):
                 print(first + " " + last + " " + email + " " + phone + "\n")
         """.trimIndent().createRender()
-        Assumptions.assumeFalse(renderedBash.startsWith("Usage: gawk"))
         assertRenderEquals(
             """
             cat "src/test/resources/data/example.csv" | $sed -e '1d' -e 's/\r\n/\n/g' | $sed -ze '/\n$/!s/$/\n$/g' | while IFS='' read -r __bp_line; do
@@ -25,7 +24,7 @@ class LoopsMainTest : MainTest() {
                 printf "${'$'}{first} ${'$'}{last} ${'$'}{email} ${'$'}{phone}\n"
             done
             
-        """.trimIndent(), renderedBash).assertRenderProduces("""
+        """.trimIndent(), renderedBash).assumeRender { !it.startsWith("Usage: gawk") }.assertRenderProduces("""
             Alice Smith alice.smith@email.com 555-1234
             Bob Johnson bob.j@email.com 555-5678
             Charlie Williams c.williams@email.com 555-9012
@@ -66,7 +65,7 @@ class LoopsMainTest : MainTest() {
                 printf "{ \"cellShort\": ${'$'}cellShort, \"lastName\": \"${'$'}lastName\" \"cell\": \"${'$'}cell\", \"regionId\": \"${'$'}regionId\" }\n"
             done
             
-        """.trimIndent(), renderedBash).assertRenderProduces("""
+        """.trimIndent(), renderedBash).assumeRender { !it.startsWith("Usage: gawk") }.assertRenderProduces("""
             Updating phone # 555-1235 with values: lastName Smith cell (555) 555-1235.
             { "cellShort": 555-1235, "lastName": "Smith" "cell": "(555) 555-1235", "regionId": "13" }
             Updating phone # 555-5679 with values: lastName Johnson cell (555) 555-5679.
@@ -92,7 +91,6 @@ class LoopsMainTest : MainTest() {
                 print("Updating phone # " + cellShort + " with values: lastName " + lastName + " cell " + cell + ".\n")
                 print("{ \"cellShort\": ${'$'}cellShort, \"lastName\": \"${'$'}lastName\" \"cell\": \"${'$'}cell\", \"regionId\": \"${'$'}regionId\" }\n")
         """.trimIndent().createRender()
-        Assumptions.assumeFalse(renderedBash.startsWith("Usage: gawk"))
         assertRenderEquals("""
             # Real world example
             declare -x HOST
@@ -112,7 +110,7 @@ class LoopsMainTest : MainTest() {
                 printf "{ \"cellShort\": ${'$'}cellShort, \"lastName\": \"${'$'}lastName\" \"cell\": \"${'$'}cell\", \"regionId\": \"${'$'}regionId\" }\n"
             done
             
-        """.trimIndent(), renderedBash).assertRenderProduces("""
+        """.trimIndent(), renderedBash).assumeRender { !it.startsWith("Usage: gawk") }.assertRenderProduces("""
             Updating phone # 555-1235 with values: lastName Smith cell (555) 555-1235.
             { "cellShort": 555-1235, "lastName": "Smith" "cell": "(555) 555-1235", "regionId": "13" }
             Updating phone # 555-5679 with values: lastName Johnson cell (555) 555-5679.
@@ -159,7 +157,7 @@ class LoopsMainTest : MainTest() {
                 printf "{ \"cellShort\": ${'$'}cellShort, \"lastName\": \"${'$'}lastName\" \"cell\": \"${'$'}cell\", \"regionId\": \"${'$'}regionId\" }\n"
             done
             
-        """.trimIndent(), renderedBash).assertRenderProduces("""
+        """.trimIndent(), renderedBash).assumeRender { !it.startsWith("Usage: gawk") }.assertRenderProduces("""
             Updating phone # 555-1235 with values: lastName Smith cell (555) 555-1235.
             { "cellShort": 555-1235, "lastName": "Smith" "cell": "(555) 555-1235", "regionId": "13" }
             Updating phone # 555-5679 with values: lastName Johnson cell (555) 555-5679.
