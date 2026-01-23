@@ -103,9 +103,10 @@ class AstConvertingVisitor: BashpileParserBaseVisitor<BastNode>() {
 
     override fun visitBlockCommentStatement(ctx: BashpileParser.BlockCommentStatementContext): BastNode {
         val trimmedText = ctx.text.trim()
-        val text = trimmedText.substring(3, trimmedText.length - 2).trim()
+        val text = trimmedText.substring(2, trimmedText.length - 2)
             .split("\n")
-            .map { "# $it"}
+            .map { it.trim() }
+            .map { "# $it".trim() }
             .joinToString("\n", postfix = "\n")
         return TerminalBastNode(text, STRING)
     }

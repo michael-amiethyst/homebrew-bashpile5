@@ -1,6 +1,7 @@
 package org.bashpile.core.maintests
 
 import org.bashpile.core.bast.statements.ForeachFileLineLoopBashNode.Companion.sed
+import org.bashpile.core.runCommand
 import org.junit.jupiter.api.Assumptions
 import kotlin.test.Test
 import kotlin.test.assertFailsWith
@@ -315,7 +316,7 @@ class LoopsMainTest : MainTest() {
             done
             
             """.trimIndent(), render
-        ).assertRenderProduces(
+        ).runCommand().mapLines { it: String -> it.trim() }.assertRenderProduces(
             """
             example.csv, example_extended.csv, example_extended_windows_line_endings.csv,
             labeled_lines.txt, plain.txt, plain_no_trailing_newline.txt
@@ -346,7 +347,7 @@ class LoopsMainTest : MainTest() {
                 done
             done
             
-        """.trimIndent(), render).assertRenderProduces("""
+        """.trimIndent(), render).runCommand().mapLines { it: String -> it.trim() }.assertRenderProduces("""
             example.csv, example_extended.csv, example_extended_windows_line_endings.csv,
             labeled_lines.txt, plain.txt, plain_no_trailing_newline.txt
             example.csv, example_extended.csv, example_extended_windows_line_endings.csv,
@@ -394,7 +395,7 @@ class LoopsMainTest : MainTest() {
                 done
             done
             
-        """.trimIndent(), render).assertRenderProduces("""
+        """.trimIndent(), render).runCommand().mapLines { it: String -> it.trim() }.assertRenderProduces("""
             example.csv, example_extended.csv, example_extended_windows_line_endings.csv,
             labeled_lines.txt, plain.txt, plain_no_trailing_newline.txt
             FirstName,LastName,Email,Phone
@@ -409,5 +410,9 @@ class LoopsMainTest : MainTest() {
             FirstName,LastName,Email,Phone
             
         """.trimIndent())
+    }
+
+    private inline fun Pair<String, Int>.mapLines(transform: (String) -> String): Pair<String, Int> {
+        return Pair(first.lines().map { line -> transform(line) }.joinToString(separator = "\n"), second)
     }
 }

@@ -54,9 +54,12 @@ abstract class MainTest {
     }
 
     protected fun String.assertRenderProduces(expectedStdout: String?, expectedExitCode: Int = 0, arguments: List<String> = listOf()) {
-        val results = runCommand(arguments = arguments)
-        if (expectedStdout != null) { assertEquals(expectedStdout, results.first) }
-        assertEquals(expectedExitCode, results.second)
+        runCommand(arguments = arguments).assertRenderProduces(expectedStdout, expectedExitCode)
+    }
+
+    protected fun Pair<String, Int>.assertRenderProduces(expectedStdout: String?, expectedExitCode: Int = 0, arguments: List<String> = listOf()) {
+        if (expectedStdout != null) { assertEquals(expectedStdout, first) }
+        assertEquals(expectedExitCode, second)
     }
 
     protected fun String.assertRenderProduces(test: Predicate<String>, expectedExitCode: Int = 0) {
