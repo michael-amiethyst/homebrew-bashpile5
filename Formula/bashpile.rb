@@ -15,6 +15,7 @@ class Bashpile < Formula
   depends_on "kotlin"
   depends_on "openjdk@21"
   depends_on "bash"
+  depends_on "gawk"
 
   # tooling dependencies for generated scripts
   # depends_on "gnu-getopt" # needed for OSX and FreeBSD, kept as generic dependency for consistency
