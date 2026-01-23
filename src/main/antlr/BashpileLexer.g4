@@ -110,7 +110,7 @@ Whitespace    : [ \t\f] -> skip;
 EscapedNewline: '\\' '\r'? '\n' ' '* -> skip;
 BashpileDoc   : '/**' .*? '*/';
 Comment       : '//' ~[\r\n\f]*;
-BlockComment  : '/*' ( BlockComment | . )*? '*/' -> skip;
+BlockComment  : '/*' ( BlockComment | . )*? '*/';
 
 // small tokens
 

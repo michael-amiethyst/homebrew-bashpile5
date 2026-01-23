@@ -124,12 +124,14 @@ class LoopsMainTest : MainTest() {
     @Test
     fun foreach_fileLine_multistatement_with_windows_line_endings_float_works() {
         val renderedBash = """
-            // Real world example
+            /* Real world example */
             HOST: readonly exported string = "HOST_NAME"
             TOKEN: readonly exported string = "OAUTH_TOKEN"
             for(firstName: string, middleName: string, lastName: string, email: string, landline: float, cell: string\
                     in "src/test/resources/data/example_extended_windows_line_endings.csv"):
-                // set progress status too
+                /*
+                 set progress status too
+                */
                 cellShort: exported string = #(printf "${'$'}cell" | cut -d " " -f 2)
                 regionId: exported integer = 13
                 print("Updating phone # " + cellShort + " with values: lastName " + lastName + " cell " + cell + ".\n")
@@ -143,7 +145,9 @@ class LoopsMainTest : MainTest() {
             TOKEN="OAUTH_TOKEN"
             cat "src/test/resources/data/example_extended_windows_line_endings.csv" | $sed -e '1d' -e 's/\r\n/\n/g' | $sed -ze '/\n$/!s/$/\n$/g' | while IFS='' read -r __bp_line; do
                 firstName=$(printf "%s" "${'$'}{__bp_line}" | gawk --csv '{print $1}'); middleName=$(printf "%s" "${'$'}{__bp_line}" | gawk --csv '{print $2}'); lastName=$(printf "%s" "${'$'}{__bp_line}" | gawk --csv '{print $3}'); email=$(printf "%s" "${'$'}{__bp_line}" | gawk --csv '{print $4}'); landline=$(printf "%s" "${'$'}{__bp_line}" | gawk --csv '{print $5}'); cell=$(printf "%s" "${'$'}{__bp_line}" | gawk --csv '{print $6}');
+                #
                 # set progress status too
+                #
                 declare -x cellShort
                 cellShort="$(printf "${'$'}cell" | cut -d " " -f 2)"
                 declare -x regionId
