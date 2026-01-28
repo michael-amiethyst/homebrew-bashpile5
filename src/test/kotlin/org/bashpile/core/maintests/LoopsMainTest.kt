@@ -2,7 +2,6 @@ package org.bashpile.core.maintests
 
 import org.bashpile.core.bast.statements.ForeachFileLineLoopBashNode.Companion.sed
 import org.bashpile.core.runCommand
-import org.junit.jupiter.api.Assumptions
 import kotlin.test.Test
 import kotlin.test.assertFailsWith
 
@@ -45,7 +44,9 @@ class LoopsMainTest : MainTest() {
                 // set progress status too
                 cellShort: exported string = #(printf "${'$'}cell" | cut -d " " -f 2)
                 regionId: exported integer = 13
-                print("Updating phone # " + cellShort + " with values: lastName " + lastName + " cell " + cell + ".\n")
+                print("Updating phone # " + cellShort + " with values: name " + firstName + " " + lastName + " cell " + cell + ".\n")
+                printf "%s" "${'$'}email" >/dev/null
+                printf "%s" "${'$'}landline" >/dev/null
                 print("{ \"cellShort\": ${'$'}cellShort, \"lastName\": \"${'$'}lastName\" \"cell\": \"${'$'}cell\", " + \
                     "\"regionId\": \"${'$'}regionId\" }\n")
         """.trimIndent().createRender()
@@ -62,16 +63,18 @@ class LoopsMainTest : MainTest() {
                 cellShort="$(printf "${'$'}cell" | cut -d " " -f 2)"
                 declare -x regionId
                 regionId=13
-                printf "Updating phone # ${'$'}{cellShort} with values: lastName ${'$'}{lastName} cell ${'$'}{cell}.\n"
+                printf "Updating phone # ${'$'}{cellShort} with values: name ${'$'}{firstName} ${'$'}{lastName} cell ${'$'}{cell}.\n"
+                printf "%s" "${'$'}email" >/dev/null
+                printf "%s" "${'$'}landline" >/dev/null
                 printf "{ \"cellShort\": ${'$'}cellShort, \"lastName\": \"${'$'}lastName\" \"cell\": \"${'$'}cell\", \"regionId\": \"${'$'}regionId\" }\n"
             done
             
         """.trimIndent(), renderedBash).assumeRender { !it.startsWith("Usage: gawk") }.assertRenderProduces("""
-            Updating phone # 555-1235 with values: lastName Smith cell (555) 555-1235.
+            Updating phone # 555-1235 with values: name Alice Smith cell (555) 555-1235.
             { "cellShort": 555-1235, "lastName": "Smith" "cell": "(555) 555-1235", "regionId": "13" }
-            Updating phone # 555-5679 with values: lastName Johnson cell (555) 555-5679.
+            Updating phone # 555-5679 with values: name Bob Johnson cell (555) 555-5679.
             { "cellShort": 555-5679, "lastName": "Johnson" "cell": "(555) 555-5679", "regionId": "13" }
-            Updating phone # 555-1701 with values: lastName Williams cell (555) 555-1701.
+            Updating phone # 555-1701 with values: name Charlie Williams cell (555) 555-1701.
             { "cellShort": 555-1701, "lastName": "Williams" "cell": "(555) 555-1701", "regionId": "13" }
 
         """.trimIndent()
@@ -90,6 +93,9 @@ class LoopsMainTest : MainTest() {
                 cellShort: exported string = #(printf "${'$'}cell" | cut -d " " -f 2)
                 regionId: exported integer = 13
                 print("Updating phone # " + cellShort + " with values: lastName " + lastName + " cell " + cell + ".\n")
+                printf "%s" "${'$'}firstName" >/dev/null
+                printf "%s" "${'$'}middleName" >/dev/null
+                printf "%s" "${'$'}landline" >/dev/null
                 print("{ \"cellShort\": ${'$'}cellShort, \"lastName\": \"${'$'}lastName\" \"cell\": \"${'$'}cell\", \"regionId\": \"${'$'}regionId\" }\n")
         """.trimIndent().createRender()
         assertRenderEquals("""
@@ -108,6 +114,9 @@ class LoopsMainTest : MainTest() {
                 declare -x regionId
                 regionId=13
                 printf "Updating phone # ${'$'}{cellShort} with values: lastName ${'$'}{lastName} cell ${'$'}{cell}.\n"
+                printf "%s" "${'$'}firstName" >/dev/null
+                printf "%s" "${'$'}middleName" >/dev/null
+                printf "%s" "${'$'}landline" >/dev/null
                 printf "{ \"cellShort\": ${'$'}cellShort, \"lastName\": \"${'$'}lastName\" \"cell\": \"${'$'}cell\", \"regionId\": \"${'$'}regionId\" }\n"
             done
             
@@ -302,17 +311,18 @@ class LoopsMainTest : MainTest() {
         val render = """
             cd src/test/resources/data
             for(line: string in "$outerFilename"):
-                print(#(ls -m $(printf '.')) + "\n")
+                printf "%s" "${'$'}line" >/dev/null
+                print(#(ls -m "$(printf '.')") + "\n")
                 
             """.trimIndent().createRender()
-        Assumptions.assumeFalse(render.startsWith("Usage: gawk"))
         assertRenderEquals(
             """
             cd src/test/resources/data
             cat "labeled_lines.txt" | $sed -e 's/\r\n/\n/g' | $sed -ze '/\n$/!s/$/\n$/g' | while IFS='' read -r line; do
+                printf "%s" "${'$'}line" >/dev/null
                 declare __bp_var0
                 __bp_var0="$(printf '.')"
-                printf "$(ls -m ${'$'}{__bp_var0})\n"
+                printf "$(ls -m "${'$'}{__bp_var0}")\n"
             done
             
             """.trimIndent(), render
@@ -333,17 +343,19 @@ class LoopsMainTest : MainTest() {
         val render = """
             cd src/test/resources/data
             for(line: string in "$outerFilename"):
+                printf "%s" "${'$'}line" >/dev/null
                 for(line: string in "$outerFilename"):
-                    print(#(ls -m $(printf '.')) + "\n")
+                    print(#(ls -m "$(printf '.')") + "\n")
                 
             """.trimIndent().createRender()
         assertRenderEquals("""
             cd src/test/resources/data
             cat "labeled_lines.txt" | $sed -e 's/\r\n/\n/g' | $sed -ze '/\n$/!s/$/\n$/g' | while IFS='' read -r line; do
+                printf "%s" "${'$'}line" >/dev/null
                 cat "labeled_lines.txt" | $sed -e 's/\r\n/\n/g' | $sed -ze '/\n$/!s/$/\n$/g' | while IFS='' read -r line; do
                     declare __bp_var0
                     __bp_var0="$(printf '.')"
-                    printf "$(ls -m ${'$'}{__bp_var0})\n"
+                    printf "$(ls -m "${'$'}{__bp_var0}")\n"
                 done
             done
             
@@ -372,7 +384,7 @@ class LoopsMainTest : MainTest() {
                     printf "%s" "${'$'}{line}" > /dev/null
                     print(#(ls -m "$(printf '.')") + "\n")
                     // this Bash makes sense to me, may God have mercy on my soul
-                    print(#(cat $(ls -all | head -4 | tail -1 | tr -s " " | cut -d " " -f 9 ) | head -1) + "\n")
+                    print(#(cat "$(ls -all | head -4 | tail -1 | tr -s " " | cut -d " " -f 9 )" | head -1) + "\n")
                 
             """.trimIndent().createRender()
         assertRenderEquals(
@@ -391,7 +403,7 @@ class LoopsMainTest : MainTest() {
                     # this Bash makes sense to me, may God have mercy on my soul
                     declare __bp_var2
                     __bp_var2="$(ls -all | head -4 | tail -1 | tr -s " " | cut -d " " -f 9 )"
-                    printf "$(cat ${'$'}{__bp_var2} | head -1)\n"
+                    printf "$(cat "${'$'}{__bp_var2}" | head -1)\n"
                 done
             done
             
