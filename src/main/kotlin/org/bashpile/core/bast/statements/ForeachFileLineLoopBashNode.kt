@@ -63,7 +63,7 @@ class ForeachFileLineLoopBashNode(
     }
 
     private fun mungeStream(): String {
-        // 1 (line) delete
+        // 1 (line) delete to skip CSV headers
         val skipFirstLine = if (columns.size > 1) "-e '1d' " else ""
 
         // Convert '\r\n' to '\n'
