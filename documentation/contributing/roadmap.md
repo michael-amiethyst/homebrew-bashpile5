@@ -1,11 +1,10 @@
 # Bashpile Compiler Plans
 
-1. switch / getopt
-2. C-style for loops
-3. lists
-4. foreach loops
-5. Work-around for options with `||`, see https://unix.stackexchange.com/questions/65532/why-does-set-e-not-work-inside-subshells-with-parenthesis-followed-by-an-or
-6. IDE integration (IntelliJ)
+1. C-style for loops
+2. lists
+3. foreach loops
+4. Work-around for options with `||`, see https://unix.stackexchange.com/questions/65532/why-does-set-e-not-work-inside-subshells-with-parenthesis-followed-by-an-or
+5. IDE integration (IntelliJ)
 
 ## Unscheduled ideas
 Take 2nd file argument, it would be the compiled file (with shebang and chmod +x)
