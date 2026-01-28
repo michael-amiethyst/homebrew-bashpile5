@@ -12,13 +12,17 @@ class DeclarationsMainTest : MainTest() {
 
     @Test
     fun getBast_declare_bool_works() {
-        val bashScript = "b: boolean = true".createRender()
+        val bashScript = """
+            b: boolean = true
+            print(b)
+        """.trimIndent().createRender()
         assertRenderEquals("""
             declare b
             b=true
+            printf "%s" "${'$'}{b}"
 
             """.trimIndent(), bashScript
-        ).assertRenderProduces("\n")
+        ).assertRenderProduces("true\n")
     }
 
     @Test

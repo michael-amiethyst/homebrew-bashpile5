@@ -23,3 +23,9 @@ jobs:
           cache: 'gradle' # have gradle included in the generated container
       - name: Run Gradle
         run: ./gradlew clean nativeCompile check
+      - name: Run ShellCheck
+        uses: ludeeus/action-shellcheck@master
+        with:
+          scandir: './build/shellcheck'
+        env:
+          SHELLCHECK_OPTS: --shell=bash --exclude=SC2059,SC2157,SC2327,SC2328

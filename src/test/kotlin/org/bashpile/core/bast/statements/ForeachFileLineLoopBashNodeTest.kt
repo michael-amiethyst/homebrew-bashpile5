@@ -17,7 +17,7 @@ class ForeachFileLineLoopBashNodeTest {
             child.asList(),"\"file.csv\"", listOf(VariableReferenceBastNode("col1", STRING)))
         assertEquals(
             """
-            cat "file.csv" | $sed -e '1d' -e 's/\r//g' | $sed -ze '/\n$/!s/$/\n$/g' | while IFS=',' read -r col1; do
+            cat "file.csv" | $sed -e 's/\r\n/\n/g' | $sed -ze '/\n$/!s/$/\n$/g' | while IFS='' read -r col1; do
                 printf "%s" "${'$'}{col1}"
             done
 
@@ -33,7 +33,7 @@ class ForeachFileLineLoopBashNodeTest {
             child.asList(),"\"file.csv\"", listOf(VariableReferenceBastNode("col1", STRING)))
         assertEquals(
             """
-            cat "file.csv" | $sed -e '1d' -e 's/\r//g' | $sed -ze '/\n$/!s/$/\n$/g' | while IFS=',' read -r col1; do
+            cat "file.csv" | $sed -e 's/\r\n/\n/g' | $sed -ze '/\n$/!s/$/\n$/g' | while IFS='' read -r col1; do
                 declare col1
                 col1="exampleValue"
             done

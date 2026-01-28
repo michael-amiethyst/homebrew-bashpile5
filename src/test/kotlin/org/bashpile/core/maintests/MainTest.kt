@@ -4,6 +4,7 @@ import org.bashpile.core.Main
 import org.bashpile.core.antlr.AstConvertingVisitor.Companion.STRICT_HEADER
 import org.bashpile.core.engine.RenderOptions.Companion.UNQUOTED
 import org.bashpile.core.runCommand
+import org.junit.jupiter.api.Assumptions.assumeTrue
 import java.nio.file.Files
 import java.nio.file.Paths
 import java.nio.file.StandardOpenOption
@@ -12,7 +13,6 @@ import kotlin.test.BeforeTest
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
 
-// TODO 0.20.0 -- run shellcheck on generated scripts (/build/shellcheck) in a GHA
 abstract class MainTest {
 
     companion object {
@@ -48,10 +48,18 @@ abstract class MainTest {
         return renderedBash
     }
 
+    protected fun String.assumeRender(test: Predicate<String>): String {
+        assumeTrue { test.test(runCommand().first) }
+        return this
+    }
+
     protected fun String.assertRenderProduces(expectedStdout: String?, expectedExitCode: Int = 0, arguments: List<String> = listOf()) {
-        val results = runCommand(arguments = arguments)
-        if (expectedStdout != null) { assertEquals(expectedStdout, results.first) }
-        assertEquals(expectedExitCode, results.second)
+        runCommand(arguments = arguments).assertRenderProduces(expectedStdout, expectedExitCode)
+    }
+
+    protected fun Pair<String, Int>.assertRenderProduces(expectedStdout: String?, expectedExitCode: Int = 0, arguments: List<String> = listOf()) {
+        if (expectedStdout != null) { assertEquals(expectedStdout, first) }
+        assertEquals(expectedExitCode, second)
     }
 
     protected fun String.assertRenderProduces(test: Predicate<String>, expectedExitCode: Int = 0) {

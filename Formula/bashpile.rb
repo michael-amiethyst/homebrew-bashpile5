@@ -1,19 +1,21 @@
 class Bashpile < Formula
   desc "The Bash Transpiler: Write in a modern language and run in a Bash5 shell!"
-  version "0.19.0"
+  version "0.20.0"
   homepage "https://github.com/michael-amiethyst/homebrew-core"
   license "MIT"
-  url "https://github.com/michael-amiethyst/homebrew-core", using: :git, branch: "main", tag: "0.19.0"
+  url "https://github.com/michael-amiethyst/homebrew-core", using: :git, branch: "main", tag: "0.20.0"
   head "https://github.com/michael-amiethyst/homebrew-core", using: :git, branch: "development"
 
   # foundational dependencies
   depends_on "make" => :build
-  depends_on "gradle@8" => :build
+  depends_on "gradle@9" => :build
   depends_on "bc"
   depends_on "gnu-sed"
+  depends_on "gsed"
   depends_on "kotlin"
   depends_on "openjdk@21"
   depends_on "bash"
+  depends_on "gawk"
 
   # tooling dependencies for generated scripts
   # depends_on "gnu-getopt" # needed for OSX and FreeBSD, kept as generic dependency for consistency
