@@ -108,9 +108,9 @@ FloatValues: INT_PART? FRACTION | INT_PART '.';
 Newline       : '\r'? '\n' ' '*;
 Whitespace    : [ \t\f] -> skip;
 EscapedNewline: '\\' '\r'? '\n' ' '* -> skip;
-BashpileDoc   : '/**' .*? '*/' -> skip;
-Comment       : '//' ~[\r\n\f]* -> skip;
-BlockComment  : '/*' ( BlockComment | . )*? '*/' -> skip;
+BashpileDoc   : '/**' .*? '*/';
+Comment       : '//' ~[\r\n\f]*;
+BlockComment  : '/*' ( BlockComment | . )*? '*/';
 
 // small tokens
 

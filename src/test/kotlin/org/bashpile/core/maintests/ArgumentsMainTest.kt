@@ -16,18 +16,18 @@ class ArgumentsMainTest : MainTest() {
     fun argument_all_works() {
         // ensure Bash is behaving as expected
         """
-            printf "$@\n"
+            printf "$@"
 
         """.trimIndent().assertRenderProduces(
             "first\n", arguments = listOf("first", "second", "third"))
 
         // ensure our Render is as expected
         val script = """
-            print(arguments[all] + "\n")
+            print(arguments[all])
 
             """.trimIndent().createRender()
         assertRenderEquals("""
-            printf "$@\n"
+            printf "$@"
 
             """.trimIndent(), script
         ).assertRenderProduces("first\n", arguments = listOf("first", "second", "third"))

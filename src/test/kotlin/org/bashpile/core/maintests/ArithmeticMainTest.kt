@@ -25,6 +25,22 @@ class ArithmeticMainTest : MainTest() {
     }
 
     @Test
+    fun getBast_basicArithmatic_withBashpileDoc_works() {
+        val render = """
+            /** Print */
+            print(1 + 1)""".trimIndent().createRender()
+        assertRenderEquals("""
+            #######
+            # Print
+            #######
+            printf "%s" "$((1 + 1))"
+            
+            """.trimIndent(), render
+        )
+        render.assertRenderProduces("2\n")
+    }
+
+    @Test
     fun getBast_basicArithmatic_subtraction_works() {
         val render = """
             print(1 - 1)""".trimIndent().createRender()
@@ -178,12 +194,13 @@ class ArithmeticMainTest : MainTest() {
     fun getBast_basicArithmatic_withShellString_works() {
         val render = """
                 i: integer = 0
-                print(#(expr ${'$'}i) as integer + 1)
+                print( #($((i))) as integer + 1)
                 print(i)""".trimIndent().createRender()
-        assertRenderEquals("""
+        assertRenderEquals(
+            """
                 declare i
                 i=0
-                printf "%s" "$(($(expr ${'$'}i) + 1))"
+                printf "%s" "$(($((i)) + 1))"
                 printf "%s" "${'$'}{i}"
 
             """.trimIndent(), render
@@ -260,17 +277,17 @@ class ArithmeticMainTest : MainTest() {
     fun getBast_floatingPointArithmatic_shellStringAndParenthesis_throws() {
         // ShellString is a... STRING
         assertFailsWith<UnsupportedOperationException> { """
-            print(#(expr 2 - 1) - (30 * .5))""".trimIndent().createRender()
+            print(#(printf "1") - (30 * .5))""".trimIndent().createRender()
         }
     }
 
     @Test
     fun getBast_floatingPointArithmatic_shellStringAndParenthesis_withTypecast_works() {
         val render = """
-            print(#(expr 2 - 1) as integer - (30 * .5))""".trimIndent().createRender()
+            print(#(printf "1") as integer - (30 * .5))""".trimIndent().createRender()
         assertRenderEquals("""
             declare __bp_var0
-            __bp_var0="$(expr 2 - 1)"
+            __bp_var0="$(printf "1")"
             printf "%s" "$(bc -l <<< "${'$'}{__bp_var0} - (30 * 0.5)")"
             
             """.trimIndent(), render

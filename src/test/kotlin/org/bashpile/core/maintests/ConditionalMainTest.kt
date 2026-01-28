@@ -23,12 +23,15 @@ class ConditionalMainTest : MainTest() {
     @Test
     fun ifStatement_works() {
         val renderedBash = """
-            if (1 > 0):
+            zero: integer = 0
+            if (1 > zero):
                 print("Math is mathing! ")
                 print("Math is mathing!\n")
             """.trimIndent().createRender()
         assertRenderEquals("""
-            if [ 1 -gt 0 ]; then
+            declare zero
+            zero=0
+            if [ 1 -gt "${'$'}{zero}" ]; then
                 printf "Math is mathing! "
                 printf "Math is mathing!\n"
             fi
@@ -567,13 +570,16 @@ class ConditionalMainTest : MainTest() {
     @Test
     fun ifElseStatement_withAnd_works() {
         val renderedBash = """
-            if (1 < 2 and 2 <= 3):
+            two: integer = 2
+            if (1 < two and two <= 3):
                 print("Math is mathing!\n")
             else:
                 print("Command failed\n")
             """.trimIndent().createRender()
         assertRenderEquals("""
-            if [ 1 -lt 2 ] && [ 2 -le 3 ]; then
+            declare two
+            two=2
+            if [ 1 -lt "${'$'}{two}" ] && [ "${'$'}{two}" -le 3 ]; then
                 printf "Math is mathing!\n"
             else
                 printf "Command failed\n"
@@ -586,13 +592,16 @@ class ConditionalMainTest : MainTest() {
     @Test
     fun ifElseStatement_withAndOr_works() {
         val renderedBash = """
-            if (1 < 2 and 2 <= 1 or #(expr 1 \> 0)):
+            two: integer = 2
+            if (1 < two and two <= 1 or #(printf "1")):
                 print("Math is mathing!\n")
             else:
                 print("Command failed\n")
             """.trimIndent().createRender()
         assertRenderEquals("""
-            if [ 1 -lt 2 ] && [ 2 -le 1 ] || (expr 1 \> 0) >/dev/null 2>&1; then
+            declare two
+            two=2
+            if [ 1 -lt "${'$'}{two}" ] && [ "${'$'}{two}" -le 1 ] || (printf "1") >/dev/null 2>&1; then
                 printf "Math is mathing!\n"
             else
                 printf "Command failed\n"
@@ -673,7 +682,7 @@ class ConditionalMainTest : MainTest() {
     fun ifElseStatement_withTypeCastSubtractionAndEquals_works() {
         val renderedBash = """
             a: integer = 1
-            if (#(expr 5 + 6) as integer - a == 10):
+            if (#(printf "11") as integer - a == 10):
                 print("It tracks\n")
             else:
                 print("Lame\n")
@@ -681,7 +690,7 @@ class ConditionalMainTest : MainTest() {
         assertRenderEquals("""
             declare a
             a=1
-            if [ $(($(expr 5 + 6) - a)) -eq 10 ]; then
+            if [ $(($(printf "11") - a)) -eq 10 ]; then
                 printf "It tracks\n"
             else
                 printf "Lame\n"
