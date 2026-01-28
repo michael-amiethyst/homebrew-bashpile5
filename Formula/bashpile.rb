@@ -8,7 +8,7 @@ class Bashpile < Formula
 
   # foundational dependencies
   depends_on "make" => :build
-  depends_on "gradle@9" => :build # TODO upgrade to Gradle 9.3
+  depends_on "gradle@9" => :build
   depends_on "bc"
   depends_on "gnu-sed"
   depends_on "gsed"
