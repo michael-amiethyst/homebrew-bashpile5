@@ -87,8 +87,10 @@ class AstConvertingVisitor: BashpileParserBaseVisitor<BastNode>() {
     }
 
     override fun visitBashpileDocStatement(ctx: BashpileParser.BashpileDocStatementContext): BastNode {
+        // does not preserve whitespace
         val trimmedText = ctx.text.trim()
-        val text = trimmedText.substring(4, trimmedText.length - 3).trim()
+        val text = trimmedText.substring(3, trimmedText.length - 2) // remove initial '/**' and trailing '*/'
+            .trim()
             .split("\n")
             .map { "# $it"}
             .joinToString("\n")
@@ -97,11 +99,13 @@ class AstConvertingVisitor: BashpileParserBaseVisitor<BastNode>() {
     }
 
     override fun visitLineCommentStatement(ctx: BashpileParser.LineCommentStatementContext): BastNode {
-        val commentText = ctx.text.substring(3).trimStart() // ignore initial "//" and spaces
+        // does not preserve whitespace
+        val commentText = ctx.text.substring(2).trimStart() // ignore initial "//" and spaces
         return TerminalBastNode("# $commentText", STRING)
     }
 
     override fun visitBlockCommentStatement(ctx: BashpileParser.BlockCommentStatementContext): BastNode {
+        // does not preserve whitespace
         val trimmedText = ctx.text.trim()
         val text = trimmedText.substring(2, trimmedText.length - 2)
             .split("\n")

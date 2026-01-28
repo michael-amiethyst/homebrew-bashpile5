@@ -21,4 +21,4 @@
 * 0.18.2 - Updates for Homebrew formula
 * 0.18.3 - More updates for Homebrew formula
 * 0.19.0 - Arguments and isSet/isNotSet
-* 0.20.0 - Added generated comments to aid debugging
+* 0.20.0 - BashpileDoc, Block Comments and Line Comments now render
