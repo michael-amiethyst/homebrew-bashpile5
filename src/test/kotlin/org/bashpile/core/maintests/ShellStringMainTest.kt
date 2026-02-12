@@ -40,14 +40,21 @@ class ShellStringMainTest : MainTest() {
         assertEquals(SCRIPT_SUCCESS, commandResult.second)
     }
 
+    /**
+     * Render produces the blank string because Bash is weird.
+     * [https://mywiki.wooledge.org/BashFAQ/104](Bash FAQ)
+     */
     @Test
     fun getBast_shellLine_initialVar_works() {
-        val script = "test_var=5 printf \"\$test_var\"".createRender()
+        val script = """
+            test_var=0
+            test_var=1 printf "${'$'}test_var" """.trimIndent().createRender()
         assertRenderEquals("""
-            test_var=5 printf "${'$'}test_var"
+            test_var=0
+            test_var=1 printf "${'$'}test_var"
             
             """.trimIndent(), script
-        )
+        ).assertRenderProduces("0\n")
     }
 
     @Test
@@ -95,11 +102,11 @@ class ShellStringMainTest : MainTest() {
     @Test
     fun getBast_shellstring_nestedSubshells_works() {
         val script = """
-            print(#(ls $(echo '.')))""".trim().createRender()
+            print(#(ls "$(echo '.')"))""".trim().createRender()
         assertRenderEquals("""
             declare __bp_var0
             __bp_var0="$(echo '.')"
-            printf "$(ls ${'$'}{__bp_var0})"
+            printf "$(ls "${'$'}{__bp_var0}")"
             """.trimIndent() + "\n", script
         )
 
@@ -116,7 +123,7 @@ class ShellStringMainTest : MainTest() {
             set -euo pipefail
             declare __bp_var0
             __bp_var0="$(echo '.'; exit ${SCRIPT_ERROR__GENERIC})"
-            printf "$(ls ${'$'}{__bp_var0})"
+            printf "$(ls "${'$'}{__bp_var0}")"
             """.trimIndent() + "\n", script
         )
         script.assertRenderProduces({
