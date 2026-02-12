@@ -41,6 +41,7 @@ class LoopsMainTest : MainTest() {
             TOKEN: readonly exported string = "OAUTH_TOKEN"
             for(firstName: string, middleName: string, lastName: string, email: string, landline: string, cell: string \
                     in "src/test/resources/data/example_extended.csv"):
+                printf "%s" "${'$'}middleName" >/dev/null
                 // set progress status too
                 cellShort: exported string = #(printf "${'$'}cell" | cut -d " " -f 2)
                 regionId: exported integer = 13
@@ -58,6 +59,7 @@ class LoopsMainTest : MainTest() {
             TOKEN="OAUTH_TOKEN"
             cat "src/test/resources/data/example_extended.csv" | $sed -e '1d' -e 's/\r\n/\n/g' | $sed -ze '/\n$/!s/$/\n$/g' | while IFS='' read -r __bp_line; do
                 firstName=$(printf "%s" "${'$'}{__bp_line}" | gawk --csv '{print $1}'); middleName=$(printf "%s" "${'$'}{__bp_line}" | gawk --csv '{print $2}'); lastName=$(printf "%s" "${'$'}{__bp_line}" | gawk --csv '{print $3}'); email=$(printf "%s" "${'$'}{__bp_line}" | gawk --csv '{print $4}'); landline=$(printf "%s" "${'$'}{__bp_line}" | gawk --csv '{print $5}'); cell=$(printf "%s" "${'$'}{__bp_line}" | gawk --csv '{print $6}');
+                printf "%s" "${'$'}middleName" >/dev/null
                 # set progress status too
                 declare -x cellShort
                 cellShort="$(printf "${'$'}cell" | cut -d " " -f 2)"
@@ -89,6 +91,7 @@ class LoopsMainTest : MainTest() {
             TOKEN: readonly exported string = "OAUTH_TOKEN"
             for(firstName: string, middleName: string, lastName: string, email: string, landline: float, \
                     cell: string in "src/test/resources/data/example_extended.csv"):
+                printf "%s" "${'$'}email" >/dev/null
                 /** set progress status too */
                 cellShort: exported string = #(printf "${'$'}cell" | cut -d " " -f 2)
                 regionId: exported integer = 13
@@ -106,6 +109,7 @@ class LoopsMainTest : MainTest() {
             TOKEN="OAUTH_TOKEN"
             cat "src/test/resources/data/example_extended.csv" | $sed -e '1d' -e 's/\r\n/\n/g' | $sed -ze '/\n$/!s/$/\n$/g' | while IFS='' read -r __bp_line; do
                 firstName=$(printf "%s" "${'$'}{__bp_line}" | gawk --csv '{print $1}'); middleName=$(printf "%s" "${'$'}{__bp_line}" | gawk --csv '{print $2}'); lastName=$(printf "%s" "${'$'}{__bp_line}" | gawk --csv '{print $3}'); email=$(printf "%s" "${'$'}{__bp_line}" | gawk --csv '{print $4}'); landline=$(printf "%s" "${'$'}{__bp_line}" | gawk --csv '{print $5}'); cell=$(printf "%s" "${'$'}{__bp_line}" | gawk --csv '{print $6}');
+                printf "%s" "${'$'}email" >/dev/null
                 #########################
                 # set progress status too
                 #########################
@@ -140,6 +144,10 @@ class LoopsMainTest : MainTest() {
             TOKEN: readonly exported string = "OAUTH_TOKEN"
             for(firstName: string, middleName: string, lastName: string, email: string, landline: float, cell: string\
                     in "src/test/resources/data/example_extended_windows_line_endings.csv"):
+                printf "%s" "${'$'}firstName" >/dev/null
+                printf "%s" "${'$'}middleName" >/dev/null
+                printf "%s" "${'$'}landline" >/dev/null
+                printf "%s" "${'$'}email" >/dev/null
                 /*
                  set progress status too
                 */
@@ -156,6 +164,10 @@ class LoopsMainTest : MainTest() {
             TOKEN="OAUTH_TOKEN"
             cat "src/test/resources/data/example_extended_windows_line_endings.csv" | $sed -e '1d' -e 's/\r\n/\n/g' | $sed -ze '/\n$/!s/$/\n$/g' | while IFS='' read -r __bp_line; do
                 firstName=$(printf "%s" "${'$'}{__bp_line}" | gawk --csv '{print $1}'); middleName=$(printf "%s" "${'$'}{__bp_line}" | gawk --csv '{print $2}'); lastName=$(printf "%s" "${'$'}{__bp_line}" | gawk --csv '{print $3}'); email=$(printf "%s" "${'$'}{__bp_line}" | gawk --csv '{print $4}'); landline=$(printf "%s" "${'$'}{__bp_line}" | gawk --csv '{print $5}'); cell=$(printf "%s" "${'$'}{__bp_line}" | gawk --csv '{print $6}');
+                printf "%s" "${'$'}firstName" >/dev/null
+                printf "%s" "${'$'}middleName" >/dev/null
+                printf "%s" "${'$'}landline" >/dev/null
+                printf "%s" "${'$'}email" >/dev/null
                 #
                 # set progress status too
                 #
@@ -383,8 +395,7 @@ class LoopsMainTest : MainTest() {
                 for(line: string in "$outerFilename"):
                     printf "%s" "${'$'}{line}" > /dev/null
                     print(#(ls -m "$(printf '.')") + "\n")
-                    // this Bash makes sense to me, may God have mercy on my soul
-                    print(#(cat "$(ls -all | head -4 | tail -1 | tr -s " " | cut -d " " -f 9 )" | head -1) + "\n")
+                    print(#(cat "$(find ./ | tail -1)" | head -1) + "\n")
                 
             """.trimIndent().createRender()
         assertRenderEquals(
@@ -400,9 +411,8 @@ class LoopsMainTest : MainTest() {
                     declare __bp_var1
                     __bp_var1="$(printf '.')"
                     printf "$(ls -m "${'$'}{__bp_var1}")\n"
-                    # this Bash makes sense to me, may God have mercy on my soul
                     declare __bp_var2
-                    __bp_var2="$(ls -all | head -4 | tail -1 | tr -s " " | cut -d " " -f 9 )"
+                    __bp_var2="$(find ./ | tail -1)"
                     printf "$(cat "${'$'}{__bp_var2}" | head -1)\n"
                 done
             done
@@ -410,16 +420,16 @@ class LoopsMainTest : MainTest() {
         """.trimIndent(), render).runCommand().mapLines { it: String -> it.trim() }.assertRenderProduces("""
             example.csv, example_extended.csv, example_extended_windows_line_endings.csv,
             labeled_lines.txt, plain.txt, plain_no_trailing_newline.txt
-            FirstName,LastName,Email,Phone
+            FirstName,MiddleName,LastName,Email,LandLine,Cell
             example.csv, example_extended.csv, example_extended_windows_line_endings.csv,
             labeled_lines.txt, plain.txt, plain_no_trailing_newline.txt
-            FirstName,LastName,Email,Phone
+            FirstName,MiddleName,LastName,Email,LandLine,Cell
             example.csv, example_extended.csv, example_extended_windows_line_endings.csv,
             labeled_lines.txt, plain.txt, plain_no_trailing_newline.txt
-            FirstName,LastName,Email,Phone
+            FirstName,MiddleName,LastName,Email,LandLine,Cell
             example.csv, example_extended.csv, example_extended_windows_line_endings.csv,
             labeled_lines.txt, plain.txt, plain_no_trailing_newline.txt
-            FirstName,LastName,Email,Phone
+            FirstName,MiddleName,LastName,Email,LandLine,Cell
             
         """.trimIndent())
     }
