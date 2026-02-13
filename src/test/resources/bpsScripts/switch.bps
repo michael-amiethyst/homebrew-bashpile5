@@ -1,0 +1,4 @@
+name: string = "David"
+switch name:
+    case "David":
+        printf "David and Goliath"

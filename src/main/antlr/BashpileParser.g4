@@ -16,7 +16,7 @@ statement
                             Colon functionBlock # functionDeclarationStatement
     | If OParen expression CParen Colon indentedStatements (elseIfClauses)* (Else Colon indentedStatements)?
                                                 # conditionalStatement
-    | Switch expression Colon INDENT (Case expression Colon indentedStatements)+ DEDENT
+    | Switch expression Colon (INDENT Case expression Colon indentedStatements DEDENT)+
                                                 # switchStatement
     | <assoc=right> typedId (Equals expression)? Newline
                                                 # variableDeclarationStatement

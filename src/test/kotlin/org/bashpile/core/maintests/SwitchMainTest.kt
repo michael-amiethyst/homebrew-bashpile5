@@ -99,4 +99,31 @@ class SwitchMainTest : MainTest() {
         """.trimIndent()
         bashScript.runCommand(arguments = listOf("--delete")).assertRenderProduces("Delete flag set to: true\n")
     }
+
+    /**
+     * TODO write tests with multiple case statements and multiple cose lines
+     */
+    @Test
+    fun switch_works() {
+        // TODO load up switch.bps
+        val render = """
+            name: string = "David"
+            switch name:
+                case "David":
+                    printf "David and Goliath"
+        """.trimIndent().createRender()
+        assertRenderEquals("""
+            declare name
+            name="David"
+            case "$1" in
+                david)
+                    printf "David and Goliath"
+                    shift
+                    ;;
+                --) shift; 
+                    break 
+                    ;;
+            esac
+        """.trimIndent(), render)
+    }
 }

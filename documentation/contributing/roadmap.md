@@ -1,10 +1,11 @@
 # Bashpile Compiler Plans
 
-1. C-style for loops
+1. While loops and argument parsing
 2. lists
-3. foreach loops
-4. Work-around for options with `||`, see https://unix.stackexchange.com/questions/65532/why-does-set-e-not-work-inside-subshells-with-parenthesis-followed-by-an-or
-5. IDE integration (IntelliJ)
+3. C-style for loops
+4. foreach loops
+5. Work-around for options with `||`, see https://unix.stackexchange.com/questions/65532/why-does-set-e-not-work-inside-subshells-with-parenthesis-followed-by-an-or
+6. IDE integration (IntelliJ)
 
 ## Unscheduled ideas
 Take 2nd file argument, it would be the compiled file (with shebang and chmod +x)
