@@ -1,6 +1,8 @@
 package org.bashpile.core.maintests
 
 import org.bashpile.core.runCommand
+import kotlin.io.path.Path
+import kotlin.io.path.readText
 import kotlin.test.Test
 
 class SwitchMainTest : MainTest() {
@@ -105,13 +107,8 @@ class SwitchMainTest : MainTest() {
      */
     @Test
     fun switch_works() {
-        // TODO load up switch.bps
-        val render = """
-            name: string = "David"
-            switch name:
-                case "David":
-                    printf "David and Goliath"
-        """.trimIndent().createRender()
+        val render: String =
+            Path("src/test/resources/bpsScripts/switch.bps").readText(Charsets.UTF_8).createRender()
         assertRenderEquals("""
             declare name
             name="David"
