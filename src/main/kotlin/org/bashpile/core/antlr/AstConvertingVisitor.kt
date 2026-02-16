@@ -72,6 +72,12 @@ class AstConvertingVisitor: BashpileParserBaseVisitor<BastNode>() {
         return ConditionalBastNode(conditions, blockBodies)
     }
 
+    override fun visitSwitchStatement(ctx: BashpileParser.SwitchStatementContext): BastNode {
+        val matchingExpression = visit(ctx.expression())
+        val cases = ctx.indentedCase().map { visit(it) }
+        return SwitchBastNode(matchingExpression, cases)
+    }
+
     override fun visitVariableDeclarationStatement(ctx: BashpileParser.VariableDeclarationStatementContext): BastNode {
         val node = visit(ctx.expression())
         val readonly = ctx.modifiers().any { it.text == "readonly" }
@@ -261,6 +267,12 @@ class AstConvertingVisitor: BashpileParserBaseVisitor<BastNode>() {
 
     // Leaf nodes (parts of expressions)
 
+    override fun visitIndentedCase(ctx: BashpileParser.IndentedCaseContext): BastNode {
+        val matcher = visit(ctx.expression())
+        val statements = ctx.indentedStatements().statement().map { visit(it) }
+        return CaseBastNode(matcher, statements)
+    }
+
     override fun visitShellString(ctx: BashpileParser.ShellStringContext): BastNode {
         return ShellStringBastNode(ctx.shellStringContents().map { visit(it) })
     }
@@ -310,7 +322,7 @@ class AstConvertingVisitor: BashpileParserBaseVisitor<BastNode>() {
             )
         }
     }
-}
+} // end of class
 
 private fun BashpileParser.VariableDeclarationStatementContext.modifiers(): List<BashpileParser.ModifierContext> {
     return typedId().modifier()

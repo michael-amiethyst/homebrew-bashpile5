@@ -111,16 +111,12 @@ class SwitchMainTest : MainTest() {
             Path("src/test/resources/bpsScripts/switch.bps").readText(Charsets.UTF_8).createRender()
         assertRenderEquals("""
             declare name
-            name="David"
-            case "$1" in
+            name="david"
+            case "${'$'}{name}" in
                 david)
                     printf "David and Goliath"
-                    shift
-                    ;;
-                --) shift; 
-                    break 
                     ;;
             esac
-        """.trimIndent(), render)
+        """.trimIndent(), render).runCommand().assertRenderProduces("David and Goliath\n")
     }
 }
