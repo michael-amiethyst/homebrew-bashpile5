@@ -13,7 +13,7 @@ class CaseBastNode(val expression: BastNode, val statements: List<BastNode>)
 
     override fun render(options: RenderOptions): String {
         val statementRenders = statements.map { it.render(options) }
-        val matchRender = "    ${expression.render(options)})\n                    "
-        return matchRender + statementRenders.joinToString("\n                    ").trimEnd()
+        val matchRender = "$TAB${expression.render(options)})\n${TAB.repeat(5)}"
+        return matchRender + statementRenders.joinToString("\n${TAB.repeat(5)}").trimEnd()
     }
 }

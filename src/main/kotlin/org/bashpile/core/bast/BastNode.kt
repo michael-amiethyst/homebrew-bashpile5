@@ -30,6 +30,8 @@ abstract class BastNode(
         // shallow copy
         get() = mutableChildren.toList()
 
+    protected val TAB = "    "
+
     init {
         children.forEach { it.parent = this }
     }
