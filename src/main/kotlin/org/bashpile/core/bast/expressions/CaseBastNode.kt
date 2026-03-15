@@ -1,10 +1,12 @@
 package org.bashpile.core.bast.expressions
 
 import org.bashpile.core.bast.BastNode
+import org.bashpile.core.bast.expressions.literals.TerminalBastNode
 import org.bashpile.core.engine.RenderOptions
+import org.bashpile.core.engine.TypeEnum.STRING
 
 /** See also [org.bashpile.core.bast.statements.SwitchBastNode] */
-class CaseBastNode(val expression: BastNode, val statements: List<BastNode>)
+class CaseBastNode(val expression: BastNode, val statements: MutableList<BastNode>)
     : BastNode((expression.asList() + statements) as MutableList<BastNode>)
 {
     override fun replaceChildren(nextChildren: List<BastNode>): BastNode {
@@ -12,11 +14,10 @@ class CaseBastNode(val expression: BastNode, val statements: List<BastNode>)
     }
 
     override fun render(options: RenderOptions): String {
-        // TODO feature/switch - refactor to avoid need to remove newlines at end, change statementRenders to List<List<String>> and have
-        // .joinToString on the list-list
-        val statementRenders = statements.map { it.render(options) } + "\n${TAB.repeat(5)};;"
+        // TODO factor out the hard-coded 5 -- create test for switch in a block
         val matchRender = "$TAB${expression.render(options)})\n${TAB.repeat(5)}"
-        val ret = matchRender + statementRenders.joinToString("\n${TAB.repeat(5)}").trimEnd()
-        return ret.lines().filter { it.isNotBlank() }.joinToString("\n").trimEnd()
+        statements.addLast(TerminalBastNode("${TAB.repeat(5)};;", STRING))
+        val statementBlock: List<String> = statements.map { it.render(options) }
+        return matchRender + statementBlock.joinToString("")
     }
 }

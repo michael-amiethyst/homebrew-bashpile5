@@ -25,7 +25,7 @@ import org.bashpile.core.engine.TypeEnum.*
  * Law of Demeter relaxed to two calls deep (extension methods are just used once or twice)
  * Code is arranged from complex at the top to simple at the bottom.
  */
-class AstConvertingVisitor: BashpileParserBaseVisitor<BastNode>() {
+class AstConvertingVisitor: BashpileParserBaseVisitor<BastNode>() { // end of class
 
     companion object {
         const val OLD_OPTIONS = "__bp_old_options"
@@ -74,7 +74,7 @@ class AstConvertingVisitor: BashpileParserBaseVisitor<BastNode>() {
 
     override fun visitSwitchStatement(ctx: BashpileParser.SwitchStatementContext): BastNode {
         val matchingExpression = visit(ctx.expression())
-        val cases = ctx.indentedCase().map { visit(it) }
+        val cases = ctx.caseClauses().map { visit(it) }
         return SwitchBastNode(matchingExpression, cases)
     }
 
@@ -267,10 +267,10 @@ class AstConvertingVisitor: BashpileParserBaseVisitor<BastNode>() {
 
     // Leaf nodes (parts of expressions)
 
-    override fun visitIndentedCase(ctx: BashpileParser.IndentedCaseContext): BastNode {
+    override fun visitCaseClauses(ctx: BashpileParser.CaseClausesContext): BastNode {
         val matcher = visit(ctx.expression())
-        val statements = ctx.indentedStatements().statement().map { visit(it) }
-        return CaseBastNode(matcher, statements)
+        val statements = ctx.statements().map { visit(it) }
+        return CaseBastNode(matcher, statements.toMutableList())
     }
 
     override fun visitShellString(ctx: BashpileParser.ShellStringContext): BastNode {
@@ -322,7 +322,7 @@ class AstConvertingVisitor: BashpileParserBaseVisitor<BastNode>() {
             )
         }
     }
-} // end of class
+}
 
 private fun BashpileParser.VariableDeclarationStatementContext.modifiers(): List<BashpileParser.ModifierContext> {
     return typedId().modifier()
@@ -330,6 +330,10 @@ private fun BashpileParser.VariableDeclarationStatementContext.modifiers(): List
 
 private fun BashpileParser.TypedIdContext.majorType(): BashpileParser.TypesContext {
     return complexType().types(0)
+}
+
+private fun BashpileParser.CaseClausesContext.statements(): List<BashpileParser.StatementContext> {
+    return indentedStatements().statement()
 }
 
 /**
