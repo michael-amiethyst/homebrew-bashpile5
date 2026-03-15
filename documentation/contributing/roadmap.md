@@ -1,6 +1,7 @@
 # Bashpile Compiler Plans
 
-1. While loops and argument parsing
+1. While loops and argument parsing 
+   1. See the test bashArguments_withWhile_worksAsExpected
 2. lists
 3. C-style for loops
 4. foreach loops

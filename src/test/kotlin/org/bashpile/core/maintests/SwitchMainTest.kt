@@ -72,7 +72,6 @@ class SwitchMainTest : MainTest() {
     }
 
     /** When we implement while statements we'll handle argument parsing this way */
-    // TODO feature/switch - create test to parse options with Bashpile
     @Test
     fun bashArguments_withWhile_worksAsExpected() {
         val bashScript = """
