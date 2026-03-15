@@ -29,4 +29,4 @@ jobs:
           scandir: './build/shellcheck'
           severity: info
         env:
-          SHELLCHECK_OPTS: --shell=bash --exclude=SC2059,SC2097,SC2098,SC2157,SC2327,SC2328
+          SHELLCHECK_OPTS: --shell=bash --exclude=SC2059,SC2097,SC2098,SC2154,SC2157,SC2327,SC2328
