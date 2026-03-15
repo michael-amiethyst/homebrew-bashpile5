@@ -102,20 +102,19 @@ class ShellStringMainTest : MainTest() {
         ).assertRenderProduces({ it.contains("bin") }, SCRIPT_ERROR__GENERIC)
     }
 
-    // TODO feature/switch - uncomment and fix
-//    @Test
-//    fun getBast_looseShellstring_twoInOneLine_works() {
-//        val script = """
-//            'ls ' + l#(printf "-all") + l#(printf "."; exit 1)
-//            """.trimIndent().createRender()
-//        assertRenderEquals("""
-//            eval "${'$'}__bp_old_options"
-//            ls $(printf "."; exit 1)
-//            set -euo pipefail
-//
-//            """.trimIndent(), script
-//        ).assertRenderProduces({ it.contains("bin") })
-//    }
+    @Test
+    fun getBast_looseShellstring_twoInOneLine_works() {
+        // TODO 0.22.0 - make test with escaped double quotes.  E.g. include `+ "\""`
+        val script = """
+            'ls "' + l#(printf "%s" "-all") + '" "' + l#(printf "."; exit 1) + '"'
+            """.trimIndent().createRender()
+        assertRenderEquals(
+            """
+            ls "$(eval "${'$'}__bp_old_options"; printf "%s" "-all")" "$(eval "${'$'}__bp_old_options"; printf "."; exit 1)"
+
+            """.trimIndent(), script
+        ).assertRenderProduces({ it.contains("bin") })
+    }
 
     @Test
     fun getBast_shellstring_withConcat_works() {
