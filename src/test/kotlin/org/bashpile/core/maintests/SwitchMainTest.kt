@@ -141,7 +141,8 @@ class SwitchMainTest : MainTest() {
     @Test
     fun switch_withMultipleCases_inCondition_works() {
         val render: String = """
-            if (4 < 5):
+            five: integer = 5
+            if (4 < five):
                 name: string = "Riker"
                 switch name:
                     case "Riker":
@@ -150,7 +151,9 @@ class SwitchMainTest : MainTest() {
                         printf "The Captain"
         """.trimIndent().createRender()
         assertRenderEquals("""
-            if [ 4 -lt 5 ]; then
+            declare five
+            five=5
+            if [ 4 -lt "${'$'}{five}" ]; then
                 declare name
                 name="Riker"
                 case "${'$'}{name}" in

@@ -5,8 +5,6 @@ import org.bashpile.core.runCommand
 import kotlin.test.Test
 import kotlin.test.assertFailsWith
 
-// TODO 0.21.0 - Fix shellcheck errors for new Switch tests
-//  command is `shellcheck --shell=bash --exclude=SC2059,SC2097,SC2098,SC2154,SC2157,SC2327,SC2328 ./build/shellcheck/Loops* `
 class LoopsMainTest : MainTest() {
 
     override val testName = "LoopsTest"
