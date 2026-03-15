@@ -103,7 +103,6 @@ class SwitchMainTest : MainTest() {
     }
 
     /**
-     * TODO feature/switch - write tests with multiple case statements and multiple cose lines
      * TODO feature/switch - write tests with defaults
      */
     @Test
@@ -167,5 +166,32 @@ class SwitchMainTest : MainTest() {
             fi
             
         """.trimIndent(), render).runCommand().assertRenderProduces("Number 1\n")
+    }
+
+    @Test
+    fun switch_withMultipleCases_multipleStatements_works() {
+        val render: String = """
+            name: string = "Riker"
+            switch name:
+                case "Riker":
+                    printf "Number 1\n"
+                    print("Trombone player")
+                case "Picard":
+                    printf "The Captain"
+        """.trimIndent().createRender()
+        assertRenderEquals("""
+            declare name
+            name="Riker"
+            case "${'$'}{name}" in
+                Riker)
+                    printf "Number 1\n"
+                    printf "Trombone player"
+                    ;;
+                Picard)
+                    printf "The Captain"
+                    ;;
+            esac
+            
+        """.trimIndent(), render).runCommand().assertRenderProduces("Number 1\nTrombone player\n")
     }
 }
