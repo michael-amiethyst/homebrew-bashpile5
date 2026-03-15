@@ -12,8 +12,11 @@ class CaseBastNode(val expression: BastNode, val statements: List<BastNode>)
     }
 
     override fun render(options: RenderOptions): String {
-        val statementRenders = statements.map { it.render(options) }
+        // TODO feature/switch - refactor to avoid need to remove newlines at end, change statementRenders to List<List<String>> and have
+        // .joinToString on the list-list
+        val statementRenders = statements.map { it.render(options) } + "\n${TAB.repeat(5)};;"
         val matchRender = "$TAB${expression.render(options)})\n${TAB.repeat(5)}"
-        return matchRender + statementRenders.joinToString("\n${TAB.repeat(5)}").trimEnd()
+        val ret = matchRender + statementRenders.joinToString("\n${TAB.repeat(5)}").trimEnd()
+        return ret.lines().filter { it.isNotBlank() }.joinToString("\n").trimEnd()
     }
 }

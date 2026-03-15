@@ -103,7 +103,8 @@ class SwitchMainTest : MainTest() {
     }
 
     /**
-     * TODO write tests with multiple case statements and multiple cose lines
+     * TODO feature/switch - write tests with multiple case statements and multiple cose lines
+     * TODO feature/switch - write tests with defaults
      */
     @Test
     fun switch_works() {
@@ -111,12 +112,30 @@ class SwitchMainTest : MainTest() {
             Path("src/test/resources/bpsScripts/switch.bps").readText(Charsets.UTF_8).createRender()
         assertRenderEquals("""
             declare name
-            name="david"
+            name="Riker"
             case "${'$'}{name}" in
-                david)
-                    printf "David and Goliath"
+                Riker)
+                    printf "Number 1"
                     ;;
             esac
-        """.trimIndent(), render).runCommand().assertRenderProduces("David and Goliath\n")
+        """.trimIndent(), render).runCommand().assertRenderProduces("Number 1\n")
+    }
+
+    @Test
+    fun switch_withMultipleCases_works() {
+        val render: String =
+            Path("src/test/resources/bpsScripts/switchTwoCases.bps").readText(Charsets.UTF_8).createRender()
+        assertRenderEquals("""
+            declare name
+            name="Riker"
+            case "${'$'}{name}" in
+                Riker)
+                    printf "Number 1"
+                    ;;
+                Picard)
+                    printf "The Captain"
+                    ;;
+            esac
+        """.trimIndent(), render).runCommand().assertRenderProduces("Number 1\n")
     }
 }

@@ -1,4 +1,4 @@
-name: string = "david"
+name: string = "Riker"
 switch name:
-    case "david":
-        printf "David and Goliath"
+    case "Riker":
+        printf "Number 1"
