@@ -393,7 +393,7 @@ class LoopsMainTest : MainTest() {
                 for(line: string in "$outerFilename"):
                     printf "%s" "${'$'}{line}" > /dev/null
                     print(#(ls -m "$(printf '.')") + "\n")
-                    print(#(cat "$(find ./ | tail -1)" | head -1) + "\n")
+                    print(#(cat "$(find example_extended.csv)" | head -1) + "\n")
                 
             """.trimIndent().createRender()
         assertRenderEquals(
@@ -410,7 +410,7 @@ class LoopsMainTest : MainTest() {
                     __bp_var1="$(printf '.')"
                     printf "$(ls -m "${'$'}{__bp_var1}")\n"
                     declare __bp_var2
-                    __bp_var2="$(find ./ | tail -1)"
+                    __bp_var2="$(find example_extended.csv)"
                     printf "$(cat "${'$'}{__bp_var2}" | head -1)\n"
                 done
             done
