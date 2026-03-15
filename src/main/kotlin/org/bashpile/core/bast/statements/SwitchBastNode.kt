@@ -18,6 +18,7 @@ class SwitchBastNode(val matchOn: BastNode, val cases: List<BastNode>)
             case "$matchOnRender" in
             $caseRenders
             esac
+            
         """.trimIndent()
     }
 }

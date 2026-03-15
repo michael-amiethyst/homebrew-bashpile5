@@ -118,6 +118,7 @@ class SwitchMainTest : MainTest() {
                     printf "Number 1"
                     ;;
             esac
+            
         """.trimIndent(), render).runCommand().assertRenderProduces("Number 1\n")
     }
 
@@ -136,6 +137,35 @@ class SwitchMainTest : MainTest() {
                     printf "The Captain"
                     ;;
             esac
+            
+        """.trimIndent(), render).runCommand().assertRenderProduces("Number 1\n")
+    }
+
+    @Test
+    fun switch_withMultipleCases_inCondition_works() {
+        val render: String = """
+            if (4 < 5):
+                name: string = "Riker"
+                switch name:
+                    case "Riker":
+                        printf "Number 1"
+                    case "Picard":
+                        printf "The Captain"
+        """.trimIndent().createRender()
+        assertRenderEquals("""
+            if [ 4 -lt 5 ]; then
+                declare name
+                name="Riker"
+                case "${'$'}{name}" in
+                    Riker)
+                        printf "Number 1"
+                        ;;
+                    Picard)
+                        printf "The Captain"
+                        ;;
+                esac
+            fi
+            
         """.trimIndent(), render).runCommand().assertRenderProduces("Number 1\n")
     }
 }

@@ -14,9 +14,10 @@ class CaseBastNode(val expression: BastNode, val statements: MutableList<BastNod
     }
 
     override fun render(options: RenderOptions): String {
-        // TODO factor out the hard-coded 5 -- create test for switch in a block
-        val matchRender = "$TAB${expression.render(options)})\n${TAB.repeat(5)}"
-        statements.addLast(TerminalBastNode("${TAB.repeat(5)};;", STRING))
+        // this is rendered in the SwitchBastNode with 3 tabs as indents
+        val tabs = TAB.repeat(5) // base of 3 tabs, one for the case and one for the statements
+        val matchRender = "$TAB${expression.render(options)})\n$tabs"
+        statements.addLast(TerminalBastNode("$tabs;;", STRING))
         val statementBlock: List<String> = statements.map { it.render(options) }
         return matchRender + statementBlock.joinToString("")
     }
