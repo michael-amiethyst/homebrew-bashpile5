@@ -74,8 +74,8 @@ class AstConvertingVisitor: BashpileParserBaseVisitor<BastNode>() { // end of cl
 
     override fun visitSwitchStatement(ctx: BashpileParser.SwitchStatementContext): BastNode {
         val matchingExpression = visit(ctx.expression())
-        val cases = ctx.caseClauses().map { visit(it) }
-        return SwitchBastNode(matchingExpression, cases)
+        val cases = ctx.caseClauses().map { visit(it) } + ctx.defaultCase()?.let { visit(it) }
+        return SwitchBastNode(matchingExpression, cases.filterNotNull())
     }
 
     override fun visitVariableDeclarationStatement(ctx: BashpileParser.VariableDeclarationStatementContext): BastNode {
@@ -269,8 +269,14 @@ class AstConvertingVisitor: BashpileParserBaseVisitor<BastNode>() { // end of cl
 
     override fun visitCaseClauses(ctx: BashpileParser.CaseClausesContext): BastNode {
         val matcher = visit(ctx.expression())
-        val statements = ctx.statements().map { visit(it) }
+        val statements = ctx.indentedStatements().statement().map { visit(it) }
         return CaseBastNode(matcher, statements.toMutableList())
+    }
+
+    override fun visitDefaultCase(ctx: BashpileParser.DefaultCaseContext): BastNode {
+        val defaultMatch = TerminalBastNode("*", STRING)
+        val statements = ctx.indentedStatements().statement().map { visit(it) }
+        return CaseBastNode(defaultMatch, statements.toMutableList())
     }
 
     override fun visitShellString(ctx: BashpileParser.ShellStringContext): BastNode {
@@ -330,10 +336,6 @@ private fun BashpileParser.VariableDeclarationStatementContext.modifiers(): List
 
 private fun BashpileParser.TypedIdContext.majorType(): BashpileParser.TypesContext {
     return complexType().types(0)
-}
-
-private fun BashpileParser.CaseClausesContext.statements(): List<BashpileParser.StatementContext> {
-    return indentedStatements().statement()
 }
 
 /**

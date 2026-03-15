@@ -16,7 +16,7 @@ statement
                             Colon functionBlock # functionDeclarationStatement
     | If OParen expression CParen Colon indentedStatements (elseIfClauses)* (Else Colon indentedStatements)?
                                                 # conditionalStatement
-    | Switch expression Colon INDENT caseClauses+ DEDENT
+    | Switch expression Colon INDENT caseClauses+ defaultCase? DEDENT
                                                 # switchStatement
     | <assoc=right> typedId (Equals expression)? Newline
                                                 # variableDeclarationStatement
@@ -42,6 +42,7 @@ argumentList: expression (Comma expression)*;
 elseIfClauses     : Else If OParen expression CParen Colon indentedStatements;
 indentedStatements: INDENT statement+ DEDENT;
 caseClauses: Case expression Colon indentedStatements;
+defaultCase: Default Colon indentedStatements;
 assignmentOperator: Equals | PlusEquals;
 
 // Force the final statement to be a return.

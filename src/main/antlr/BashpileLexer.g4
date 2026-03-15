@@ -41,6 +41,7 @@ If       : 'if';
 Else     : 'else';
 Switch   : 'switch';
 Case     : 'case';
+Default  : 'default';
 Pass     : 'pass';
 Arguments: 'arguments';
 All      : 'all';

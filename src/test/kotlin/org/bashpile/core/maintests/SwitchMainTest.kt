@@ -72,6 +72,7 @@ class SwitchMainTest : MainTest() {
     }
 
     /** When we implement while statements we'll handle argument parsing this way */
+    // TODO feature/switch - create test to parse options with Bashpile
     @Test
     fun bashArguments_withWhile_worksAsExpected() {
         val bashScript = """
@@ -102,9 +103,6 @@ class SwitchMainTest : MainTest() {
         bashScript.runCommand(arguments = listOf("--delete")).assertRenderProduces("Delete flag set to: true\n")
     }
 
-    /**
-     * TODO feature/switch - write tests with defaults
-     */
     @Test
     fun switch_works() {
         val render: String =
@@ -175,7 +173,7 @@ class SwitchMainTest : MainTest() {
             switch name:
                 case "Riker":
                     printf "Number 1\n"
-                    print("Trombone player")
+                    print("Trombone player\n")
                 case "Picard":
                     printf "The Captain"
         """.trimIndent().createRender()
@@ -185,7 +183,7 @@ class SwitchMainTest : MainTest() {
             case "${'$'}{name}" in
                 Riker)
                     printf "Number 1\n"
-                    printf "Trombone player"
+                    printf "Trombone player\n"
                     ;;
                 Picard)
                     printf "The Captain"
@@ -193,5 +191,37 @@ class SwitchMainTest : MainTest() {
             esac
             
         """.trimIndent(), render).runCommand().assertRenderProduces("Number 1\nTrombone player\n")
+    }
+
+    @Test
+    fun switch_withDefault_works() {
+        val render: String = """
+            name: string = "La Forge"
+            switch name:
+                case "Riker":
+                    printf "Number 1\n"
+                    print("Trombone player\n")
+                case "Picard":
+                    printf "The Captain"
+                default:
+                    print("Other crew\n")
+        """.trimIndent().createRender()
+        assertRenderEquals("""
+            declare name
+            name="La Forge"
+            case "${'$'}{name}" in
+                Riker)
+                    printf "Number 1\n"
+                    printf "Trombone player\n"
+                    ;;
+                Picard)
+                    printf "The Captain"
+                    ;;
+                *)
+                    printf "Other crew\n"
+                    ;;
+            esac
+            
+        """.trimIndent(), render).runCommand().assertRenderProduces("Other crew\n")
     }
 }
