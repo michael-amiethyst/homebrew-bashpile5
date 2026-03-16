@@ -81,3 +81,5 @@ Prerequisite: don't have the Homebrew version installed.  Run `brew uninstall ba
   * `arguments[splat]` -> `$*`
     * `print(arguments[splat])` prints all arguments as one would expect
     * By default it will separate with a space, to change set IFS (e.g. set to a linebreak with `l#(IFS="\n")`)
+* [Switch/Case statements](statements/switch-statements.md)
+* [Foreach-File-Line Loops](statements/foreach-file-line.md)

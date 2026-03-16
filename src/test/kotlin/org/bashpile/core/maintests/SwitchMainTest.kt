@@ -137,6 +137,10 @@ class SwitchMainTest : MainTest() {
         """.trimIndent(), render).runCommand().assertRenderProduces("Number 1\n")
     }
 
+    // TODO feature/switch make integer test
+    // TODO feature/switch make float test
+    // TODO feature/switch make shell globbing (wildcards, charactor classes like `[1-9]|[1-7][0-9]|8[0-4])`.  Matches 1-9, 10-79, or 80-84
+    // TODO feature/switch change if statement to not use paranthesis so it matches the switch statement
     @Test
     fun switch_withMultipleCases_inCondition_works() {
         val render: String = """
