@@ -1,6 +1,6 @@
 # Switch Statements
 
-May use integers, floats, strings or shell globbing.
+May use integers, floats, strings or shell globbing.  Note that Bash uses string based matching so a float of 1.0, 1. and 1.00 will all be different cases.
 
 Shell globbing includes wildcards and charactor classes like `[1-9]|[1-7][0-9]|8[0-4])`.  This example matches 1-9, 10-79, or 80-84.
 
