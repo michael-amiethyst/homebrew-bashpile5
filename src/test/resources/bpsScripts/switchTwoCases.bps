@@ -1,5 +1,5 @@
 name: string = "Riker"
-switch name:
+switch (name):
     case Riker:
         printf "Number 1"
     case Picard:

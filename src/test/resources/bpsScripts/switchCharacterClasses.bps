@@ -1,5 +1,5 @@
 starbaseNumber: float = 1.0
-switch starbaseNumber:
+switch (starbaseNumber):
     case [1][.][0-1]:
         print("Earth")
         print(", the first one")

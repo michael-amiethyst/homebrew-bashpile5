@@ -1,5 +1,5 @@
 starbaseNumber: integer = 1
-switch starbaseNumber:
+switch (starbaseNumber):
     case 1:
         print("Earth\n")
     case 80:

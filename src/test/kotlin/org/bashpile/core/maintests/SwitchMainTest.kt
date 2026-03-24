@@ -167,14 +167,13 @@ class SwitchMainTest : MainTest() {
         """.trimIndent(), render).runCommand().assertRenderProduces("Number 1\n")
     }
 
-    // TODO feature/switch change if statement to not use paranthesis so it matches the switch statement
     @Test
     fun switch_withMultipleCases_inCondition_works() {
         val render: String = """
             five: integer = 5
             if (4 < five):
                 name: string = "Riker"
-                switch name:
+                switch (name):
                     case Riker:
                         printf "Number 1"
                     case Picard:
@@ -203,7 +202,7 @@ class SwitchMainTest : MainTest() {
     fun switch_withMultipleCases_multipleStatements_works() {
         val render: String = """
             name: string = "Riker"
-            switch name:
+            switch (name):
                 case Riker:
                     printf "Number 1\n"
                     print("Trombone player\n")
@@ -248,7 +247,7 @@ class SwitchMainTest : MainTest() {
     fun switch_withMultipleCases_multipleStatements_floats_works() {
         val render: String = """
             starbaseNumber: float = 1.0
-            switch starbaseNumber:
+            switch (starbaseNumber):
                 case 1.0:
                     print("Earth")
                     print(", the first one")
@@ -294,7 +293,7 @@ class SwitchMainTest : MainTest() {
     fun switch_withMultipleCases_multipleStatements_characterClassesAndStrings_works() {
         val render = """
             starbaseNumber: float = 1.0
-            switch starbaseNumber:
+            switch (starbaseNumber):
                 case 1.[0-1]:
                     print("Earth")
                     print(", the first one")
@@ -320,7 +319,7 @@ class SwitchMainTest : MainTest() {
     fun switch_withMultipleCases_multipleStatements_asterisk_works() {
         val render = """
             starbaseNumber: float = 1.0
-            switch starbaseNumber:
+            switch (starbaseNumber):
                 case 1*:
                     print("Earth")
                     print(", the first one")
@@ -346,7 +345,7 @@ class SwitchMainTest : MainTest() {
     fun switch_withMultipleCases_multipleStatements_questionMark_works() {
         val render = """
             starbaseNumber: float = 1.0
-            switch starbaseNumber:
+            switch (starbaseNumber):
                 case 1?0:
                     print("Earth")
                     print(", the first one")
@@ -372,7 +371,7 @@ class SwitchMainTest : MainTest() {
     fun switch_withMultipleCases_multipleStatements_characterClassesAndStrings_literalColon_works() {
         val render = """
             starbaseNumber: string = "1.0:"
-            switch starbaseNumber:
+            switch (starbaseNumber):
                 case 1.[0-1]\::
                     print("Earth")
                     print(", the first one")
@@ -398,7 +397,7 @@ class SwitchMainTest : MainTest() {
     fun switch_withMultipleCases_multipleStatements_characterClassesAndStrings_withOr_works() {
         val render = """
             starbaseNumber: string = "1.2"
-            switch starbaseNumber:
+            switch (starbaseNumber):
                 case 1.[0-1]\:|1.2:
                     print("Earth")
                     print(", the first one")
@@ -424,7 +423,7 @@ class SwitchMainTest : MainTest() {
     fun switch_withMultipleCases_multipleStatements_negatedCharacterClassesAndStrings_withOr_works() {
         val render = """
             starbaseNumber: string = "1.0:"
-            switch starbaseNumber:
+            switch (starbaseNumber):
                 case 1.[!2-9]\:|1.2:
                     print("Earth")
                     print(", the first one")
@@ -450,7 +449,7 @@ class SwitchMainTest : MainTest() {
     fun switch_withDefault_works() {
         val render: String = """
             name: string = "La Forge"
-            switch name:
+            switch (name):
                 case Riker:
                     printf "Number 1\n"
                     print("Trombone player\n")

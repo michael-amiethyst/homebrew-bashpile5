@@ -16,7 +16,7 @@ statement
                             Colon functionBlock # functionDeclarationStatement
     | If OParen expression CParen Colon indentedStatements (elseIfClauses)* (Else Colon indentedStatements)?
                                                 # conditionalStatement
-    | Switch expression Colon INDENT caseClauses+ defaultCase? DEDENT
+    | Switch OParen expression CParen Colon INDENT caseClauses+ defaultCase? DEDENT
                                                 # switchStatement
     | <assoc=right> typedId (Equals expression)? Newline
                                                 # variableDeclarationStatement
@@ -51,7 +51,7 @@ globPattern //: extended_pattern  // extglob: ?(p|p), *(p|p), +(p|p), @(p|p), !(
             | literal                // literal characters
             ;
 //// Character Sets: [abc], [a-zA-Z], [!0-9]
-globCharacterSet : OBracket Bang? (CaseModeClassBody | NumberValues | StringValues) CBracket;
+globCharacterSet : OBracket (CaseModeClassBody | NumberValues | StringValues) CBracket;
 defaultCase: Default Colon indentedStatements;
 assignmentOperator: Equals | PlusEquals;
 
