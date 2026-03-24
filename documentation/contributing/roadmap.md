@@ -9,6 +9,7 @@
 6. IDE integration (IntelliJ)
 
 ## Unscheduled ideas
+switch/case statement extglob support
 Take 2nd file argument, it would be the compiled file (with shebang and chmod +x)
 
 # Bashpile STDLIB Plans

@@ -117,11 +117,8 @@ BlockComment  : '/*' ( BlockComment | . )*? '*/';
 
 Colon   : ':';
 Comma   : ',';
-// opening square bracket
-OBracket: '[';
-// closing square bracket
-CBracket: ']';
-Bang    : '!';
+OBracket: '['; // opening square bracket
+CBracket: ']'; // closing square bracket
 
 // strings
 

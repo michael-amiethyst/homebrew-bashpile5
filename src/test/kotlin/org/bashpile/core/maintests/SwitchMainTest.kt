@@ -167,7 +167,6 @@ class SwitchMainTest : MainTest() {
         """.trimIndent(), render).runCommand().assertRenderProduces("Number 1\n")
     }
 
-    // TODO feature/switch make shell globbing (wildcards, charactor classes like `[1-9]|[1-7][0-9]|8[0-4])`.  Matches 1-9, 10-79, or 80-84
     // TODO feature/switch change if statement to not use paranthesis so it matches the switch statement
     @Test
     fun switch_withMultipleCases_inCondition_works() {
@@ -384,6 +383,58 @@ class SwitchMainTest : MainTest() {
             starbaseNumber="1.0:"
             case "${'$'}{starbaseNumber}" in
                 1.[0-1]\:)
+                    printf "Earth"
+                    printf ", the first one"
+                    ;;
+                80.0)
+                    printf "The Lower Decks one\n"
+                    ;;
+            esac
+            
+        """.trimIndent(), render).runCommand().assertRenderProduces("Earth, the first one\n")
+    }
+
+    @Test
+    fun switch_withMultipleCases_multipleStatements_characterClassesAndStrings_withOr_works() {
+        val render = """
+            starbaseNumber: string = "1.2"
+            switch starbaseNumber:
+                case 1.[0-1]\:|1.2:
+                    print("Earth")
+                    print(", the first one")
+                case 80.0:
+                    print("The Lower Decks one\n")""".trimIndent().createRender()
+        assertRenderEquals("""
+            declare starbaseNumber
+            starbaseNumber="1.2"
+            case "${'$'}{starbaseNumber}" in
+                1.[0-1]\:|1.2)
+                    printf "Earth"
+                    printf ", the first one"
+                    ;;
+                80.0)
+                    printf "The Lower Decks one\n"
+                    ;;
+            esac
+            
+        """.trimIndent(), render).runCommand().assertRenderProduces("Earth, the first one\n")
+    }
+
+    @Test
+    fun switch_withMultipleCases_multipleStatements_negatedCharacterClassesAndStrings_withOr_works() {
+        val render = """
+            starbaseNumber: string = "1.0:"
+            switch starbaseNumber:
+                case 1.[!2-9]\:|1.2:
+                    print("Earth")
+                    print(", the first one")
+                case 80.0:
+                    print("The Lower Decks one\n")""".trimIndent().createRender()
+        assertRenderEquals("""
+            declare starbaseNumber
+            starbaseNumber="1.0:"
+            case "${'$'}{starbaseNumber}" in
+                1.[!2-9]\:|1.2)
                     printf "Earth"
                     printf ", the first one"
                     ;;
