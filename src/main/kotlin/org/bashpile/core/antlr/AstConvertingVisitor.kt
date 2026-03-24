@@ -124,7 +124,14 @@ class AstConvertingVisitor: BashpileParserBaseVisitor<BastNode>() { // end of cl
     override fun visitPrintStatement(ctx: BashpileParser.PrintStatementContext): BastNode {
         val antlrExpressions = ctx.argumentList().expression()
         val nodes = antlrExpressions.map { visit(it) }
-        return PrintBastNode(nodes)
+
+        val endContexts = ctx.statementEnd().children
+        val ends = if (endContexts.isNotEmpty()) {
+            val endNodes = endContexts.map { visit(it) }
+            endNodes.subList(0, endNodes.size - 1) // remove trailing newline
+        } else { listOf() }
+
+        return PrintBastNode(nodes, ends)
     }
 
     override fun visitExpressionStatement(ctx: BashpileParser.ExpressionStatementContext): BastNode {
@@ -166,7 +173,6 @@ class AstConvertingVisitor: BashpileParserBaseVisitor<BastNode>() { // end of cl
     override fun visitLiteral(ctx: BashpileParser.LiteralContext): BastNode {
         val boolContext = ctx.BoolValues()?.text
         val stringContext = ctx.StringValues()?.text
-        val numberText = ctx.NumberValues()?.text
 
         return if (boolContext != null) {
             BooleanLiteralBastNode(boolContext.toBoolean())
@@ -174,12 +180,9 @@ class AstConvertingVisitor: BashpileParserBaseVisitor<BastNode>() { // end of cl
             // remove enclosing double or single quotes
             val trimEnds = stringContext.substring(1, stringContext.length - 1)
             StringLiteralBastNode(trimEnds)
-        } else if (numberText?.contains(".") == true) {
-            FloatLiteralBastNode(numberText.toBigDecimal())
-        } else if (numberText != null) {
-            IntegerLiteralBastNode(numberText.toBigInteger())
         } else {
-            throw IllegalArgumentException("Unknown literal type.")
+            val message = "Unknown literal type.  Numeric values should be handled in visitNumberExpression"
+            throw IllegalArgumentException(message)
         }
     }
 
@@ -327,6 +330,12 @@ class AstConvertingVisitor: BashpileParserBaseVisitor<BastNode>() { // end of cl
             BashpileLexer.CParen -> ClosingParenthesisTerminalBastNode()
             BashpileLexer.Comment -> TerminalBastNode(
                 node.text.replace("^//".toRegex(), "#"),
+                STRING
+            )
+            BashpileLexer.BlockComment -> TerminalBastNode(
+                // chop off initial /* and */.  Then add Bash comment on each line
+                // TODO switch - add test for a line that starts with a block comment.  E.g. `endOfComment */ x: int = 1`
+                node.text.substring(3, node.text.length - 3).lines().map { "# $it" }.joinToString(""),
                 STRING
             )
             else -> TerminalBastNode(

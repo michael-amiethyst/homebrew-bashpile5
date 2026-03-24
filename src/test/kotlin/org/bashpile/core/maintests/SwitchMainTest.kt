@@ -445,7 +445,6 @@ class SwitchMainTest : MainTest() {
         """.trimIndent(), render).runCommand().assertRenderProduces("Earth, the first one\n")
     }
 
-    /** TODO switch - these comments really should render */
     /** TODO switch - write tests for statementEnds */
     @Test
     fun switch_withMultipleCases_multipleStatements_withEscapes_works() {
@@ -467,14 +466,14 @@ class SwitchMainTest : MainTest() {
             name="La Forge:|"
             case "${'$'}{name}" in
                 Riker)
-                    printf "Number 1\n"
+                    printf "Number 1\n" # new lines needed
                     printf "Trombone player\n"
                     ;;
                 Picard)
                     printf "The Captain"
                     ;;
                 La\ For[!a]?\:\|)
-                    printf "Chief Engineer"
+                    printf "Chief Engineer" # this prints
                     ;;
                 *)
                     printf "Other"

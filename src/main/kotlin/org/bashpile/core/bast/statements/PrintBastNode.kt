@@ -3,10 +3,12 @@ package org.bashpile.core.bast.statements
 import org.bashpile.core.bast.BastNode
 import org.bashpile.core.bast.expressions.VariableReferenceBastNode
 import org.bashpile.core.engine.RenderOptions
+import org.bashpile.core.engine.RenderOptions.Companion.UNQUOTED
 import org.bashpile.core.engine.TypeEnum.*
 
 /** This is a Print Statement node */
-class PrintBastNode(children: List<BastNode> = listOf()) : StatementBastNode(children) {
+class PrintBastNode(children: List<BastNode> = listOf(), val commentNodes: List<BastNode> = listOf()
+) : StatementBastNode(children) {
 
     constructor(vararg child: BastNode) : this(child.toList())
 
@@ -14,7 +16,7 @@ class PrintBastNode(children: List<BastNode> = listOf()) : StatementBastNode(chi
     override fun render(options: RenderOptions): String {
         val printfArguments = mutableListOf<String>()
         val childRenders = children.map {
-            val render = it.render(RenderOptions.UNQUOTED)
+            val render = it.render(UNQUOTED)
             val notNumeric = !immediateImportantDescendants().areNumbers()
             if (it !is VariableReferenceBastNode && notNumeric) {
                 render
@@ -26,7 +28,9 @@ class PrintBastNode(children: List<BastNode> = listOf()) : StatementBastNode(chi
         }.joinToString("")
 
         val renderedArguments = printfArguments.joinToString("") { " \"$it\"" }
-        return "printf \"$childRenders\"$renderedArguments\n"
+        val rawComments = commentNodes.map { it.render(UNQUOTED) }.joinToString("", " ")
+        val renderedComments = rawComments.ifBlank { "" }
+        return "printf \"$childRenders\"$renderedArguments$renderedComments\n"
     }
 
     override fun replaceChildren(nextChildren: List<BastNode>): PrintBastNode {
