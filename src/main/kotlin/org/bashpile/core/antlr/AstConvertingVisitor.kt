@@ -271,11 +271,7 @@ class AstConvertingVisitor: BashpileParserBaseVisitor<BastNode>() { // end of cl
     // Leaf nodes (parts of expressions)
 
     override fun visitCaseClauses(ctx: BashpileParser.CaseClausesContext): BastNode {
-        val matcher = if (ctx.literal() != null) {
-            visit(ctx.literal()).toList()
-        } else {
-            ctx.globPattern().map { TerminalBastNode(it.text, STRING) }
-        }
+        val matcher = ctx.globPattern().map { TerminalBastNode(it.text, STRING) }
         val statements = ctx.indentedStatements().statement().map { visit(it) }
         return CaseBastNode(matcher, statements.toMutableList())
     }

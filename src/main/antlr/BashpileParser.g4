@@ -42,13 +42,13 @@ argumentList: expression (Comma expression)*;
 elseIfClauses     : Else If OParen expression CParen Colon indentedStatements;
 indentedStatements: INDENT statement+ DEDENT;
 //caseClauses: Case expression Colon indentedStatements;
-caseClauses: Case (literal | globPattern+) Colon indentedStatements;
+caseClauses: Case globPattern+ Colon indentedStatements;
 globPattern //: extended_pattern  // extglob: ?(p|p), *(p|p), +(p|p), @(p|p), !(p|p)
 //            //| brace_expansion   // {a,b}
             : globCharacterSet    // [a-z]
 //            | Multiply            // *
 //            | Question            // ?
-//            | Text                // literal characters
+            | literal                // literal characters
             ;
 //// Character Sets: [abc], [a-zA-Z], [!0-9]
 globCharacterSet : OBracket Bang? (CaseModeClassBody | NumberValues | StringValues) CBracket;

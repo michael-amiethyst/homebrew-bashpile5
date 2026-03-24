@@ -176,9 +176,9 @@ class SwitchMainTest : MainTest() {
             if (4 < five):
                 name: string = "Riker"
                 switch name:
-                    case "Riker":
+                    case Riker:
                         printf "Number 1"
-                    case "Picard":
+                    case Picard:
                         printf "The Captain"
         """.trimIndent().createRender()
         assertRenderEquals("""
@@ -205,10 +205,10 @@ class SwitchMainTest : MainTest() {
         val render: String = """
             name: string = "Riker"
             switch name:
-                case "Riker":
+                case Riker:
                     printf "Number 1\n"
                     print("Trombone player\n")
-                case "Picard":
+                case Picard:
                     printf "The Captain"
         """.trimIndent().createRender()
         assertRenderEquals("""
@@ -272,7 +272,6 @@ class SwitchMainTest : MainTest() {
         """.trimIndent(), render).runCommand().assertRenderProduces("Earth, the first one\n")
     }
 
-    // TODO switches - make test for mixed matcher (e.g. string + char classes)
     @Test
     fun switch_withMultipleCases_multipleStatements_characterClasses_works() {
         val render = Path("src/test/resources/bpsScripts/switchCharacterClasses.bps").readText().createRender()
@@ -293,14 +292,66 @@ class SwitchMainTest : MainTest() {
     }
 
     @Test
+    fun switch_withMultipleCases_multipleStatements_characterClassesAndStrings_works() {
+        val render = """
+            starbaseNumber: float = 1.0
+            switch starbaseNumber:
+                case 1.[0-1]:
+                    print("Earth")
+                    print(", the first one")
+                case 80.0:
+                    print("The Lower Decks one\n")""".trimIndent().createRender()
+        assertRenderEquals("""
+            declare starbaseNumber
+            starbaseNumber=1.0
+            case "${'$'}{starbaseNumber}" in
+                1.[0-1])
+                    printf "Earth"
+                    printf ", the first one"
+                    ;;
+                80.0)
+                    printf "The Lower Decks one\n"
+                    ;;
+            esac
+            
+        """.trimIndent(), render).runCommand().assertRenderProduces("Earth, the first one\n")
+    }
+
+    @Test
+    fun switch_withMultipleCases_multipleStatements_characterClassesAndStrings_literalColon_works() {
+        val render = """
+            starbaseNumber: string = "1.0:"
+            switch starbaseNumber:
+                case 1.[0-1]\::
+                    print("Earth")
+                    print(", the first one")
+                case 80.0:
+                    print("The Lower Decks one\n")""".trimIndent().createRender()
+        assertRenderEquals("""
+            declare starbaseNumber
+            starbaseNumber="1.0:"
+            case "${'$'}{starbaseNumber}" in
+                1.[0-1]\:)
+                    printf "Earth"
+                    printf ", the first one"
+                    ;;
+                80.0)
+                    printf "The Lower Decks one\n"
+                    ;;
+            esac
+            
+        """.trimIndent(), render).runCommand().assertRenderProduces("Earth, the first one\n")
+    }
+
+    @Test
     fun switch_withDefault_works() {
         val render: String = """
             name: string = "La Forge"
             switch name:
-                case "Riker":
+                case Riker:
                     printf "Number 1\n"
                     print("Trombone player\n")
-                case "Picard":
+                case Picard:
                     printf "The Captain"
                 default:
                     print("Other crew\n")

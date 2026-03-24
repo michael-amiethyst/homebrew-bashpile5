@@ -159,10 +159,7 @@ CaseModeOBracket : '[' -> type(OBracket);
 CaseModeCBracket : ']' -> type(CBracket);
 CaseModeColon    : ':' -> type(Colon), popMode;
 CaseModeWhitespace    : [ \t\f] -> skip;
-CaseModeSingleQuoteStringValues : '\'' ( StringEscapeSequence | ~[\\\r\n\f'] )* '\'' -> type(StringValues);
-CaseModeDoubleQuoteStringValues : '"'  ( StringEscapeSequence | ~[\\\r\n\f"] )* '"' -> type(StringValues);
-CaseModeIntegerValues: (NON_ZERO_DIGIT DIGIT* | '0') -> type(NumberValues);
-CaseModeFloatValues: (INT_PART? FRACTION | INT_PART '.') -> type(NumberValues);
+CaseModeText : ( StringEscapeSequence | ~[\r\n\t\f': ] )+ -> type(StringValues);
 CaseModeClassBody: [a-zA-Z0-9-.]+;
 
 // fragments
