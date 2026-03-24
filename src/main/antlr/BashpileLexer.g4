@@ -121,7 +121,6 @@ Comma   : ',';
 OBracket: '[';
 // closing square bracket
 CBracket: ']';
-Question: '?';
 Bang    : '!';
 
 // strings

@@ -318,6 +318,58 @@ class SwitchMainTest : MainTest() {
     }
 
     @Test
+    fun switch_withMultipleCases_multipleStatements_asterisk_works() {
+        val render = """
+            starbaseNumber: float = 1.0
+            switch starbaseNumber:
+                case 1*:
+                    print("Earth")
+                    print(", the first one")
+                case 80.0:
+                    print("The Lower Decks one\n")""".trimIndent().createRender()
+        assertRenderEquals("""
+            declare starbaseNumber
+            starbaseNumber=1.0
+            case "${'$'}{starbaseNumber}" in
+                1*)
+                    printf "Earth"
+                    printf ", the first one"
+                    ;;
+                80.0)
+                    printf "The Lower Decks one\n"
+                    ;;
+            esac
+            
+        """.trimIndent(), render).runCommand().assertRenderProduces("Earth, the first one\n")
+    }
+
+    @Test
+    fun switch_withMultipleCases_multipleStatements_questionMark_works() {
+        val render = """
+            starbaseNumber: float = 1.0
+            switch starbaseNumber:
+                case 1?0:
+                    print("Earth")
+                    print(", the first one")
+                case 80.0:
+                    print("The Lower Decks one\n")""".trimIndent().createRender()
+        assertRenderEquals("""
+            declare starbaseNumber
+            starbaseNumber=1.0
+            case "${'$'}{starbaseNumber}" in
+                1?0)
+                    printf "Earth"
+                    printf ", the first one"
+                    ;;
+                80.0)
+                    printf "The Lower Decks one\n"
+                    ;;
+            esac
+            
+        """.trimIndent(), render).runCommand().assertRenderProduces("Earth, the first one\n")
+    }
+
+    @Test
     fun switch_withMultipleCases_multipleStatements_characterClassesAndStrings_literalColon_works() {
         val render = """
             starbaseNumber: string = "1.0:"
