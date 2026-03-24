@@ -7,6 +7,7 @@ import kotlin.test.Test
 
 class SwitchMainTest : MainTest() {
     override val testName = "SwitchTest"
+    val bpsScriptsDir = "src/test/resources/bpsScripts"
 
     @Test
     fun bashSwitch_worksAsExpected() {
@@ -69,6 +70,35 @@ class SwitchMainTest : MainTest() {
 
         """.trimIndent()
         bashScript.runCommand(arguments = listOf("--alpha")).assertRenderProduces("Processing 'alpha' option\n")
+    }
+
+    @Test
+    fun bashArguments_withSingleCharacterClass_worksAsExpected() {
+        val bashScript = """
+            case "$1" in
+                [1][.])
+                    printf "Processing 'alpha' option"
+                    shift
+                    ;;
+                -b | --beta)
+                    printf "Processing 'beta' option"
+                    shift
+                    ;;
+                -g | --gamma)
+                    printf "Processing 'gamma' option. Input argument is '$2'"
+                    shift 2
+                    ;;
+                -d | --delta)
+                    printf "Processing 'delta' option. Input argument is '$2'"
+                    shift 2
+                    ;;
+                --) shift; 
+                    break 
+                    ;;
+                esac
+
+        """.trimIndent()
+        bashScript.runCommand(arguments = listOf("1.")).assertRenderProduces("Processing 'alpha' option\n")
     }
 
     /** When we implement while statements we'll handle argument parsing this way */
@@ -199,14 +229,7 @@ class SwitchMainTest : MainTest() {
 
     @Test
     fun switch_withMultipleCases_multipleStatements_integers_works() {
-        val render: String = """
-            starbaseNumber: integer = 1
-            switch starbaseNumber:
-                case 1:
-                    print("Earth\n")
-                case 80:
-                    print("The Lower Decks one\n")
-        """.trimIndent().createRender()
+        val render: String = Path("$bpsScriptsDir/switchIntegers.bps").readText().createRender()
         assertRenderEquals("""
             declare starbaseNumber
             starbaseNumber=1
@@ -238,6 +261,26 @@ class SwitchMainTest : MainTest() {
             starbaseNumber=1.0
             case "${'$'}{starbaseNumber}" in
                 1.0)
+                    printf "Earth"
+                    printf ", the first one"
+                    ;;
+                80.0)
+                    printf "The Lower Decks one\n"
+                    ;;
+            esac
+            
+        """.trimIndent(), render).runCommand().assertRenderProduces("Earth, the first one\n")
+    }
+
+    // TODO switches - make test for mixed matcher (e.g. string + char classes)
+    @Test
+    fun switch_withMultipleCases_multipleStatements_characterClasses_works() {
+        val render = Path("src/test/resources/bpsScripts/switchCharacterClasses.bps").readText().createRender()
+        assertRenderEquals("""
+            declare starbaseNumber
+            starbaseNumber=1.0
+            case "${'$'}{starbaseNumber}" in
+                [1][.][0-1])
                     printf "Earth"
                     printf ", the first one"
                     ;;

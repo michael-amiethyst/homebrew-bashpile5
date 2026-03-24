@@ -40,7 +40,7 @@ BoolValues: 'true' | 'false';
 If       : 'if';
 Else     : 'else';
 Switch   : 'switch';
-Case     : 'case';
+Case     : 'case' -> pushMode(CASE_MODE);
 Default  : 'default';
 Pass     : 'pass';
 Arguments: 'arguments';
@@ -121,6 +121,8 @@ Comma   : ',';
 OBracket: '[';
 // closing square bracket
 CBracket: ']';
+Question: '?';
+Bang    : '!';
 
 // strings
 
@@ -131,7 +133,7 @@ StringValues
 
 StringEscapeSequence: '\\' . | '\\' Newline;
 
-// tokens for modes
+// ShellString tokens
 
 LHashOParen  : 'l#(' -> pushMode(SHELL_STRING);
 VHashOParen  : 'v#(' -> pushMode(SHELL_STRING);
@@ -151,6 +153,17 @@ ShellStringText          : (~[\\\f()#$]
                            )+;
 ShellStringEscapeSequence: '\\' . | '\\' Newline;
 ShellStringCParen        : ')' -> type(CParen), popMode;
+
+mode CASE_MODE;
+CaseModeOBracket : '[' -> type(OBracket);
+CaseModeCBracket : ']' -> type(CBracket);
+CaseModeColon    : ':' -> type(Colon), popMode;
+CaseModeWhitespace    : [ \t\f] -> skip;
+CaseModeSingleQuoteStringValues : '\'' ( StringEscapeSequence | ~[\\\r\n\f'] )* '\'' -> type(StringValues);
+CaseModeDoubleQuoteStringValues : '"'  ( StringEscapeSequence | ~[\\\r\n\f"] )* '"' -> type(StringValues);
+CaseModeIntegerValues: (NON_ZERO_DIGIT DIGIT* | '0') -> type(NumberValues);
+CaseModeFloatValues: (INT_PART? FRACTION | INT_PART '.') -> type(NumberValues);
+CaseModeClassBody: [a-zA-Z0-9-.]+;
 
 // fragments
 

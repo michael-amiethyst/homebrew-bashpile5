@@ -164,19 +164,22 @@ class AstConvertingVisitor: BashpileParserBaseVisitor<BastNode>() { // end of cl
     }
 
     override fun visitLiteral(ctx: BashpileParser.LiteralContext): BastNode {
-        val boolContext = ctx.BoolValues()
-        val stringContext = ctx.StringValues()
+        val boolContext = ctx.BoolValues()?.text
+        val stringContext = ctx.StringValues()?.text
+        val numberText = ctx.NumberValues()?.text
 
         return if (boolContext != null) {
-            BooleanLiteralBastNode(boolContext.text.toBoolean())
+            BooleanLiteralBastNode(boolContext.toBoolean())
         } else if (stringContext != null) {
-            val text = stringContext.text
             // remove enclosing double or single quotes
-            val trimEnds = stringContext.text.substring(1, text.length - 1)
+            val trimEnds = stringContext.substring(1, stringContext.length - 1)
             StringLiteralBastNode(trimEnds)
+        } else if (numberText?.contains(".") == true) {
+            FloatLiteralBastNode(numberText.toBigDecimal())
+        } else if (numberText != null) {
+            IntegerLiteralBastNode(numberText.toBigInteger())
         } else {
-            val message = "Unknown literal type.  Numeric values should be handled in visitNumberExpression"
-            throw IllegalArgumentException(message)
+            throw IllegalArgumentException("Unknown literal type.")
         }
     }
 
@@ -268,7 +271,11 @@ class AstConvertingVisitor: BashpileParserBaseVisitor<BastNode>() { // end of cl
     // Leaf nodes (parts of expressions)
 
     override fun visitCaseClauses(ctx: BashpileParser.CaseClausesContext): BastNode {
-        val matcher = visit(ctx.expression())
+        val matcher = if (ctx.literal() != null) {
+            visit(ctx.literal()).toList()
+        } else {
+            ctx.globPattern().map { TerminalBastNode(it.text, STRING) }
+        }
         val statements = ctx.indentedStatements().statement().map { visit(it) }
         return CaseBastNode(matcher, statements.toMutableList())
     }
@@ -276,7 +283,7 @@ class AstConvertingVisitor: BashpileParserBaseVisitor<BastNode>() { // end of cl
     override fun visitDefaultCase(ctx: BashpileParser.DefaultCaseContext): BastNode {
         val defaultMatch = TerminalBastNode("*", STRING)
         val statements = ctx.indentedStatements().statement().map { visit(it) }
-        return CaseBastNode(defaultMatch, statements.toMutableList())
+        return CaseBastNode(defaultMatch.toList(), statements.toMutableList())
     }
 
     override fun visitShellString(ctx: BashpileParser.ShellStringContext): BastNode {
