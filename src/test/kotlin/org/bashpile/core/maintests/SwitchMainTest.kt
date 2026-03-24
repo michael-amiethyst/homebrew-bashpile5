@@ -445,6 +445,45 @@ class SwitchMainTest : MainTest() {
         """.trimIndent(), render).runCommand().assertRenderProduces("Earth, the first one\n")
     }
 
+    /** TODO switch - these comments really should render */
+    /** TODO switch - write tests for statementEnds */
+    @Test
+    fun switch_withMultipleCases_multipleStatements_withEscapes_works() {
+        val render = """
+            name: string = "La Forge:|"
+            switch (name):
+                case Riker:
+                    print("Number 1\n") /* new lines needed */
+                    print("Trombone player\n")
+                case Picard:
+                    print("The Captain")
+                case La\ For[!a]?\:\|:
+                    print("Chief Engineer") // this prints
+                default:
+                    print("Other")
+        """.trimIndent().createRender()
+        assertRenderEquals("""
+            declare name
+            name="La Forge:|"
+            case "${'$'}{name}" in
+                Riker)
+                    printf "Number 1\n"
+                    printf "Trombone player\n"
+                    ;;
+                Picard)
+                    printf "The Captain"
+                    ;;
+                La\ For[!a]?\:\|)
+                    printf "Chief Engineer"
+                    ;;
+                *)
+                    printf "Other"
+                    ;;
+            esac
+            
+        """.trimIndent(), render).runCommand().assertRenderProduces("Chief Engineer\n")
+    }
+
     @Test
     fun switch_withDefault_works() {
         val render: String = """

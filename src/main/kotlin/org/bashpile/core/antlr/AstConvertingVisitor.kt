@@ -325,6 +325,10 @@ class AstConvertingVisitor: BashpileParserBaseVisitor<BastNode>() { // end of cl
             BashpileLexer.DollarOParen -> SubshellStartTerminalBastNode()
             BashpileLexer.OParen -> OpeningParenthesisTerminalBastNode()
             BashpileLexer.CParen -> ClosingParenthesisTerminalBastNode()
+            BashpileLexer.Comment -> TerminalBastNode(
+                node.text.replace("^//".toRegex(), "#"),
+                STRING
+            )
             else -> TerminalBastNode(
                 node.text.replace("^newline$".toRegex(), "\n"),
                 STRING

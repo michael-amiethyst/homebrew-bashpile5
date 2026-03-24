@@ -8,10 +8,10 @@ Here is an example with a string.  The syntax is similar to Java without break s
 
 ```Bash
 name: string = "Riker"
-switch name:
-    case "Riker":
+switch (name):
+    case Riker:
         printf "Number 1"
-    case "Picard":
+    case Picard:
         printf "The Captain"
 // prints "Number 1"
 ```
@@ -20,11 +20,26 @@ Default cases can be specified as well.  Such as:
 
 ```Bash
 name: string = "La Forge"
-switch name:
-    case "Riker":
+switch (name):
+    case Riker:
         print("Number 1")
-    case "Picard":
+    case Picard:
         print("The Captain")
     default:
         print("Other") // prints "Other"
+```
+
+Glob patterns and pipes are allowed as well, and character escapes.  Such as:
+
+```Bash
+name: string = "La Forge:|"
+switch (name):
+    case Riker:
+        print("Number 1")
+    case Picard:
+        print("The Captain")
+    case La\ For[!a]?\:\|:
+        print("Chief Engineer") // this prints
+    default:
+        print("Other")
 ```
