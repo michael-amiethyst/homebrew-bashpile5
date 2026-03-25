@@ -85,7 +85,9 @@ class AstConvertingVisitor: BashpileParserBaseVisitor<BastNode>() { // end of cl
         val id = ctx.typedId().Id().text
         val typeText = ctx.typedId().majorType().text
         val type = valueOf(typeText.uppercase())
-        return VariableDeclarationBastNode(id, type, readonly = readonly, export = export, child = node)
+        val comments = ctx.comments().children?.map { visit(it) } ?: listOf()
+        return VariableDeclarationBastNode(
+            id, type, readonly = readonly, export = export, child = node, comments = comments)
     }
 
     override fun visitReassignmentStatement(ctx: BashpileParser.ReassignmentStatementContext): BastNode {
@@ -125,13 +127,10 @@ class AstConvertingVisitor: BashpileParserBaseVisitor<BastNode>() { // end of cl
         val antlrExpressions = ctx.argumentList().expression()
         val nodes = antlrExpressions.map { visit(it) }
 
-        val endContexts = ctx.statementEnd().children
-        val ends = if (endContexts.isNotEmpty()) {
-            val endNodes = endContexts.map { visit(it) }
-            endNodes.subList(0, endNodes.size - 1) // remove trailing newline
-        } else { listOf() }
+        val comments = ctx.comments().children ?: listOf()
+        val commentNodes = comments.map { visit(it) }
 
-        return PrintBastNode(nodes, ends)
+        return PrintBastNode(nodes, commentNodes)
     }
 
     override fun visitExpressionStatement(ctx: BashpileParser.ExpressionStatementContext): BastNode {

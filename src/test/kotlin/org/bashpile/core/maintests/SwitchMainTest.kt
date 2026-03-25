@@ -445,7 +445,7 @@ class SwitchMainTest : MainTest() {
         """.trimIndent(), render).runCommand().assertRenderProduces("Earth, the first one\n")
     }
 
-    /** TODO switch - write tests for statementEnds */
+    /** TODO switch - write tests for statementEnds with block comments end sharing a line */
     @Test
     fun switch_withMultipleCases_multipleStatements_withEscapes_works() {
         val render = """
@@ -498,6 +498,38 @@ class SwitchMainTest : MainTest() {
         """.trimIndent().createRender()
         assertRenderEquals("""
             declare name
+            name="La Forge"
+            case "${'$'}{name}" in
+                Riker)
+                    printf "Number 1\n"
+                    printf "Trombone player\n"
+                    ;;
+                Picard)
+                    printf "The Captain"
+                    ;;
+                *)
+                    printf "Other crew\n"
+                    ;;
+            esac
+            
+        """.trimIndent(), render).runCommand().assertRenderProduces("Other crew\n")
+    }
+
+    @Test
+    fun switch_withDefault_withMultipleComments_works() {
+        val render: String = """
+            name: string = "La Forge" /* A cool actor */ // did Reading Rainbow too
+            switch (name):
+                case Riker:
+                    printf "Number 1\n"
+                    print("Trombone player\n")
+                case Picard:
+                    printf "The Captain"
+                default:
+                    print("Other crew\n")
+        """.trimIndent().createRender()
+        assertRenderEquals("""
+            declare name # A cool guy # did Reading Rainbow too
             name="La Forge"
             case "${'$'}{name}" in
                 Riker)

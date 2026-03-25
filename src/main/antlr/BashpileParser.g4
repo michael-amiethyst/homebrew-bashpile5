@@ -5,7 +5,7 @@ program: statement+;
 
 // statements, in descending order of complexity
 statement
-    : Import StringValues statementEnd          # importStatement
+    : Import StringValues                       # importStatement
     | ShellLine Newline                         # shellLineStatement
     | While expression Colon indentedStatements # whileStatement
     | For OParen typedId (Comma typedId)* In StringValues CParen Colon indentedStatements
@@ -18,11 +18,11 @@ statement
                                                 # conditionalStatement
     | Switch OParen expression CParen Colon INDENT caseClauses+ defaultCase? DEDENT
                                                 # switchStatement
-    | <assoc=right> typedId (Equals expression)? Newline
+    | <assoc=right> typedId (Equals expression)? comments Newline
                                                 # variableDeclarationStatement
     | <assoc=right> (Id | listAccess) assignmentOperator expression Newline
                                                 # reassignmentStatement
-    | Print OParen argumentList? CParen statementEnd
+    | Print OParen argumentList? CParen comments Newline
                                                 # printStatement
     | BashpileDoc Newline                       # bashpileDocStatement
     | Comment Newline                           # lineCommentStatement
@@ -31,7 +31,7 @@ statement
     | Newline                                   # blankStmt
     ;
 
-statementEnd: (Comment | BlockComment)* Newline;
+comments: (Comment | BlockComment)*;
 tags        : OBracket (StringValues*) CBracket;
 // like (x: str, y: str = "Jordi")
 paramaters  : OParen ( typedId (Comma typedId)* (Comma defaultedTypedId)* )? CParen

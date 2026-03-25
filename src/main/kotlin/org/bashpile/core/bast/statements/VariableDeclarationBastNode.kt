@@ -12,8 +12,9 @@ class VariableDeclarationBastNode(
     val subtype: TypeEnum = TypeEnum.UNKNOWN,
     val readonly: Boolean = false,
     val export: Boolean = false,
-    child: BastNode
-) : StatementBastNode(child, id, type)
+    child: BastNode,
+    comments: List<BastNode> = listOf()
+) : StatementBastNode(child.toList(), id, type, comments = comments)
 {
     override fun render(options: RenderOptions): String {
         Main.Companion.callStack.addVariableInfo(id!!, majorType(), subtype, readonly)
@@ -21,8 +22,10 @@ class VariableDeclarationBastNode(
         if (export) { exportFlags += "x" }
         val flags = if (exportFlags.isNotEmpty()) "-$exportFlags " else ""
         val childRender = children[0].render(options.quoted())
+        val commentRenders = comments
+            .map { it.render(RenderOptions.UNQUOTED) }.joinToString(" ", " ").ifBlank { "" }
         return """
-            declare $flags$id
+            declare $flags$id$commentRenders
             $id=$childRender
 
         """.trimIndent()

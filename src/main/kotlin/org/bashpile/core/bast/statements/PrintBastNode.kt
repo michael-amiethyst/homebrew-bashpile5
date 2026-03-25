@@ -7,8 +7,8 @@ import org.bashpile.core.engine.RenderOptions.Companion.UNQUOTED
 import org.bashpile.core.engine.TypeEnum.*
 
 /** This is a Print Statement node */
-class PrintBastNode(children: List<BastNode> = listOf(), val commentNodes: List<BastNode> = listOf()
-) : StatementBastNode(children) {
+class PrintBastNode(children: List<BastNode> = listOf(), comments: List<BastNode> = listOf()
+) : StatementBastNode(children, comments = comments) {
 
     constructor(vararg child: BastNode) : this(child.toList())
 
@@ -28,8 +28,8 @@ class PrintBastNode(children: List<BastNode> = listOf(), val commentNodes: List<
         }.joinToString("")
 
         val renderedArguments = printfArguments.joinToString("") { " \"$it\"" }
-        val rawComments = commentNodes.map { it.render(UNQUOTED) }.joinToString("", " ")
-        val renderedComments = rawComments.ifBlank { "" }
+        val renderedComments = this.comments.map { it.render(UNQUOTED) }
+            .joinToString(" ", " ").ifBlank { "" }
         return "printf \"$childRenders\"$renderedArguments$renderedComments\n"
     }
 
