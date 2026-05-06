@@ -334,7 +334,7 @@ class AstConvertingVisitor: BashpileParserBaseVisitor<BastNode>() { // end of cl
             BashpileLexer.BlockComment -> TerminalBastNode(
                 // chop off initial /* and */.  Then add Bash comment on each line
                 // TODO switch - add test for a line that starts with a block comment.  E.g. `endOfComment */ x: int = 1`
-                node.text.substring(3, node.text.length - 3).lines().map { "# $it" }.joinToString(""),
+                node.text.substring(3, node.text.length - 3).lines().map { "# $it" }.joinToString(" "),
                 STRING
             )
             else -> TerminalBastNode(

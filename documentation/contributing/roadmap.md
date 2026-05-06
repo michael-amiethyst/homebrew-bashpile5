@@ -8,6 +8,13 @@
 5. Work-around for options with `||`, see https://unix.stackexchange.com/questions/65532/why-does-set-e-not-work-inside-subshells-with-parenthesis-followed-by-an-or
 6. IDE integration (IntelliJ)
 
+## Full Release (v1.0.0)
+Copy repo to michael-amiethyst/homebrew-bashpile/
+1. Rename old homebrew-bashpile to homebrew-bashpile-java.
+2. Rename current to homebrew-bashpile.
+3. Test bashpile.com/bashpile.org links after a day or two to verify.
+    1. Make java.bashpile.org, kotlin.bashpile.org
+
 ## Unscheduled ideas
 switch/case statement extglob support
 Take 2nd file argument, it would be the compiled file (with shebang and chmod +x)

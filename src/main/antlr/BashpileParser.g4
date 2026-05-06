@@ -4,8 +4,10 @@ options { tokenVocab = BashpileLexer; }
 program: statement+;
 
 // statements, in descending order of complexity
+// TODO switch - ensure comments render for all statements
+// TODO switch - change newline to eol.  eol -> comments newline
 statement
-    : Import StringValues                       # importStatement
+    : Import StringValues comments              # importStatement
     | ShellLine Newline                         # shellLineStatement
     | While expression Colon indentedStatements # whileStatement
     | For OParen typedId (Comma typedId)* In StringValues CParen Colon indentedStatements

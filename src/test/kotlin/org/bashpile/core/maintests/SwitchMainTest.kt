@@ -445,14 +445,15 @@ class SwitchMainTest : MainTest() {
         """.trimIndent(), render).runCommand().assertRenderProduces("Earth, the first one\n")
     }
 
-    /** TODO switch - write tests for statementEnds with block comments end sharing a line */
     @Test
     fun switch_withMultipleCases_multipleStatements_withEscapes_works() {
         val render = """
-            name: string = "La Forge:|"
+            name: string = "La Forge:|" /* We wanted to see if
+            colon and pipe worked */
             switch (name):
                 case Riker:
-                    print("Number 1\n") /* new lines needed */
+                    print("Number 1\n") /* new lines
+                    needed */
                     print("Trombone player\n")
                 case Picard:
                     print("The Captain")
@@ -462,11 +463,11 @@ class SwitchMainTest : MainTest() {
                     print("Other")
         """.trimIndent().createRender()
         assertRenderEquals("""
-            declare name
+            declare name # We wanted to see if # colon and pipe worked
             name="La Forge:|"
             case "${'$'}{name}" in
                 Riker)
-                    printf "Number 1\n" # new lines needed
+                    printf "Number 1\n" # new lines #         needed
                     printf "Trombone player\n"
                     ;;
                 Picard)
@@ -529,7 +530,7 @@ class SwitchMainTest : MainTest() {
                     print("Other crew\n")
         """.trimIndent().createRender()
         assertRenderEquals("""
-            declare name # A cool guy # did Reading Rainbow too
+            declare name # A cool actor # did Reading Rainbow too
             name="La Forge"
             case "${'$'}{name}" in
                 Riker)
