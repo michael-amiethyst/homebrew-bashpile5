@@ -111,7 +111,7 @@ Whitespace    : [ \t\f] -> skip;
 EscapedNewline: '\\' '\r'? '\n' ' '* -> skip;
 BashpileDoc   : '/**' .*? '*/';
 Comment       : '//' ~[\r\n\f]*;
-BlockComment  : '/*' ( BlockComment | . )*? '*/';
+BlockComment  : '/*' ( BlockComment | . )*? '*/'; // TODO now -- remove Block comments
 
 // small tokens
 

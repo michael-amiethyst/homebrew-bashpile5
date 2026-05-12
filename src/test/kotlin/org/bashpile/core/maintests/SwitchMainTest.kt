@@ -1,6 +1,8 @@
 package org.bashpile.core.maintests
 
+import org.antlr.v4.runtime.misc.ParseCancellationException
 import org.bashpile.core.runCommand
+import org.junit.jupiter.api.assertThrows
 import kotlin.io.path.Path
 import kotlin.io.path.readText
 import kotlin.test.Test
@@ -546,5 +548,25 @@ class SwitchMainTest : MainTest() {
             esac
             
         """.trimIndent(), render).runCommand().assertRenderProduces("Other crew\n")
+    }
+
+    /** Test for comments */
+    @Test
+    fun switch_withDefault_withMultilineComments_atStartOfLine_works() {
+        // TODO now - make same test for /** Bashpile Doc */
+        assertThrows<ParseCancellationException> {
+            // mixing the end of a multiline comment and the start of statements is not supported
+            """
+                name: string = "La Forge" /* A cool
+                 actor */ switch (name):
+                    case Riker:
+                        printf "Number 1\n"
+                        print("Trombone player\n")
+                    case Picard:
+                        printf "The Captain"
+                    default:
+                        print("Other crew\n")
+            """.trimIndent().createRender()
+        }
     }
 }

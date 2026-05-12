@@ -34,6 +34,7 @@ class ForeachFileLineLoopBashNode(
     }
 
     override fun render(options: RenderOptions): String {
+        // Read each line with `read -r`, if more than 1 column parse each line as a CSV
         callStack.use { stack ->
             stack.pushStackframe()
 
