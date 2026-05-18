@@ -32,6 +32,50 @@ class LoopsMainTest : MainTest() {
     }
 
     @Test
+    fun foreach_fileLine_withComment_works() {
+        val renderedBash = """
+            for(first: string, last: string, email: string, phone: string in "src/test/resources/data/example.csv"): // comment
+                print(first + " " + last + " " + email + " " + phone + "\n")
+        """.trimIndent().createRender()
+        assertRenderEquals(
+            """
+            cat "src/test/resources/data/example.csv" | $sed -e '1d' -e 's/\r\n/\n/g' | $sed -ze '/\n$/!s/$/\n$/g' | while IFS='' read -r __bp_line; do # comment
+                first=$(printf "%s" "${'$'}{__bp_line}" | gawk --csv '{print $1}'); last=$(printf "%s" "${'$'}{__bp_line}" | gawk --csv '{print $2}'); email=$(printf "%s" "${'$'}{__bp_line}" | gawk --csv '{print $3}'); phone=$(printf "%s" "${'$'}{__bp_line}" | gawk --csv '{print $4}');
+                printf "${'$'}{first} ${'$'}{last} ${'$'}{email} ${'$'}{phone}\n"
+            done
+            
+        """.trimIndent(), renderedBash).assumeRender { !it.startsWith("Usage: gawk") }.assertRenderProduces("""
+            Alice Smith alice.smith@email.com 555-1234
+            Bob Johnson bob.j@email.com 555-5678
+            Charlie Williams c.williams@email.com 555-9012
+            
+        """.trimIndent()
+        )
+    }
+
+    @Test
+    fun foreach_fileLine_withTripleComment_works() {
+        val renderedBash = """
+            for(first: string, last: string, email: string, phone: string in "src/test/resources/data/example.csv"): // comment1 //comment2 //  comment3
+                print(first + " " + last + " " + email + " " + phone + "\n")
+        """.trimIndent().createRender()
+        assertRenderEquals(
+            """
+            cat "src/test/resources/data/example.csv" | $sed -e '1d' -e 's/\r\n/\n/g' | $sed -ze '/\n$/!s/$/\n$/g' | while IFS='' read -r __bp_line; do # comment1 //comment2 //  comment3
+                first=$(printf "%s" "${'$'}{__bp_line}" | gawk --csv '{print $1}'); last=$(printf "%s" "${'$'}{__bp_line}" | gawk --csv '{print $2}'); email=$(printf "%s" "${'$'}{__bp_line}" | gawk --csv '{print $3}'); phone=$(printf "%s" "${'$'}{__bp_line}" | gawk --csv '{print $4}');
+                printf "${'$'}{first} ${'$'}{last} ${'$'}{email} ${'$'}{phone}\n"
+            done
+            
+        """.trimIndent(), renderedBash).assumeRender { !it.startsWith("Usage: gawk") }.assertRenderProduces("""
+            Alice Smith alice.smith@email.com 555-1234
+            Bob Johnson bob.j@email.com 555-5678
+            Charlie Williams c.williams@email.com 555-9012
+            
+        """.trimIndent()
+        )
+    }
+
+    @Test
     fun foreach_fileLine_multistatement_works() {
         val renderedBash = """
             // Real world example

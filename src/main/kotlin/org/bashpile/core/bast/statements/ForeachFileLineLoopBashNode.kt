@@ -14,7 +14,8 @@ import org.bashpile.core.runCommand
 class ForeachFileLineLoopBashNode(
     children: List<BastNode> = listOf(),
     val doubleQuotedFilepath: String,
-    val columns: List<VariableReferenceBastNode>) : StatementBastNode(children.toMutableList())
+    val columns: List<VariableReferenceBastNode>,
+    comments: List<BastNode> = listOf()) : StatementBastNode(children.toMutableList(), comments = comments)
 {
     companion object {
         val sed: String = if ("which gsed".runCommand().second == SCRIPT_SUCCESS) "gsed" else "sed"
@@ -43,6 +44,9 @@ class ForeachFileLineLoopBashNode(
             }
 
             val lineVariableName = if (columns.size > 1) { "__bp_line" } else { columns[0].id!! }
+            val commentText = if (comments.isNotEmpty()) {
+                " " + comments.map { it.render(options) }.joinToString(" ")
+            } else { "" }
             val setLoopVariables = if (columns.size > 1) {
                 columns.mapIndexed { i, it -> """
                     ${it.id}=$(printf "%s" "${'$'}{__bp_line}" | gawk --csv '{print $${i + 1}}');""".trimIndent()
@@ -55,7 +59,7 @@ class ForeachFileLineLoopBashNode(
             }
             val childRenders = childRenderList.joinToString("").removeSuffix("\n")
             return """
-                cat $doubleQuotedFilepath | ${mungeStream()} | while IFS='' read -r $lineVariableName; do
+                cat $doubleQuotedFilepath | ${mungeStream()} | while IFS='' read -r $lineVariableName; do$commentText
                 $setLoopVariables$childRenders
                 done
     

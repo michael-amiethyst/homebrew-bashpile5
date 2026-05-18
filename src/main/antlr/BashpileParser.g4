@@ -4,14 +4,13 @@ options { tokenVocab = BashpileLexer; }
 program: statement+;
 
 // statements, in descending order of complexity
-// TODO switch - ensure comments render for all statements
-// TODO switch - change newline to eol.  eol -> comments newline
+// TODO switch - ensure comments render for all statements (foreachFileline done)
 statement
-    : Import StringValues Comment* Newline      # importStatement
-    | ShellLine Newline                         # shellLineStatement
-    | While expression Colon indentedStatements # whileStatement
-    | For OParen typedId (Comma typedId)* In StringValues CParen Colon indentedStatements
-                                                # foreachFileLineLoopStatement
+    : Import StringValues eol # importStatement
+    | ShellLine Newline # shellLineStatement
+    | While expression Colon Comment* indentedStatements # whileStatement
+    | For OParen typedId (Comma typedId)* In StringValues CParen Colon Comment* indentedStatements
+      # foreachFileLineLoopStatement
     | Function Id paramaters (Arrow complexType)?
                                                 # functionForwardDeclarationStatement
     | Function Id paramaters tags? (Arrow complexType)?
@@ -32,6 +31,7 @@ statement
     | Newline                                   # blankStmt
     ;
 
+eol         : Comment* Newline;
 tags        : OBracket (StringValues*) CBracket;
 // like (x: str, y: str = "Jordi")
 paramaters  : OParen ( typedId (Comma typedId)* (Comma defaultedTypedId)* )? CParen
