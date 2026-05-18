@@ -85,7 +85,7 @@ class AstConvertingVisitor: BashpileParserBaseVisitor<BastNode>() { // end of cl
         val id = ctx.typedId().Id().text
         val typeText = ctx.typedId().majorType().text
         val type = valueOf(typeText.uppercase())
-        val comments = ctx.comments().children?.map { visit(it) } ?: listOf()
+        val comments = ctx.Comment()?.map { visit(it) } ?: listOf()
         return VariableDeclarationBastNode(
             id, type, readonly = readonly, export = export, child = node, comments = comments)
     }
@@ -109,17 +109,9 @@ class AstConvertingVisitor: BashpileParserBaseVisitor<BastNode>() { // end of cl
     override fun visitLineCommentStatement(ctx: BashpileParser.LineCommentStatementContext): BastNode {
         // does not preserve whitespace
         val commentText = ctx.text.substring(2).trimStart() // ignore initial "//" and spaces
-        return TerminalBastNode("# $commentText", STRING)
-    }
-
-    override fun visitBlockCommentStatement(ctx: BashpileParser.BlockCommentStatementContext): BastNode {
-        // does not preserve whitespace
-        val trimmedText = ctx.text.trim()
-        val text = trimmedText.substring(2, trimmedText.length - 2)
-            .split("\n")
-            .map { it.trim() }
-            .map { "# $it".trim() }
-            .joinToString("\n", postfix = "\n")
+        // trim for the case of there being no commentText
+        var text = "#"
+        if (commentText.isNotBlank()) { text += " $commentText" }
         return TerminalBastNode(text, STRING)
     }
 
@@ -127,7 +119,7 @@ class AstConvertingVisitor: BashpileParserBaseVisitor<BastNode>() { // end of cl
         val antlrExpressions = ctx.argumentList().expression()
         val nodes = antlrExpressions.map { visit(it) }
 
-        val comments = ctx.comments().children ?: listOf()
+        val comments = ctx.Comment() ?: listOf()
         val commentNodes = comments.map { visit(it) }
 
         return PrintBastNode(nodes, commentNodes)
@@ -328,12 +320,7 @@ class AstConvertingVisitor: BashpileParserBaseVisitor<BastNode>() { // end of cl
             BashpileLexer.OParen -> OpeningParenthesisTerminalBastNode()
             BashpileLexer.CParen -> ClosingParenthesisTerminalBastNode()
             BashpileLexer.Comment -> TerminalBastNode(
-                node.text.replace("^//".toRegex(), "#"),
-                STRING
-            )
-            BashpileLexer.BlockComment -> TerminalBastNode(
-                // chop off initial /* and */.  Then add Bash comment on each line
-                node.text.substring(3, node.text.length - 3).lines().map { "# $it" }.joinToString(" "),
+                node.text.replace("^//".toRegex(), "#").trim(),
                 STRING
             )
             else -> TerminalBastNode(

@@ -7,7 +7,7 @@ program: statement+;
 // TODO switch - ensure comments render for all statements
 // TODO switch - change newline to eol.  eol -> comments newline
 statement
-    : Import StringValues comments              # importStatement
+    : Import StringValues Comment* Newline      # importStatement
     | ShellLine Newline                         # shellLineStatement
     | While expression Colon indentedStatements # whileStatement
     | For OParen typedId (Comma typedId)* In StringValues CParen Colon indentedStatements
@@ -20,20 +20,18 @@ statement
                                                 # conditionalStatement
     | Switch OParen expression CParen Colon INDENT caseClauses+ defaultCase? DEDENT
                                                 # switchStatement
-    | <assoc=right> typedId (Equals expression)? comments Newline
+    | <assoc=right> typedId (Equals expression)? Comment* Newline
                                                 # variableDeclarationStatement
     | <assoc=right> (Id | listAccess) assignmentOperator expression Newline
                                                 # reassignmentStatement
-    | Print OParen argumentList? CParen comments Newline
+    | Print OParen argumentList? CParen Comment* Newline
                                                 # printStatement
     | BashpileDoc Newline                       # bashpileDocStatement
-    | Comment Newline                           # lineCommentStatement
-    | BlockComment Newline                      # blockCommentStatement
+    | Comment+ Newline                          # lineCommentStatement
     | expression Newline                        # expressionStatement
     | Newline                                   # blankStmt
     ;
 
-comments: (Comment | BlockComment)*;
 tags        : OBracket (StringValues*) CBracket;
 // like (x: str, y: str = "Jordi")
 paramaters  : OParen ( typedId (Comma typedId)* (Comma defaultedTypedId)* )? CParen

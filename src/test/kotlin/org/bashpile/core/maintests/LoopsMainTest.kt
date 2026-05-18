@@ -137,7 +137,7 @@ class LoopsMainTest : MainTest() {
     @Test
     fun foreach_fileLine_multistatement_with_windows_line_endings_float_works() {
         val renderedBash = """
-            /* Real world example */
+            // Real world example
             HOST: readonly exported string = "HOST_NAME"
             TOKEN: readonly exported string = "OAUTH_TOKEN"
             for(firstName: string, middleName: string, lastName: string, email: string, landline: float, cell: string\
@@ -146,9 +146,9 @@ class LoopsMainTest : MainTest() {
                 printf "%s" "${'$'}middleName" >/dev/null
                 printf "%s" "${'$'}landline" >/dev/null
                 printf "%s" "${'$'}email" >/dev/null
-                /*
-                 set progress status too
-                */
+                //
+                // set progress status too
+                //
                 cellShort: exported string = #(printf "${'$'}cell" | cut -d " " -f 2)
                 regionId: exported integer = 13
                 print("Updating phone # " + cellShort + " with values: lastName " + lastName + " cell " + cell + ".\n")

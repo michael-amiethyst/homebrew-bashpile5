@@ -450,12 +450,10 @@ class SwitchMainTest : MainTest() {
     @Test
     fun switch_withMultipleCases_multipleStatements_withEscapes_works() {
         val render = """
-            name: string = "La Forge:|" /* We wanted to see if
-            colon and pipe worked */
+            name: string = "La Forge:|" // We wanted to see if colon and pipe worked
             switch (name):
                 case Riker:
-                    print("Number 1\n") /* new lines
-                    needed */
+                    print("Number 1\n") // new lines needed
                     print("Trombone player\n")
                 case Picard:
                     print("The Captain")
@@ -465,11 +463,11 @@ class SwitchMainTest : MainTest() {
                     print("Other")
         """.trimIndent().createRender()
         assertRenderEquals("""
-            declare name # We wanted to see if # colon and pipe worked
+            declare name # We wanted to see if colon and pipe worked
             name="La Forge:|"
             case "${'$'}{name}" in
                 Riker)
-                    printf "Number 1\n" # new lines #         needed
+                    printf "Number 1\n" # new lines needed
                     printf "Trombone player\n"
                     ;;
                 Picard)
@@ -521,7 +519,7 @@ class SwitchMainTest : MainTest() {
     @Test
     fun switch_withDefault_withMultipleComments_works() {
         val render: String = """
-            name: string = "La Forge" /* A cool actor */ // did Reading Rainbow too
+            name: string = "La Forge" // A cool actor // did Reading Rainbow too
             switch (name):
                 case Riker:
                     printf "Number 1\n"
@@ -532,7 +530,7 @@ class SwitchMainTest : MainTest() {
                     print("Other crew\n")
         """.trimIndent().createRender()
         assertRenderEquals("""
-            declare name # A cool actor # did Reading Rainbow too
+            declare name # A cool actor // did Reading Rainbow too
             name="La Forge"
             case "${'$'}{name}" in
                 Riker)

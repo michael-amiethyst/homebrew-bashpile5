@@ -4,20 +4,20 @@
 Like Java, just add `//` to start the comment.  It will be rendered
 
 ## Block Comments
-Also like Java, anything inside of `/*` and `*/` is a comment.
-
-Bash doesn't have a native Block Comment, so only use it at the end of a line.
-
-E.g.
-```bash
-/* Here is an example of what
-NOT to do */ print("Will not compile")
-
-i: int = 0 /* You can start
-sharing a line though */
-print("The render will be on one line though")
-```
+Block comments (`/* */`) are not supported since Bash doesn't have a native Block Comment.  There are no good workarounds.
 
 ## Bashpile Doc
 
-Similar to Java, `/**` and `*/`.
+Similar to Java, `/**` and `*/`.  Keep them on their own lines only.
+E.g. avoid
+```shell
+/**
+ * Docs
+ */ str: exported string = 'A_STRING'
+ 
+// instead do:
+/**
+ * Docs
+ */
+str: exported string = 'A_STRING'
+```

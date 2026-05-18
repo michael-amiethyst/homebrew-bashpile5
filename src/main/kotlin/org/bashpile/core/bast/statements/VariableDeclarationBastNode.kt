@@ -5,7 +5,10 @@ import org.bashpile.core.bast.BastNode
 import org.bashpile.core.engine.TypeEnum
 import org.bashpile.core.engine.RenderOptions
 
-/** Created by [org.bashpile.core.antlr.AstConvertingVisitor.visitVariableDeclarationStatement] */
+/**
+ * Created by [org.bashpile.core.antlr.AstConvertingVisitor.visitVariableDeclarationStatement]
+ * Tested with DeclarationsMainTest.
+ */
 class VariableDeclarationBastNode(
     id: String,
     type: TypeEnum,
