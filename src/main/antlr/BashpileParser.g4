@@ -4,7 +4,7 @@ options { tokenVocab = BashpileLexer; }
 program: statement+;
 
 // statements, in descending order of complexity
-// TODO switch - ensure comments render for all statements (foreachFileline done)
+// TODO switch - ensure comments render for all statements (on conditionalStatement)
 statement
     : Import StringValues eol # importStatement
     | ShellLine Newline # shellLineStatement
@@ -13,7 +13,7 @@ statement
       # foreachFileLineLoopStatement
     | Function Id paramaters (Arrow complexType)? eol # functionForwardDeclarationStatement
     | Function Id paramaters tags? (Arrow complexType)? Colon Comment* functionBlock # functionDeclarationStatement
-    | If OParen expression CParen Colon indentedStatements (elseIfClauses)* (Else Colon indentedStatements)?
+    | If OParen expression CParen Colon Comment* indentedStatements (elseIfClauses)* (Else Colon indentedStatements)?
                                                 # conditionalStatement
     | Switch OParen expression CParen Colon INDENT caseClauses+ defaultCase? DEDENT
                                                 # switchStatement

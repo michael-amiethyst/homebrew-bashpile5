@@ -7,9 +7,9 @@ import org.bashpile.core.engine.RenderOptions.Companion.IGNORE_OUTPUT
 import org.bashpile.core.engine.RenderOptions.Companion.UNQUOTED
 
 /** If-elseif-else */
-class ConditionalBastNode(val conditions: List<BastNode>, val blockBodies: List<List<BastNode>>)
-    : StatementBastNode(conditions + blockBodies.flatMap { it })
-{
+class ConditionalBastNode(
+    val conditions: List<BastNode>, val blockBodies: List<List<BastNode>>, comments: List<BastNode> = listOf()
+) : StatementBastNode(conditions + blockBodies.flatMap { it }, comments = comments) {
     init {
         // conditions may only be equal to or one less than blockBodies
         require(conditions.size <= blockBodies.size)
@@ -33,9 +33,12 @@ class ConditionalBastNode(val conditions: List<BastNode>, val blockBodies: List<
         }
         val renderedConditions = conditions.map { it.render(IGNORE_OUTPUT) }
         val renderedIfBody = formattedBodiesRenders.first()
+        val renderedComments = if (comments.isNotEmpty()) {
+            " " + comments.map { it.render(options) }.joinToString(" ")
+        } else { "" }
         return when (formattedBodiesRenders.size) {
             1 -> { """
-                if ${renderedConditions.first()}; then
+                if ${renderedConditions.first()}; then$renderedComments
                 $renderedIfBody
                 fi
                 
@@ -44,7 +47,7 @@ class ConditionalBastNode(val conditions: List<BastNode>, val blockBodies: List<
             2 -> {
                 val renderedElseBody = formattedBodiesRenders.last()
                 """
-                if ${renderedConditions.first()}; then
+                if ${renderedConditions.first()}; then$renderedComments
                 $renderedIfBody
                 else
                 $renderedElseBody
@@ -65,7 +68,7 @@ class ConditionalBastNode(val conditions: List<BastNode>, val blockBodies: List<
                 }.joinToString("\n")
                 val renderedElseBody = formattedBodiesRenders.last()
                 """
-                if ${renderedConditions.first()}; then
+                if ${renderedConditions.first()}; then$renderedComments
                 $renderedIfBody
                 $renderedElseIfBlocks
                 else

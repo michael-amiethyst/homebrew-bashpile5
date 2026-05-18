@@ -41,6 +41,27 @@ class ConditionalMainTest : MainTest() {
     }
 
     @Test
+    fun ifStatement_withConditionalComment_works() {
+        val renderedBash = """
+            zero: integer = 0
+            if (1 > zero): // just a quick comment test
+                print("Math is mathing! ")
+                print("Math is mathing!\n")
+            """.trimIndent().createRender()
+        assertRenderEquals("""
+            declare zero
+            zero=0
+            if [ 1 -gt "${'$'}{zero}" ]; then # just a quick comment test
+                printf "Math is mathing! "
+                printf "Math is mathing!\n"
+            fi
+            
+            """.trimIndent(), renderedBash
+        ).assertRenderProduces("Math is mathing! Math is mathing!\n")
+    }
+
+    // TODO now - make test for comment after "else:"
+    @Test
     fun ifStatement_isEmpty_works() {
         val renderedBash = """
             name: string = ""
