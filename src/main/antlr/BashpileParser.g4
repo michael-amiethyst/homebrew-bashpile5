@@ -11,10 +11,8 @@ statement
     | While expression Colon Comment* indentedStatements # whileStatement
     | For OParen typedId (Comma typedId)* In StringValues CParen Colon Comment* indentedStatements
       # foreachFileLineLoopStatement
-    | Function Id paramaters (Arrow complexType)?
-                                                # functionForwardDeclarationStatement
-    | Function Id paramaters tags? (Arrow complexType)?
-                            Colon functionBlock # functionDeclarationStatement
+    | Function Id paramaters (Arrow complexType)? eol # functionForwardDeclarationStatement
+    | Function Id paramaters tags? (Arrow complexType)? Colon Comment* functionBlock # functionDeclarationStatement
     | If OParen expression CParen Colon indentedStatements (elseIfClauses)* (Else Colon indentedStatements)?
                                                 # conditionalStatement
     | Switch OParen expression CParen Colon INDENT caseClauses+ defaultCase? DEDENT
