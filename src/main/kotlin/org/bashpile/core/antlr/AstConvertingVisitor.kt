@@ -87,7 +87,7 @@ class AstConvertingVisitor: BashpileParserBaseVisitor<BastNode>() { // end of cl
         val id = ctx.typedId().Id().text
         val typeText = ctx.typedId().majorType().text
         val type = valueOf(typeText.uppercase())
-        val comments = ctx.Comment()?.map { visit(it) } ?: listOf()
+        val comments = ctx.eol().Comment()?.map { visit(it) } ?: listOf()
         return VariableDeclarationBastNode(
             id, type, readonly = readonly, export = export, child = node, comments = comments)
     }

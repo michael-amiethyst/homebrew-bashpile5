@@ -19,6 +19,8 @@ Copy repo to michael-amiethyst/homebrew-bashpile/
 ## Unscheduled ideas
 switch/case statement extglob support
 Take 2nd file argument, it would be the compiled file (with shebang and chmod +x)
+Reverse compile (Bash -> Bashpile) for easy diffs
+- And/Or add Bashpile as comment above the Bash
 
 # Bashpile STDLIB Plans
 

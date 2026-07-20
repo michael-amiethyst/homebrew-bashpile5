@@ -15,12 +15,9 @@ statement
     | Function Id paramaters tags? (Arrow complexType)? Colon Comment* functionBlock # functionDeclarationStatement
     | If OParen expression CParen Colon Comment* indentedStatements (elseIfClauses)* (Else Colon indentedStatements)?
                                                 # conditionalStatement
-    | Switch OParen expression CParen Colon INDENT caseClauses+ defaultCase? DEDENT
-                                                # switchStatement
-    | <assoc=right> typedId (Equals expression)? Comment* Newline
-                                                # variableDeclarationStatement
-    | <assoc=right> (Id | listAccess) assignmentOperator expression Newline
-                                                # reassignmentStatement
+    | Switch OParen expression CParen Colon INDENT caseClauses+ defaultCase? DEDENT # switchStatement
+    | <assoc=right> typedId (Equals expression)? eol # variableDeclarationStatement
+    | <assoc=right> (Id | listAccess) assignmentOperator expression Newline # reassignmentStatement
     | Print OParen argumentList? CParen Comment* Newline
                                                 # printStatement
     | BashpileDoc Newline                       # bashpileDocStatement
