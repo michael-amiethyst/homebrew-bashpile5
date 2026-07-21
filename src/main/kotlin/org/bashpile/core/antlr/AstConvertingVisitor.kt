@@ -93,7 +93,8 @@ class AstConvertingVisitor: BashpileParserBaseVisitor<BastNode>() { // end of cl
     }
 
     override fun visitReassignmentStatement(ctx: BashpileParser.ReassignmentStatementContext): BastNode {
-        return ReassignmentBastNode(ctx.Id().text, visit(ctx.expression()))
+        val comments = ctx.eol().Comment()?.map { visit(it) } ?: listOf()
+        return ReassignmentBastNode(ctx.Id().text, visit(ctx.expression()), comments)
     }
 
     override fun visitBashpileDocStatement(ctx: BashpileParser.BashpileDocStatementContext): BastNode {

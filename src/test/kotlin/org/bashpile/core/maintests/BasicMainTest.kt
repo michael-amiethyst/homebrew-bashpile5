@@ -73,6 +73,16 @@ class BasicMainTest: MainTest() {
     }
 
     @Test
+    fun getBast_printBool_withComment_works() {
+        val render = "print(true) // the truth!".createRender()
+        assertRenderEquals("""
+            printf "true" # the truth!
+            
+            """.trimIndent(), render
+        )
+    }
+
+    @Test
     fun getBast_printBool_withParens_works() {
         val render = "print(((true)))".createRender()
         assertRenderEquals("""

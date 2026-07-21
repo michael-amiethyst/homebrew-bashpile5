@@ -17,13 +17,12 @@ statement
                                                 # conditionalStatement
     | Switch OParen expression CParen Colon INDENT caseClauses+ defaultCase? DEDENT # switchStatement
     | <assoc=right> typedId (Equals expression)? eol # variableDeclarationStatement
-    | <assoc=right> (Id | listAccess) assignmentOperator expression Newline # reassignmentStatement
+    | <assoc=right> (Id | listAccess) assignmentOperator expression eol # reassignmentStatement
     | Print OParen argumentList? CParen eol # printStatement
-    | BashpileDoc Newline                       # bashpileDocStatement
-    | Comment+ Newline                          # lineCommentStatement
+    | BashpileDoc Newline # bashpileDocStatement
+    | Comment+ Newline # lineCommentStatement
     | expression eol # expressionStatement
-    | Newline                                   # blankStmt
-    ;
+    | Newline  # blankStmt;
 
 eol         : Comment* Newline;
 tags        : OBracket (StringValues*) CBracket;
