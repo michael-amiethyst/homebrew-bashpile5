@@ -21,7 +21,7 @@ statement
     | Print OParen argumentList? CParen eol # printStatement
     | BashpileDoc Newline                       # bashpileDocStatement
     | Comment+ Newline                          # lineCommentStatement
-    | expression Newline                        # expressionStatement
+    | expression eol # expressionStatement
     | Newline                                   # blankStmt
     ;
 
@@ -44,8 +44,7 @@ globPattern //: extended_pattern  // extglob: ?(p|p), *(p|p), +(p|p), @(p|p), !(
             : globCharacterSet    // [a-z]
 //            | Multiply            // *
 //            | Question            // ?
-            | literal                // literal characters
-            ;
+            | literal;
 //// Character Sets: [abc], [a-zA-Z], [!0-9]
 globCharacterSet : OBracket (CaseModeClassBody | NumberValues | StringValues) CBracket;
 defaultCase: Default Colon indentedStatements;

@@ -126,6 +126,16 @@ class BasicMainTest: MainTest() {
     }
 
     @Test
+    fun getBast_printFloat_withComment_works() {
+        val render = "print(1.0) // decimals?".createRender()
+        assertRenderEquals("""
+            printf "%s" "1.0" # decimals?
+            
+            """.trimIndent(), render
+        )
+    }
+
+    @Test
     fun getBast_printFloat_plusString_fails() {
         assertFailsWith<UnsupportedOperationException> {
             "print(1.0 + \" apples please\")".createRender()
