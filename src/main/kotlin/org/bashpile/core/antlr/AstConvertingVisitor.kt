@@ -121,7 +121,7 @@ class AstConvertingVisitor: BashpileParserBaseVisitor<BastNode>() { // end of cl
         val antlrExpressions = ctx.argumentList().expression()
         val nodes = antlrExpressions.map { visit(it) }
 
-        val comments = ctx.Comment() ?: listOf()
+        val comments = ctx.eol().Comment() ?: listOf()
         val commentNodes = comments.map { visit(it) }
 
         return PrintBastNode(nodes, commentNodes)
