@@ -26,6 +26,21 @@ class DeclarationsMainTest : MainTest() {
     }
 
     @Test
+    fun getBast_declare_bool_withComment_works() {
+        val bashScript = """
+            b: boolean = true//stdBool
+            print(b)
+        """.trimIndent().createRender()
+        assertRenderEquals("""
+            declare b #stdBool
+            b=true
+            printf "%s" "${'$'}{b}"
+
+            """.trimIndent(), bashScript
+        ).assertRenderProduces("true\n")
+    }
+
+    @Test
     fun getBast_declare_readonlyExported_string_works() {
         val bashScript = "b: readonly exported string = 'A_STRING'".createRender()
         assertRenderEquals("""

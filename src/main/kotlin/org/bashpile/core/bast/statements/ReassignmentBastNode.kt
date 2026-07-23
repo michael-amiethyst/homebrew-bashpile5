@@ -3,7 +3,10 @@ package org.bashpile.core.bast.statements
 import org.bashpile.core.bast.BastNode
 import org.bashpile.core.engine.RenderOptions
 
-/** Created by [org.bashpile.core.antlr.AstConvertingVisitor.visitReassignmentStatement] */
+/**
+ * Created by [org.bashpile.core.antlr.AstConvertingVisitor.visitReassignmentStatement]
+ * @see VariableDeclarationBastNode
+ */
 class ReassignmentBastNode(id: String, child: BastNode, comments: List<BastNode>)
     : StatementBastNode(listOf(child), id, child.majorType(), comments)
 {

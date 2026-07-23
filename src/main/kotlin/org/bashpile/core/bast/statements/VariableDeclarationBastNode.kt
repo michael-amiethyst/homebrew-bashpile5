@@ -8,6 +8,7 @@ import org.bashpile.core.engine.RenderOptions
 /**
  * Created by [org.bashpile.core.antlr.AstConvertingVisitor.visitVariableDeclarationStatement]
  * Tested with DeclarationsMainTest.
+ * @see ReassignmentBastNode
  */
 class VariableDeclarationBastNode(
     id: String,
