@@ -1,10 +1,10 @@
 class Bashpile < Formula
   desc "The Bash Transpiler: Write in a modern language and run in a Bash5 shell!"
   version "0.21.0"
-  homepage "https://github.com/michael-amiethyst/homebrew-core"
+  homepage "https://github.com/michael-amiethyst/homebrew-bashpile5"
   license "MIT"
-  url "https://github.com/michael-amiethyst/homebrew-core", using: :git, branch: "main", tag: "0.21.0"
-  head "https://github.com/michael-amiethyst/homebrew-core", using: :git, branch: "development"
+  url "https://github.com/michael-amiethyst/homebrew-bashpile5", using: :git, branch: "main", tag: "0.21.0"
+  head "https://github.com/michael-amiethyst/homebrew-bashpile5", using: :git, branch: "development"
 
   # foundational dependencies
   depends_on "make" => :build

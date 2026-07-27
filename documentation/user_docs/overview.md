@@ -25,8 +25,8 @@ Also, for all of its faults mentioned above it's fast, especially if you are mak
 
 ## Quickstart
 This will install a JVM Jar, and may be a bit slow (a few seconds to compile a small program).
-1. `brew tap michael-amiethyst/core`
-2. `brew install michael-amiethyst/core/bashpile`
+1. `brew tap michael-amiethyst/bashpile5`
+2. `brew install michael-amiethyst/bashpile5/bashpile`
 3. `bashpile -c "print('Hello World')"`
    1. This will print out the Bash translation
    2. You can redirect this to a file to use the Bash directly or immediatly execute it
