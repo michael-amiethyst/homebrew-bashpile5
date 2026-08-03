@@ -3,6 +3,7 @@ package org.bashpile.core
 import org.bashpile.core.antlr.AstConvertingVisitor.Companion.STRICT_HEADER
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Assumptions.assumeTrue
+import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.Test
 import java.nio.file.Files
 import java.nio.file.Path
@@ -19,6 +20,12 @@ class SystemTest {
         private const val BASHPILE_EXECUTABLE = "build/native/nativeCompile/bashpile"
         private const val HELLO_FILENAME = "src/test/resources/bpsScripts/hello.bps"
         private const val SHEBANG_SCRIPT_FILENAME = "build/resources/test/bpsScripts/shebang.bps"
+
+        @JvmStatic
+        @BeforeAll
+        fun requireNativeBinary() {
+            assumeTrue(Files.isExecutable(Path.of(BASHPILE_EXECUTABLE)))
+        }
     }
 
     @Test

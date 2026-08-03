@@ -1,6 +1,5 @@
 package org.bashpile.core
 
-import org.apache.commons.lang3.Strings
 import java.io.File
 import java.io.IOException
 import java.nio.file.Files
@@ -19,38 +18,23 @@ private val executors = Executors.newFixedThreadPool(8)
 /** Strip initial logging line */
 fun String.stripFirstLine(): String = this.lines().drop(1).joinToString("\n")
 
-fun String.appendIfMissing(suffix: String): String = Strings.CS.appendIfMissing(this, suffix)
-
 /**
  * Returns stdout/stderr and the exit code.
  */
 fun String.runCommand(workingDir: File? = null, arguments: List<String> = listOf()): Pair<String, Int> {
     val cwd = File(System.getProperty("user.dir"))
-    val profileFilenames = listOf(".profile", ".bash_profile", ".bashrc")
     val tempFile = Files.createTempFile("", "").writeString(this).makeExecutable()
-    var stdoutText = ""
-    for (profileFilename in profileFilenames) {
-        val commandResult = tempFile.absolutePathString()
-            .runCommandImpl(workingDir ?: cwd, profileFilename, arguments)
-        stdoutText = commandResult.first
-        val noFile = "No such file or directory"
-        if (!stdoutText.contains("$profileFilename: $noFile")) {
-            return commandResult
-        } // else try next profileFilename
-    }
-
-    throw IllegalStateException(
-        "Could not find valid profile.  Checked ~/.profile, ~/.bash_profile, ~/.bashrc.  \n" +
-                "Command results: $stdoutText")
+    val commandResult = tempFile.absolutePathString().runCommandImpl(workingDir ?: cwd, arguments)
+    return commandResult
 }
 
-private fun String.runCommandImpl(workingDir: File, profileFilename: String, arguments: List<String>): Pair<String, Int> {
+private fun String.runCommandImpl(workingDir: File, arguments: List<String>): Pair<String, Int> {
     var proc: Process? = null
     try {
         val callable: Callable<Process> = Callable {
             val argumentsString = arguments.joinToString(" ")
             val proc2 = ProcessBuilder(
-                listOf("bash", "-c", ". ${'$'}HOME/$profileFilename; $this $argumentsString"))
+                listOf("bash", "-c", "$this $argumentsString"))
                 .directory(workingDir)
                 .redirectOutput(ProcessBuilder.Redirect.PIPE)
                 .redirectErrorStream(true)

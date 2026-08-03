@@ -14,9 +14,9 @@ version = properties["version.bashpile"] as String
 plugins {
     antlr
     // kotlin version in plugins must be literal
-    kotlin("jvm") version "2.1.21"
+    kotlin("jvm") version "2.3.21"
     id("com.gradleup.shadow") version "9.0.0-beta15"
-    id("org.graalvm.buildtools.native") version "0.10.6"
+    id("org.graalvm.buildtools.native") version "1.1.5"
     id("org.gradlex.jvm-dependency-conflict-detection") version "2.2"
     id("com.adarshr.test-logger") version "4.0.0"
 }
@@ -43,7 +43,7 @@ dependencies {
     // logging
     implementation("org.apache.logging.log4j:log4j-api:2.17.1")
     implementation("org.apache.logging.log4j:log4j-to-slf4j:2.24.3")
-    implementation("ch.qos.logback:logback-classic:1.5.18")
+    implementation("ch.qos.logback:logback-classic:1.5.19")
     runtimeOnly("com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:2.18.0")
 
     // other dependencies
@@ -57,6 +57,13 @@ dependencies {
 
 tasks.test {
     useJUnitPlatform()
+}
+
+java {
+    toolchain {
+        languageVersion.set(JavaLanguageVersion.of(21))
+        vendor.set(JvmVendorSpec.matching("GraalVM"))
+    }
 }
 
 kotlin {
@@ -106,9 +113,77 @@ sourceSets {
     }
 }
 
+//////////////////////////////////
+// Adjust PATH on Windows machines
+//////////////////////////////////
+
+val linuxHome = System.getProperty("user.home")
+
+val homebrewPaths = System.getenv("HOMEBREW_PREFIX")
+    ?.let { listOf("$it/bin", "$it/sbin") }
+    .orEmpty()
+
+val linuxPath = (
+        listOf(
+            "$linuxHome/.sdkman/candidates/java/current/bin",
+            "/home/linuxbrew/.linuxbrew/bin",
+            "/home/linuxbrew/.linuxbrew/sbin",
+            "$linuxHome/.linuxbrew/bin",
+            "$linuxHome/.linuxbrew/sbin",
+        ) + homebrewPaths + listOf(
+            "/usr/local/sbin",
+            "/usr/local/bin",
+            "/usr/sbin",
+            "/usr/bin",
+            "/sbin",
+            "/bin",
+        )
+        ).joinToString(":")
+
+val missingLinuxToolchainPath = "/usr/bin" !in System.getenv("PATH").orEmpty().split(':')
+
+tasks.withType<Exec>().configureEach {
+    if (missingLinuxToolchainPath) {
+        environment("PATH", linuxPath)
+    }
+}
+
+tasks.withType<JavaExec>().configureEach {
+    if (missingLinuxToolchainPath) {
+        environment("PATH", linuxPath)
+    }
+}
+
+tasks.withType<Test>().configureEach {
+    if (missingLinuxToolchainPath) {
+        environment("PATH", linuxPath)
+    }
+}
+
 /////////////////
 // GraalVM Native
 /////////////////
+
+// Windows-hosted IntelliJ can start WSL Gradle without the normal Linux PATH.
+// Native Image requires /usr/bin for gcc, as, and linker tools.
+val nativeToolchainOnPath = System.getenv("PATH")
+    .orEmpty()
+    .split(':')
+    .contains("/usr/bin")
+
+tasks.named("nativeCompile") {
+    onlyIf {
+        if (!nativeToolchainOnPath) {
+            logger.warn(
+                "Skipping nativeCompile on Windows. " +
+                        "Run nativeCompile from a WSL terminal or " +
+                        "run your IDE with a WSL backend (like Intellij Ultimate can do) " +
+                        "to build the native binary."
+            )
+        }
+        nativeToolchainOnPath
+    }
+}
 
 graalvmNative {
     binaries {
@@ -126,6 +201,7 @@ graalvmNative {
             // From https://stackoverflow.com/questions/72770461/graalvm-native-image-can-not-compile-logback-dependencies
             buildArgs.add("-H:+UnlockExperimentalVMOptions")
             buildArgs.add("-H:ReflectionConfigurationFiles=../../../src/main/resources/reflection-config.json")
+            buildArgs.add("-H:CCompilerPath=/usr/bin/gcc")
         }
     }
 }
