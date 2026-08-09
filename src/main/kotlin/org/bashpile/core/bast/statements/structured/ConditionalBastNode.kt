@@ -8,7 +8,6 @@ import org.bashpile.core.engine.RenderOptions
 import org.bashpile.core.engine.RenderOptions.Companion.IGNORE_OUTPUT
 import org.bashpile.core.engine.RenderOptions.Companion.UNQUOTED
 import java.util.stream.Collectors
-import java.util.stream.Stream
 
 /** If-elseif-else */
 class ConditionalBastNode(
@@ -31,84 +30,52 @@ class ConditionalBastNode(
         val formattedBodiesRenders = blockBodies.map { block ->
             callStack.use { stack ->
                 stack.pushStackframe()
-                block.flatMap { statement ->
-                    statement.render(UNQUOTED).lines().map { "    $it" }
-                }.joinToString("\n").removeSuffix("\n")
+
+                block.joinToString("\n") { statement ->
+                    statement.render(UNQUOTED).trimEnd().prependIndent(TAB)
+                }
             }
         }
         val renderedConditions = conditions.map { it.render(IGNORE_OUTPUT) }
-        val renderedIfBody = ifClause.body.map { statement ->
-            callStack.use { stack ->
-                stack.pushStackframe()
-                statement.render(UNQUOTED).lines().map { "    $it" }
-            }.joinToString("\n").removeSuffix("\n")
-        }.joinToString("\n").removeSuffix("\n")
+        val renderedIfBody = callStack.use { stack ->
+            stack.pushStackframe()
+
+            ifClause.body.joinToString("\n") { statement ->
+                statement.render(UNQUOTED).trimEnd().prependIndent(TAB)
+            }
+        }
         val renderedComments = if (comments.isNotEmpty()) {
-            " " + comments.map { it.render(options) }.joinToString(" ")
+            " " + comments.joinToString(" ") { it.render(options) }
         } else { "" }
         val renderedElseBody = if (elseBody.isNotEmpty()) {
             val renderedElseComment = if (elseComments.isNotEmpty()) {
                 " " + elseComments.joinToString(" ") { it.render(options) }
-            } else ""
-            "\nelse$renderedElseComment\n$TAB" + elseBody.joinToString("\n$TAB") { it.render(options) }
-        } else ""
+            } else { "" }
+
+            val renderedStatements = callStack.use { stack ->
+                stack.pushStackframe()
+
+                elseBody.joinToString("\n") { statement ->
+                    statement.render(UNQUOTED)
+                        .trimEnd()
+                        .prependIndent(TAB)
+                }
+            }
+
+            "\nelse$renderedElseComment\n$renderedStatements"
+        } else {
+            ""
+        }
 
         // final render
-        val renderedElseIfBodies: String? = zip(
+        val renderedElseIfBodies: String = zip(
             renderedConditions.stream(),
             formattedBodiesRenders.stream()
-        ) { first, second -> "\nelif ${first}; then\n${second}" }.collect(Collectors.joining(" "))
-        return """
-            if ${ifClause.condition.render(IGNORE_OUTPUT)}; then$renderedComments
-            $renderedIfBody$renderedElseIfBodies$renderedElseBody
-            fi
-
-        """.trimScriptIndent("            ")
-//        return when (formattedBodiesRenders.size) {
-//            // TODO now merge our handling of one, two and more
-//            0 -> { """
-//                if ${renderedConditions.first()}; then$renderedComments
-//                $renderedIfBody$renderedElseBody
-//                fi
-//
-//                """.trimScriptIndent("                ")
-//            }
-//            1 -> {
-//                val bodyStream: Stream<String> = formattedBodiesRenders.subList(1, formattedBodiesRenders.size).stream()
-//                val conditionStream: Stream<String> = renderedConditions.subList(1, renderedConditions.size).stream()
-//                val renderedElseIfBodies: String? = zip(
-//                    conditionStream,
-//                    bodyStream
-//                ) { first, second -> "\nelif ${first}; then\n${second}" }.collect(Collectors.joining(" "))
-//                """
-//                if ${renderedConditions.first()}; then$renderedComments
-//                $renderedIfBody$renderedElseIfBodies$renderedElseBody
-//                fi
-//
-//                """.trimScriptIndent("                ")
-//            }
-//            else -> {
-//                // not first or last
-//                val elseIfs: List<String> = formattedBodiesRenders.subList(1, formattedBodiesRenders.size - 1)
-//                val renderedElseIfBlocks: String = elseIfs.mapIndexed { index, it ->
-//                    // offset by one to skip the initial if condition
-//                    val renderedElseIfCondition = renderedConditions[index + 1]
-//                    """
-//                    elif $renderedElseIfCondition; then
-//                    $it
-//                    """.trimScriptIndent("                    ")
-//                }.joinToString("\n")
-//                val renderedElseBody = formattedBodiesRenders.last()
-//                """
-//                if ${renderedConditions.first()}; then$renderedComments
-//                $renderedIfBody
-//                $renderedElseIfBlocks
-//                else
-//                $renderedElseBody
-//                fi
-//
-//                """.trimScriptIndent("                ")
-//            }
-//        }
+        ) {
+            first, second -> "\nelif ${first}; then\n${second}"
+        }.collect(Collectors.joining(" ")).removeSuffix("\n$TAB")
+        return "if ${ifClause.condition.render(IGNORE_OUTPUT)}; then$renderedComments\n" +
+                "$renderedIfBody$renderedElseIfBodies$renderedElseBody\n" +
+                "fi\n"
     }
 }

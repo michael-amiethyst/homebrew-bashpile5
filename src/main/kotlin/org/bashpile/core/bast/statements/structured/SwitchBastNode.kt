@@ -14,12 +14,12 @@ class SwitchBastNode(val matchOn: BastNode, val cases: List<BastNode>)
 
     override fun render(options: RenderOptions): String {
         val matchOnRender = matchOn.render(options)
-        val caseRenders = cases.map { it.render(options) }.joinToString("\n" + TAB.repeat(3))
+        val caseRenders = cases.joinToString("\n" + TAB.repeat(3)) { it.render(options) }
         return """
             case "$matchOnRender" in
             $caseRenders
             esac
             
-        """.trimIndent()
+        """.trimScriptIndent("            ")
     }
 }
