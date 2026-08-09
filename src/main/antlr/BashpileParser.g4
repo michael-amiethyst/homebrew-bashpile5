@@ -34,7 +34,7 @@ complexType : types (LessThan types MoreThan)?;
 modifier    : Exported | Readonly;
 argumentList: expression (Comma expression)*;
 elseIfClauses : Else If OParen expression CParen Colon indentedStatements;
-elseClause: Else Comment* Colon indentedStatements;
+elseClause: Else Colon Comment* indentedStatements;
 indentedStatements: INDENT statement+ DEDENT;
 //caseClauses: Case expression Colon indentedStatements;
 caseClauses: Case globPattern+ Colon indentedStatements;

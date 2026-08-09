@@ -13,7 +13,7 @@ import java.util.stream.Stream
 class ConditionalBastNode(
     val conditions: List<BastNode>, val blockBodies: List<List<BastNode>>, val ifComments: List<BastNode> = listOf(),
     val elseBody: List<BastNode>, val elseComments: List<BastNode>
-) : StatementBastNode(conditions + blockBodies.flatten() + elseBody, comments = ifComments + elseComments) {
+) : StatementBastNode(conditions + blockBodies.flatten() + elseBody, comments = ifComments) {
     init {
         // conditions may only be equal to or one less than blockBodies
         require(conditions.size <= blockBodies.size)
@@ -41,13 +41,16 @@ class ConditionalBastNode(
             " " + comments.map { it.render(options) }.joinToString(" ")
         } else { "" }
         val renderedElseBody = if (elseBody.isNotEmpty()) {
-            "\nelse\n$TAB" + elseBody.joinToString("\n$TAB") { it.render(options) }
+            val renderedElseComment = if (elseComments.isNotEmpty()) {
+                " " + elseComments.joinToString(" ") { it.render(options) }
+            } else ""
+            "\nelse$renderedElseComment\n$TAB" + elseBody.joinToString("\n$TAB") { it.render(options) }
         } else ""
-        val renderedElseComment = elseComments.joinToString(" ") { it.render(options) }
         return when (formattedBodiesRenders.size) {
+            // TODO now merge our handling of one, two and more
             1 -> { """
                 if ${renderedConditions.first()}; then$renderedComments
-                $renderedIfBody$renderedElseBody$renderedElseComment
+                $renderedIfBody$renderedElseBody
                 fi
                 
                 """.trimScriptIndent("                ")
@@ -61,7 +64,7 @@ class ConditionalBastNode(
                 ) { first, second -> "\nelif ${first}; then\n${second}" }.collect(Collectors.joining(" "))
                 """
                 if ${renderedConditions.first()}; then$renderedComments
-                $renderedIfBody$renderedElseIfBodies$renderedElseBody$renderedElseComment
+                $renderedIfBody$renderedElseIfBodies$renderedElseBody
                 fi
                 
                 """.trimScriptIndent("                ")
