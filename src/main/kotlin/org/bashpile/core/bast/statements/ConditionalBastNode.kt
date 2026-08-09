@@ -41,7 +41,7 @@ class ConditionalBastNode(
             " " + comments.map { it.render(options) }.joinToString(" ")
         } else { "" }
         val renderedElseBody = if (elseBody.isNotEmpty()) {
-            "\nelse\n$TAB" + elseBody.joinToString(" ") { it.render(options) }
+            "\nelse\n$TAB" + elseBody.joinToString("\n$TAB") { it.render(options) }
         } else ""
         val renderedElseComment = elseComments.joinToString(" ") { it.render(options) }
         return when (formattedBodiesRenders.size) {
