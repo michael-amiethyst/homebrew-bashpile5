@@ -11,35 +11,18 @@ import java.util.stream.Collectors
 
 /** If-elseif-else */
 class ConditionalBastNode(
-    val ifClause: IfClause, val conditions: List<BastNode>, val blockBodies: List<List<BastNode>>,
+    // TODO change else to double-record
+    val ifClause: IfClause, val elseIfClauses: List<IfClause>,
     val elseBody: List<BastNode>, val elseComments: List<BastNode>
-) : StatementBastNode(conditions + blockBodies.flatten() + elseBody, comments = ifClause.comments) {
-    init {
-        // conditions may only be equal to or one less than blockBodies
-        require(conditions.size <= blockBodies.size)
-        require(conditions.size >= blockBodies.size - 1)
-    }
+) : StatementBastNode(ifClause.toBastList() + elseIfClauses.flatMap { it.toBastList() } + elseBody, comments = ifClause.comments) {
 
     override fun replaceChildren(nextChildren: List<BastNode>): BastNode {
-        return ConditionalBastNode(ifClause, conditions.map { it.deepCopy() }, blockBodies.map { statements ->
-            statements.map { it.deepCopy()}
-        }, elseBody, elseComments)
+        return ConditionalBastNode(ifClause, elseIfClauses.map { it.deepCopy() }, elseBody, elseComments)
     }
 
     override fun render(options: RenderOptions): String {
-        val formattedBodiesRenders = blockBodies.map { block ->
-            callStack.use { stack ->
-                stack.pushStackframe()
-
-                block.joinToString("\n") { statement ->
-                    statement.render(UNQUOTED).trimEnd().prependIndent(TAB)
-                }
-            }
-        }
-        val renderedConditions = conditions.map { it.render(IGNORE_OUTPUT) }
         val renderedIfBody = callStack.use { stack ->
             stack.pushStackframe()
-
             ifClause.body.joinToString("\n") { statement ->
                 statement.render(UNQUOTED).trimEnd().prependIndent(TAB)
             }
@@ -54,11 +37,8 @@ class ConditionalBastNode(
 
             val renderedStatements = callStack.use { stack ->
                 stack.pushStackframe()
-
-                elseBody.joinToString("\n") { statement ->
-                    statement.render(UNQUOTED)
-                        .trimEnd()
-                        .prependIndent(TAB)
+                elseBody.joinToString("\n") {
+                    statement -> statement.render(UNQUOTED).trimEnd().prependIndent(TAB)
                 }
             }
 
@@ -68,12 +48,20 @@ class ConditionalBastNode(
         }
 
         // final render
-        val renderedElseIfBodies: String = zip(
-            renderedConditions.stream(),
-            formattedBodiesRenders.stream()
-        ) {
-            first, second -> "\nelif ${first}; then\n${second}"
-        }.collect(Collectors.joining(" ")).removeSuffix("\n$TAB")
+        val renderedElseIfBodies = elseIfClauses.joinToString("") { elseIf ->
+            callStack.use { stack ->
+                stack.pushStackframe()
+                val condition = elseIf.condition.render(IGNORE_OUTPUT)
+                val comments = elseIf.comments
+                    .joinToString(" ") { it.render(UNQUOTED) }
+                    .let { if (it.isBlank()) "" else " $it" }
+                val body = elseIf.body.joinToString("\n") { statement ->
+                    statement.render(UNQUOTED).trimEnd().prependIndent(TAB)
+                }
+
+                "\nelif $condition; then$comments\n$body"
+            }
+        }
         return "if ${ifClause.condition.render(IGNORE_OUTPUT)}; then$renderedComments\n" +
                 "$renderedIfBody$renderedElseIfBodies$renderedElseBody\n" +
                 "fi\n"

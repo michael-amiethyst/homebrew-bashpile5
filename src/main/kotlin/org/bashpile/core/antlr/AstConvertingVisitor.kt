@@ -66,21 +66,18 @@ class AstConvertingVisitor: BashpileParserBaseVisitor<BastNode>() { // end of cl
     }
 
     override fun visitConditionalStatement(ctx: BashpileParser.ConditionalStatementContext): BastNode {
-        val conditions = mutableListOf(visit(ctx.expression()))
         val ifComments = ctx.Comment().map { visit(it) }
         val ifBody = listOf(ctx.indentedStatements())
             .flatMap { ifBlock -> ifBlock.statement().map { visit(it) } }
-        val ifClause = IfClause(conditions.removeFirst(), ifComments, ifBody)
-        val blockBodies = mutableListOf<List<BastNode>>()
-        ctx.elseIfClauses().forEach { elseIf ->
-            conditions += visit(elseIf.expression())
-            val insertIndex = if (blockBodies.size >= 2) blockBodies.size - 1 else blockBodies.size
-            val map: List<BastNode> = elseIf.indentedStatements().statement().map { visit(it) }
-            blockBodies.add(insertIndex, map)
+        val ifClause = IfClause(visit(ctx.expression()), ifComments, ifBody)
+        val elseIfClauses = ctx.elseIfClauses().map { elseIf ->
+            IfClause(visit(elseIf.expression()),
+                elseIf.Comment().map { visit(it) },
+                elseIf.indentedStatements().statement().map { visit(it) })
         }
         val elseBlock = ctx.elseClause()?.indentedStatements()?.statement()?.map { visit(it) } ?: listOf()
         val elseComments = ctx.elseClause()?.Comment()?.map { visit(it) } ?: listOf()
-        return ConditionalBastNode(ifClause, conditions, blockBodies, elseBlock, elseComments)
+        return ConditionalBastNode(ifClause, elseIfClauses, elseBlock, elseComments)
     }
 
     override fun visitSwitchStatement(ctx: BashpileParser.SwitchStatementContext): BastNode {
