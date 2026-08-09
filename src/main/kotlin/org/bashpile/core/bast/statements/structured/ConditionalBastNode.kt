@@ -1,8 +1,9 @@
-package org.bashpile.core.bast.statements
+package org.bashpile.core.bast.statements.structured
 
 import com.google.common.collect.Streams.zip
 import org.bashpile.core.Main.Companion.callStack
 import org.bashpile.core.bast.BastNode
+import org.bashpile.core.bast.statements.StatementBastNode
 import org.bashpile.core.engine.RenderOptions
 import org.bashpile.core.engine.RenderOptions.Companion.IGNORE_OUTPUT
 import org.bashpile.core.engine.RenderOptions.Companion.UNQUOTED

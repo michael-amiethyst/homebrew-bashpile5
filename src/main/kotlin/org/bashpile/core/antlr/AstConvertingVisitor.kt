@@ -15,6 +15,8 @@ import org.bashpile.core.bast.expressions.shellstrings.LooseShellStringBastNode
 import org.bashpile.core.bast.expressions.shellstrings.ShellStringBastNode
 import org.bashpile.core.bast.expressions.shellstrings.VerbatimShellStringBastNode
 import org.bashpile.core.bast.statements.*
+import org.bashpile.core.bast.statements.structured.ConditionalBastNode
+import org.bashpile.core.bast.statements.structured.SwitchBastNode
 import org.bashpile.core.engine.TypeEnum.*
 
 /**
@@ -64,7 +66,7 @@ class AstConvertingVisitor: BashpileParserBaseVisitor<BastNode>() { // end of cl
 
     override fun visitConditionalStatement(ctx: BashpileParser.ConditionalStatementContext): BastNode {
         val conditions = mutableListOf(visit(ctx.expression()))
-        val colonComments = ctx.Comment().map { visit(it) }
+        val ifComments = ctx.Comment().map { visit(it) }
         val blockBodies = listOf(ctx.indentedStatements())
             .map { ifBlock -> ifBlock.statement().map { visit(it) } }.toMutableList()
         ctx.elseIfClauses().forEach { elseIf ->
@@ -74,7 +76,7 @@ class AstConvertingVisitor: BashpileParserBaseVisitor<BastNode>() { // end of cl
         }
         val elseBlock = ctx.elseClause()?.indentedStatements()?.statement()?.map { visit(it) } ?: listOf()
         val elseComments = ctx.elseClause()?.Comment()?.map { visit(it) } ?: listOf()
-        return ConditionalBastNode(conditions, blockBodies, colonComments, elseBlock, elseComments)
+        return ConditionalBastNode(conditions, blockBodies, ifComments, elseBlock, elseComments)
     }
 
     override fun visitSwitchStatement(ctx: BashpileParser.SwitchStatementContext): BastNode {

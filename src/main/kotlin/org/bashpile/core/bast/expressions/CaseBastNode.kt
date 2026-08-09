@@ -5,7 +5,7 @@ import org.bashpile.core.bast.expressions.literals.TerminalBastNode
 import org.bashpile.core.engine.RenderOptions
 import org.bashpile.core.engine.TypeEnum.STRING
 
-/** See also [org.bashpile.core.bast.statements.SwitchBastNode] */
+/** See also [org.bashpile.core.bast.statements.structured.SwitchBastNode] */
 class CaseBastNode(val expression: List<BastNode>, val statements: MutableList<BastNode>)
     : BastNode((expression + statements) as MutableList<BastNode>)
 {

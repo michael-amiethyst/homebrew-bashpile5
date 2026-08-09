@@ -93,17 +93,20 @@ class ConditionalMainTest : MainTest() {
             else:
                 print("Not empty\n")
             """.trimIndent().createRender()
-        assertRenderEquals("""
-            declare name
-            name=""
-            if [ -z "${'$'}{name}" ]; then
+        assertRenderEquals(
+            $$"""
+            declare x
+            x=1
+            if [ "${x}" -lt 0 ]; then # negative
+                printf "Negative\n"
+            elif [ "${x}" -eq 0 ]; then # zero
                 printf "Empty\n"
             else
                 printf "Not empty\n"
             fi
             
             """.trimIndent(), renderedBash
-        ).assertRenderProduces("Empty\n")
+        ).assertRenderProduces("Not Empty\n")
     }
 
     @Test

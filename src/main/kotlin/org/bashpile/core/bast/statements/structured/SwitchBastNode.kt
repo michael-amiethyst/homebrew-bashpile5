@@ -1,6 +1,7 @@
-package org.bashpile.core.bast.statements
+package org.bashpile.core.bast.statements.structured
 
 import org.bashpile.core.bast.BastNode
+import org.bashpile.core.bast.statements.StatementBastNode
 import org.bashpile.core.engine.RenderOptions
 
 /** If-elseif-else */
