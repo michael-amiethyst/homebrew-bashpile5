@@ -82,7 +82,30 @@ class ConditionalMainTest : MainTest() {
         ).assertRenderProduces("Empty\n")
     }
 
-    // TODO make else-if comment test
+    @Test
+    fun ifStatement_ifElseIfElse_works() {
+        val renderedBash = """
+            x: integer = 1
+            if (x < 0): // negative
+                print("Negative\n")
+            else if (x == 0): // zero
+                print("Empty\n")
+            else:
+                print("Not empty\n")
+            """.trimIndent().createRender()
+        assertRenderEquals("""
+            declare name
+            name=""
+            if [ -z "${'$'}{name}" ]; then
+                printf "Empty\n"
+            else
+                printf "Not empty\n"
+            fi
+            
+            """.trimIndent(), renderedBash
+        ).assertRenderProduces("Empty\n")
+    }
+
     @Test
     fun ifStatement_withElseComment_works() {
         val renderedBash = """
