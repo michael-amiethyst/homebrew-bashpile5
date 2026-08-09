@@ -1,10 +1,13 @@
 package org.bashpile.core.bast.statements
 
+import com.google.common.collect.Streams.zip
 import org.bashpile.core.Main.Companion.callStack
 import org.bashpile.core.bast.BastNode
 import org.bashpile.core.engine.RenderOptions
 import org.bashpile.core.engine.RenderOptions.Companion.IGNORE_OUTPUT
 import org.bashpile.core.engine.RenderOptions.Companion.UNQUOTED
+import java.util.stream.Collectors
+import java.util.stream.Stream
 
 /** If-elseif-else */
 class ConditionalBastNode(
@@ -37,23 +40,26 @@ class ConditionalBastNode(
         val renderedComments = if (comments.isNotEmpty()) {
             " " + comments.map { it.render(options) }.joinToString(" ")
         } else { "" }
+        val renderedElseBody = "\nelse\n$TAB" + elseBody.joinToString(" ") { it.render(options) }
+        val renderedElseComment = elseComments.joinToString(" ") { it.render(options) }
         return when (formattedBodiesRenders.size) {
-            1 -> {
-                // TODO check for elseBody / comment
-                """
+            1 -> { """
                 if ${renderedConditions.first()}; then$renderedComments
-                $renderedIfBody
+                $renderedIfBody$renderedElseBody$renderedElseComment
                 fi
                 
                 """.trimScriptIndent("                ")
             }
             2 -> {
-                val renderedElseBody = formattedBodiesRenders.last()
+                val bodyStream: Stream<String> = formattedBodiesRenders.subList(1, formattedBodiesRenders.size).stream()
+                val conditionStream: Stream<String> = renderedConditions.subList(1, renderedConditions.size).stream()
+                val renderedElseIfBodies: String? = zip(
+                    conditionStream,
+                    bodyStream
+                ) { first, second -> "\nelif ${first}; then\n${second}" }.collect(Collectors.joining(" "))
                 """
                 if ${renderedConditions.first()}; then$renderedComments
-                $renderedIfBody
-                else
-                $renderedElseBody
+                $renderedIfBody$renderedElseIfBodies$renderedElseBody$renderedElseComment
                 fi
                 
                 """.trimScriptIndent("                ")
