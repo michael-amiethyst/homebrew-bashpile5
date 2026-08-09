@@ -8,8 +8,9 @@ import org.bashpile.core.engine.RenderOptions.Companion.UNQUOTED
 
 /** If-elseif-else */
 class ConditionalBastNode(
-    val conditions: List<BastNode>, val blockBodies: List<List<BastNode>>, comments: List<BastNode> = listOf()
-) : StatementBastNode(conditions + blockBodies.flatMap { it }, comments = comments) {
+    val conditions: List<BastNode>, val blockBodies: List<List<BastNode>>, val ifComments: List<BastNode> = listOf(),
+    val elseBody: List<BastNode>, val elseComments: List<BastNode>
+) : StatementBastNode(conditions + blockBodies.flatten() + elseBody, comments = ifComments + elseComments) {
     init {
         // conditions may only be equal to or one less than blockBodies
         require(conditions.size <= blockBodies.size)
@@ -19,7 +20,7 @@ class ConditionalBastNode(
     override fun replaceChildren(nextChildren: List<BastNode>): BastNode {
         return ConditionalBastNode(conditions.map { it.deepCopy() }, blockBodies.map { statements ->
             statements.map { it.deepCopy()}
-        })
+        }, ifComments, elseBody, elseComments)
     }
 
     override fun render(options: RenderOptions): String {
@@ -37,7 +38,9 @@ class ConditionalBastNode(
             " " + comments.map { it.render(options) }.joinToString(" ")
         } else { "" }
         return when (formattedBodiesRenders.size) {
-            1 -> { """
+            1 -> {
+                // TODO check for elseBody / comment
+                """
                 if ${renderedConditions.first()}; then$renderedComments
                 $renderedIfBody
                 fi
