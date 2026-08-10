@@ -107,7 +107,7 @@ class ArithmeticMainTest : MainTest() {
                 declare four
                 four="4"
                 declare i
-                i="$(bc -l <<< "6 / ${'$'}{four}")"
+                i="$(bc -l <<<"6 / ${'$'}{four}")"
                 printf "%s" "${'$'}{i}"
 
             """.trimIndent(), render
@@ -242,7 +242,7 @@ class ArithmeticMainTest : MainTest() {
         val render = """
             print(1.0 + .5)""".trimIndent().createRender()
         assertRenderEquals("""
-            printf "%s" "$(bc -l <<< "1.0 + 0.5")"
+            printf "%s" "$(bc -l <<<"1.0 + 0.5")"
             
             """.trimIndent(), render
         )
@@ -254,7 +254,7 @@ class ArithmeticMainTest : MainTest() {
         val render = """
             print(1.0 - (30 * .5))""".trimIndent().createRender()
         assertRenderEquals("""
-                printf "%s" "$(bc -l <<< "1.0 - (30 * 0.5)")"
+                printf "%s" "$(bc -l <<<"1.0 - (30 * 0.5)")"
             
             """.trimIndent(), render
         )
@@ -266,7 +266,7 @@ class ArithmeticMainTest : MainTest() {
         val render = """
             print(1.0 - 30 * .5)""".trimIndent().createRender()
         assertRenderEquals("""
-                printf "%s" "$(bc -l <<< "1.0 - 30 * 0.5")"
+                printf "%s" "$(bc -l <<<"1.0 - 30 * 0.5")"
             
             """.trimIndent(), render
         )
@@ -288,7 +288,7 @@ class ArithmeticMainTest : MainTest() {
         assertRenderEquals("""
             declare __bp_var0
             __bp_var0="$(printf "1")"
-            printf "%s" "$(bc -l <<< "${'$'}{__bp_var0} - (30 * 0.5)")"
+            printf "%s" "$(bc -l <<<"${'$'}{__bp_var0} - (30 * 0.5)")"
             
             """.trimIndent(), render
         )
