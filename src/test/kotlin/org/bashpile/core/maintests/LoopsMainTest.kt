@@ -19,7 +19,12 @@ class LoopsMainTest : MainTest() {
         assertRenderEquals(
             """
             cat "src/test/resources/data/example.csv" | $sed -e '1d' -e 's/\r\n/\n/g' | $sed -ze '/\n$/!s/$/\n$/g' | while IFS='' read -r __bp_line; do
-                first=$(printf "%s" "${'$'}{__bp_line}" | gawk --csv '{print $1}'); last=$(printf "%s" "${'$'}{__bp_line}" | gawk --csv '{print $2}'); email=$(printf "%s" "${'$'}{__bp_line}" | gawk --csv '{print $3}'); phone=$(printf "%s" "${'$'}{__bp_line}" | gawk --csv '{print $4}');
+                # loop variables (Bashpile generated)
+                first=$(printf "%s" "${'$'}{__bp_line}" | gawk --csv '{print $1}')
+                last=$(printf "%s" "${'$'}{__bp_line}" | gawk --csv '{print $2}')
+                email=$(printf "%s" "${'$'}{__bp_line}" | gawk --csv '{print $3}')
+                phone=$(printf "%s" "${'$'}{__bp_line}" | gawk --csv '{print $4}')
+                # body
                 printf "${'$'}{first} ${'$'}{last} ${'$'}{email} ${'$'}{phone}\n"
             done
             
@@ -41,7 +46,12 @@ class LoopsMainTest : MainTest() {
         assertRenderEquals(
             """
             cat "src/test/resources/data/example.csv" | $sed -e '1d' -e 's/\r\n/\n/g' | $sed -ze '/\n$/!s/$/\n$/g' | while IFS='' read -r __bp_line; do # comment
-                first=$(printf "%s" "${'$'}{__bp_line}" | gawk --csv '{print $1}'); last=$(printf "%s" "${'$'}{__bp_line}" | gawk --csv '{print $2}'); email=$(printf "%s" "${'$'}{__bp_line}" | gawk --csv '{print $3}'); phone=$(printf "%s" "${'$'}{__bp_line}" | gawk --csv '{print $4}');
+                # loop variables (Bashpile generated)
+                first=$(printf "%s" "${'$'}{__bp_line}" | gawk --csv '{print $1}')
+                last=$(printf "%s" "${'$'}{__bp_line}" | gawk --csv '{print $2}')
+                email=$(printf "%s" "${'$'}{__bp_line}" | gawk --csv '{print $3}')
+                phone=$(printf "%s" "${'$'}{__bp_line}" | gawk --csv '{print $4}')
+                # body
                 printf "${'$'}{first} ${'$'}{last} ${'$'}{email} ${'$'}{phone}\n"
             done
             
@@ -63,7 +73,12 @@ class LoopsMainTest : MainTest() {
         assertRenderEquals(
             """
             cat "src/test/resources/data/example.csv" | $sed -e '1d' -e 's/\r\n/\n/g' | $sed -ze '/\n$/!s/$/\n$/g' | while IFS='' read -r __bp_line; do # comment1 //comment2 //  comment3
-                first=$(printf "%s" "${'$'}{__bp_line}" | gawk --csv '{print $1}'); last=$(printf "%s" "${'$'}{__bp_line}" | gawk --csv '{print $2}'); email=$(printf "%s" "${'$'}{__bp_line}" | gawk --csv '{print $3}'); phone=$(printf "%s" "${'$'}{__bp_line}" | gawk --csv '{print $4}');
+                # loop variables (Bashpile generated)
+                first=$(printf "%s" "${'$'}{__bp_line}" | gawk --csv '{print $1}')
+                last=$(printf "%s" "${'$'}{__bp_line}" | gawk --csv '{print $2}')
+                email=$(printf "%s" "${'$'}{__bp_line}" | gawk --csv '{print $3}')
+                phone=$(printf "%s" "${'$'}{__bp_line}" | gawk --csv '{print $4}')
+                # body
                 printf "${'$'}{first} ${'$'}{last} ${'$'}{email} ${'$'}{phone}\n"
             done
             
@@ -86,7 +101,12 @@ class LoopsMainTest : MainTest() {
         assertRenderEquals(
             """
             cat "src/test/resources/data/example.csv" | $sed -e '1d' -e 's/\r\n/\n/g' | $sed -ze '/\n$/!s/$/\n$/g' | while IFS='' read -r __bp_line; do
-                first=$(printf "%s" "${'$'}{__bp_line}" | gawk --csv '{print $1}'); last=$(printf "%s" "${'$'}{__bp_line}" | gawk --csv '{print $2}'); email=$(printf "%s" "${'$'}{__bp_line}" | gawk --csv '{print $3}'); phone=$(printf "%s" "${'$'}{__bp_line}" | gawk --csv '{print $4}');
+                # loop variables (Bashpile generated)
+                first=$(printf "%s" "${'$'}{__bp_line}" | gawk --csv '{print $1}')
+                last=$(printf "%s" "${'$'}{__bp_line}" | gawk --csv '{print $2}')
+                email=$(printf "%s" "${'$'}{__bp_line}" | gawk --csv '{print $3}')
+                phone=$(printf "%s" "${'$'}{__bp_line}" | gawk --csv '{print $4}')
+                # body
                 printf "${'$'}{first} ${'$'}{last} ${'$'}{email} ${'$'}{phone}\n" # body print
             done
             
@@ -124,7 +144,14 @@ class LoopsMainTest : MainTest() {
             declare -x TOKEN
             TOKEN="OAUTH_TOKEN"
             cat "src/test/resources/data/example_extended.csv" | $sed -e '1d' -e 's/\r\n/\n/g' | $sed -ze '/\n$/!s/$/\n$/g' | while IFS='' read -r __bp_line; do
-                firstName=$(printf "%s" "${'$'}{__bp_line}" | gawk --csv '{print $1}'); middleName=$(printf "%s" "${'$'}{__bp_line}" | gawk --csv '{print $2}'); lastName=$(printf "%s" "${'$'}{__bp_line}" | gawk --csv '{print $3}'); email=$(printf "%s" "${'$'}{__bp_line}" | gawk --csv '{print $4}'); landline=$(printf "%s" "${'$'}{__bp_line}" | gawk --csv '{print $5}'); cell=$(printf "%s" "${'$'}{__bp_line}" | gawk --csv '{print $6}');
+                # loop variables (Bashpile generated)
+                firstName=$(printf "%s" "${'$'}{__bp_line}" | gawk --csv '{print $1}')
+                middleName=$(printf "%s" "${'$'}{__bp_line}" | gawk --csv '{print $2}')
+                lastName=$(printf "%s" "${'$'}{__bp_line}" | gawk --csv '{print $3}')
+                email=$(printf "%s" "${'$'}{__bp_line}" | gawk --csv '{print $4}')
+                landline=$(printf "%s" "${'$'}{__bp_line}" | gawk --csv '{print $5}')
+                cell=$(printf "%s" "${'$'}{__bp_line}" | gawk --csv '{print $6}')
+                # body
                 printf "%s" "${'$'}middleName" >/dev/null
                 # set progress status too
                 declare -x cellShort
@@ -174,7 +201,14 @@ class LoopsMainTest : MainTest() {
             declare -x TOKEN
             TOKEN="OAUTH_TOKEN"
             cat "src/test/resources/data/example_extended.csv" | $sed -e '1d' -e 's/\r\n/\n/g' | $sed -ze '/\n$/!s/$/\n$/g' | while IFS='' read -r __bp_line; do
-                firstName=$(printf "%s" "${'$'}{__bp_line}" | gawk --csv '{print $1}'); middleName=$(printf "%s" "${'$'}{__bp_line}" | gawk --csv '{print $2}'); lastName=$(printf "%s" "${'$'}{__bp_line}" | gawk --csv '{print $3}'); email=$(printf "%s" "${'$'}{__bp_line}" | gawk --csv '{print $4}'); landline=$(printf "%s" "${'$'}{__bp_line}" | gawk --csv '{print $5}'); cell=$(printf "%s" "${'$'}{__bp_line}" | gawk --csv '{print $6}');
+                # loop variables (Bashpile generated)
+                firstName=$(printf "%s" "${'$'}{__bp_line}" | gawk --csv '{print $1}')
+                middleName=$(printf "%s" "${'$'}{__bp_line}" | gawk --csv '{print $2}')
+                lastName=$(printf "%s" "${'$'}{__bp_line}" | gawk --csv '{print $3}')
+                email=$(printf "%s" "${'$'}{__bp_line}" | gawk --csv '{print $4}')
+                landline=$(printf "%s" "${'$'}{__bp_line}" | gawk --csv '{print $5}')
+                cell=$(printf "%s" "${'$'}{__bp_line}" | gawk --csv '{print $6}')
+                # body
                 printf "%s" "${'$'}email" >/dev/null
                 #########################
                 # set progress status too
@@ -229,7 +263,14 @@ class LoopsMainTest : MainTest() {
             declare -x TOKEN
             TOKEN="OAUTH_TOKEN"
             cat "src/test/resources/data/example_extended_windows_line_endings.csv" | $sed -e '1d' -e 's/\r\n/\n/g' | $sed -ze '/\n$/!s/$/\n$/g' | while IFS='' read -r __bp_line; do
-                firstName=$(printf "%s" "${'$'}{__bp_line}" | gawk --csv '{print $1}'); middleName=$(printf "%s" "${'$'}{__bp_line}" | gawk --csv '{print $2}'); lastName=$(printf "%s" "${'$'}{__bp_line}" | gawk --csv '{print $3}'); email=$(printf "%s" "${'$'}{__bp_line}" | gawk --csv '{print $4}'); landline=$(printf "%s" "${'$'}{__bp_line}" | gawk --csv '{print $5}'); cell=$(printf "%s" "${'$'}{__bp_line}" | gawk --csv '{print $6}');
+                # loop variables (Bashpile generated)
+                firstName=$(printf "%s" "${'$'}{__bp_line}" | gawk --csv '{print $1}')
+                middleName=$(printf "%s" "${'$'}{__bp_line}" | gawk --csv '{print $2}')
+                lastName=$(printf "%s" "${'$'}{__bp_line}" | gawk --csv '{print $3}')
+                email=$(printf "%s" "${'$'}{__bp_line}" | gawk --csv '{print $4}')
+                landline=$(printf "%s" "${'$'}{__bp_line}" | gawk --csv '{print $5}')
+                cell=$(printf "%s" "${'$'}{__bp_line}" | gawk --csv '{print $6}')
+                # body
                 printf "%s" "${'$'}firstName" >/dev/null
                 printf "%s" "${'$'}middleName" >/dev/null
                 printf "%s" "${'$'}landline" >/dev/null
@@ -266,6 +307,8 @@ class LoopsMainTest : MainTest() {
         """.trimIndent().createRender()
         assertRenderEquals("""
             cat "$filename" | $sed -e 's/\r\n/\n/g' | $sed -ze '/\n$/!s/$/\n$/g' | while IFS='' read -r line; do
+                # loop variables (Bashpile generated)
+                # body
                 printf "${'$'}{line}\n"
             done
             
@@ -286,6 +329,8 @@ class LoopsMainTest : MainTest() {
         """.trimIndent().createRender()
         assertRenderEquals("""
             cat "$filename" | $sed -e 's/\r\n/\n/g' | $sed -ze '/\n$/!s/$/\n$/g' | while IFS='' read -r line; do
+                # loop variables (Bashpile generated)
+                # body
                 printf "${'$'}{line}\n"
             done
             
@@ -397,6 +442,8 @@ class LoopsMainTest : MainTest() {
             """
             cd src/test/resources/data
             cat "labeled_lines.txt" | $sed -e 's/\r\n/\n/g' | $sed -ze '/\n$/!s/$/\n$/g' | while IFS='' read -r line; do
+                # loop variables (Bashpile generated)
+                # body
                 printf "%s" "${'$'}line" >/dev/null
                 declare __bp_var0
                 __bp_var0="$(printf '.')"
@@ -429,8 +476,12 @@ class LoopsMainTest : MainTest() {
         assertRenderEquals("""
             cd src/test/resources/data
             cat "labeled_lines.txt" | $sed -e 's/\r\n/\n/g' | $sed -ze '/\n$/!s/$/\n$/g' | while IFS='' read -r line; do
+                # loop variables (Bashpile generated)
+                # body
                 printf "%s" "${'$'}line" >/dev/null
                 cat "labeled_lines.txt" | $sed -e 's/\r\n/\n/g' | $sed -ze '/\n$/!s/$/\n$/g' | while IFS='' read -r line; do
+                    # loop variables (Bashpile generated)
+                    # body
                     declare __bp_var0
                     __bp_var0="$(printf '.')"
                     printf "$(ls -m "${'$'}{__bp_var0}")\n"
@@ -468,12 +519,16 @@ class LoopsMainTest : MainTest() {
             """
             cd src/test/resources/data
             cat "labeled_lines.txt" | $sed -e 's/\r\n/\n/g' | $sed -ze '/\n$/!s/$/\n$/g' | while IFS='' read -r line; do
-                printf "%s" "${'$'}{line}" > /dev/null
+                # loop variables (Bashpile generated)
+                # body
+                printf "%s" "${'$'}{line}" >/dev/null
                 declare __bp_var0
                 __bp_var0="$(printf '.')"
-                printf "$(ls -m "${'$'}{__bp_var0}" > /dev/null)"
+                printf "$(ls -m "${'$'}{__bp_var0}" >/dev/null)"
                 cat "labeled_lines.txt" | $sed -e 's/\r\n/\n/g' | $sed -ze '/\n$/!s/$/\n$/g' | while IFS='' read -r line; do
-                    printf "%s" "${'$'}{line}" > /dev/null
+                    # loop variables (Bashpile generated)
+                    # body
+                    printf "%s" "${'$'}{line}" >/dev/null
                     declare __bp_var1
                     __bp_var1="$(printf '.')"
                     printf "$(ls -m "${'$'}{__bp_var1}")\n"

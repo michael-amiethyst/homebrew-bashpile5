@@ -50,7 +50,7 @@ class ForeachFileLineLoopBashNode(
             val setLoopVariables = if (columns.size > 1) {
                 columns.mapIndexed { i, it -> """
                     ${it.id}=$(printf "%s" "${'$'}{__bp_line}" | gawk --csv '{print $${i + 1}}');""".trimIndent()
-                }.joinToString(prefix = "    ", separator = " ", postfix = "\n")
+                }.joinToString(prefix = "    ", separator = " ", postfix = "")
             } else { "" }
             val childRenderList = children.map { child ->
                 child.render(RenderOptions.UNQUOTED).lines().filter { it.isNotBlank() }.map {
@@ -60,7 +60,10 @@ class ForeachFileLineLoopBashNode(
             val childRenders = childRenderList.joinToString("").removeSuffix("\n")
             return """
                 cat $doubleQuotedFilepath | ${mungeStream()} | while IFS='' read -r $lineVariableName; do$commentText
-                $setLoopVariables$childRenders
+                    # loop variables (Bashpile generated)
+                $setLoopVariables
+                    # body
+                $childRenders
                 done
     
             """.trimScriptIndent("                ")
