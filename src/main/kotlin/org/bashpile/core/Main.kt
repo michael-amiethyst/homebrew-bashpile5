@@ -100,7 +100,7 @@ class Main : CliktCommand() {
             generateSequence(::readLine).joinToString("\n")
         }
         val bastRoot: BastNode = _getBast(script.byteInputStream())
-        val bash: String = bastRoot.render(RenderOptions.UNQUOTED)
+        val bash: String = bastRoot.render(RenderOptions.UNQUOTED).shfmt()
         if (!commandMode()) {
             logger.debug("Writing to STDOUT in regular (non-command) mode")
             echo(SHEBANG_HEADER + bash, false)

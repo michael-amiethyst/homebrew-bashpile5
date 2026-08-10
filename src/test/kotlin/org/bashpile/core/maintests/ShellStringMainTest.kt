@@ -82,7 +82,11 @@ class ShellStringMainTest : MainTest() {
         // loose unsets '-o pipefail' so `exit 1` is ignored
         val script = "'ls \"' + l#(printf \".\"; exit 1) + '\"'".createRender()
         assertRenderEquals("""
-            ls "$(eval "${'$'}__bp_old_options"; printf "."; exit 1)"
+            ls "$(
+                eval "${'$'}__bp_old_options"
+                printf "."
+                exit 1
+            )"
             
             """.trimIndent(), script
         ).assertRenderProduces({ it.contains("bin") })
@@ -95,7 +99,11 @@ class ShellStringMainTest : MainTest() {
             printf "%s" "${'$'}undefinedVar"
             """.trimIndent().createRender()
         assertRenderEquals("""
-            ls "$(eval "${'$'}__bp_old_options"; printf "."; exit 1)"
+            ls "$(
+                eval "${'$'}__bp_old_options"
+                printf "."
+                exit 1
+            )"
             printf "%s" "${'$'}undefinedVar"
             
             """.trimIndent(), script
@@ -110,7 +118,14 @@ class ShellStringMainTest : MainTest() {
             """.trimIndent().createRender()
         assertRenderEquals(
             """
-            ls "$(eval "${'$'}__bp_old_options"; printf "%s" "-all")" "$(eval "${'$'}__bp_old_options"; printf "."; exit 1)"
+            ls "$(
+                eval "${'$'}__bp_old_options"
+                printf "%s" "-all"
+            )" "$(
+                eval "${'$'}__bp_old_options"
+                printf "."
+                exit 1
+            )"
 
             """.trimIndent(), script
         ).assertRenderProduces({ it.contains("bin") })
@@ -147,7 +162,10 @@ class ShellStringMainTest : MainTest() {
         assertRenderEquals("""
             set -euo pipefail
             declare __bp_var0
-            __bp_var0="$(echo '.'; exit ${SCRIPT_ERROR__GENERIC})"
+            __bp_var0="$(
+                echo '.'
+                exit ${SCRIPT_ERROR__GENERIC}
+            )"
             printf "$(ls "${'$'}{__bp_var0}")"
             """.trimIndent() + "\n", script
         )

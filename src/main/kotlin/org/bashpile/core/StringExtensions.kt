@@ -60,3 +60,36 @@ private fun String.runCommandImpl(workingDir: File, arguments: List<String>): Pa
         return Pair(e.stackTraceToString(), proc?.exitValue() ?: -1)
     }
 }
+
+// TODO combine with runCommand or make LinuxProcess class
+fun String.shfmt(): String {
+    val script = Files.createTempFile("bashpile-", ".sh")
+    val diagnostics = Files.createTempFile("bashpile-shfmt-", ".log")
+
+    try {
+        Files.writeString(script, this)
+
+        val process = ProcessBuilder(
+            "shfmt", "-ln", "bash", "-i", "4", "-ci", "-w", script.toString()
+        )
+            .redirectErrorStream(true)
+            .redirectOutput(diagnostics.toFile())
+            .start()
+
+        if (!process.waitFor(30, TimeUnit.SECONDS)) {
+            process.destroyForcibly()
+            process.waitFor()
+            error("shfmt timed out after 30 seconds")
+        }
+
+        val messages = Files.readString(diagnostics)
+        check(process.exitValue() == SCRIPT_SUCCESS) {
+            "shfmt exited with code ${process.exitValue()}:\n$messages"
+        }
+
+        return Files.readString(script)
+    } finally {
+        Files.deleteIfExists(script)
+        Files.deleteIfExists(diagnostics)
+    }
+}

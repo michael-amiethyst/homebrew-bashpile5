@@ -409,7 +409,7 @@ class SwitchMainTest : MainTest() {
             declare starbaseNumber
             starbaseNumber="1.2"
             case "${'$'}{starbaseNumber}" in
-                1.[0-1]\:|1.2)
+                1.[0-1]\: | 1.2)
                     printf "Earth"
                     printf ", the first one"
                     ;;
@@ -435,7 +435,7 @@ class SwitchMainTest : MainTest() {
             declare starbaseNumber
             starbaseNumber="1.0:"
             case "${'$'}{starbaseNumber}" in
-                1.[!2-9]\:|1.2)
+                1.[!2-9]\: | 1.2)
                     printf "Earth"
                     printf ", the first one"
                     ;;
