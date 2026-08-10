@@ -77,6 +77,7 @@ class Main : CliktCommand() {
      * The main entry point for the Bashpile compiler.
      * This method is called by the `main` function by Clikt.
      */
+    // TODO change project to use two spaces for tabs (Google style guide)
     override fun run() {
         // guard, etc
         val scriptPath = Path.of(scriptArgument)

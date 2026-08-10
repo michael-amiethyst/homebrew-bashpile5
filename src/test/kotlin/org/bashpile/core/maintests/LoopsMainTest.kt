@@ -5,7 +5,6 @@ import org.bashpile.core.runCommand
 import kotlin.test.Test
 import kotlin.test.assertFailsWith
 
-// TODO add comments for variable definitions and body
 class LoopsMainTest : MainTest() {
 
     override val testName = "LoopsTest"

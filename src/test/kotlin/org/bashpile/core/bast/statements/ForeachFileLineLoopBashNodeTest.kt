@@ -1,6 +1,7 @@
 package org.bashpile.core.bast.statements
 
 import org.bashpile.core.Main
+import org.bashpile.core.shfmt
 import org.bashpile.core.engine.CallStack
 import org.bashpile.core.engine.TypeEnum.EMPTY
 import org.bashpile.core.engine.TypeEnum.STRING
@@ -31,7 +32,7 @@ class ForeachFileLineLoopBashNodeTest {
                 printf "%s" "${'$'}{col1}"
             done
 
-        """.trimIndent(), fixture.render(UNQUOTED))
+        """.trimIndent(), fixture.render(UNQUOTED).shfmt())
     }
 
     /** Statement in block needs 2 Bash lines to render */
@@ -50,6 +51,6 @@ class ForeachFileLineLoopBashNodeTest {
                 col1="exampleValue"
             done
 
-        """.trimIndent(), fixture.render(UNQUOTED))
+        """.trimIndent(), fixture.render(UNQUOTED).shfmt())
     }
 }

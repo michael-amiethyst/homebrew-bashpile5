@@ -8,7 +8,7 @@ Here's some things from the "Bash Iceberg" that Bashpile will handle for you:
 * Ensuring that generated scripts run in "strict mode" to ensure that errors are caught early
 * shellcheck compatible
 * Portability (e.g. POSIX)
-* Whitespace (Bash says that spaces separate tokens but "varName = 1" will not work)
+* Generated Bash formatting (`shfmt` canonicalizes indentation and presentation whitespace)
 * Various Bash bugs (e.g. a nested subshell will have a bad exit code ignored)
 
 As a bonus example if in that arithmetic you want to use `<=`,
@@ -55,7 +55,7 @@ Prerequisite: don't have the Homebrew version installed.  Run `brew uninstall ba
 ## Language Reference
 
 * Quick compiles!  Within a second
-* White space agnostic (except for Python style indentation)
+* Bashpile source is whitespace agnostic except for Python-style block indentation
   * Bash is white space sensitive and inconsistent about it too!
 * `print("Any String here")`, [print statements](statements/print-statements.md)
 * `"string" + "concatination"` [calculation expressions](expressions/calculation-expressions.md)

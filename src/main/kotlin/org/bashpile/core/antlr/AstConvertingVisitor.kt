@@ -28,7 +28,7 @@ import org.bashpile.core.engine.TypeEnum.*
  * Law of Demeter relaxed to two calls deep (extension methods are just used once or twice)
  * Code is arranged from complex at the top to simple at the bottom.
  */
-class AstConvertingVisitor: BashpileParserBaseVisitor<BastNode>() { // end of class
+class AstConvertingVisitor: BashpileParserBaseVisitor<BastNode>() {
 
     companion object {
         const val OLD_OPTIONS = "__bp_old_options"
