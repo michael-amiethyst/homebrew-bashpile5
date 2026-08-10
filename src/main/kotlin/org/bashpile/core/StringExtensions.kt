@@ -62,6 +62,7 @@ private fun String.runCommandImpl(workingDir: File, arguments: List<String>): Pa
 }
 
 // TODO combine with runCommand or make LinuxProcess class
+// TODO remove WS formatting calls
 fun String.shfmt(): String {
     val script = Files.createTempFile("bashpile-", ".sh")
     val diagnostics = Files.createTempFile("bashpile-shfmt-", ".log")

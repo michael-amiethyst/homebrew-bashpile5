@@ -531,7 +531,10 @@ class ConditionalMainTest : MainTest() {
                 print("Command failed\n")
             """.trimIndent().createRender()
         assertRenderEquals("""
-            if (expr 1 \> 0; exit ${SCRIPT_ERROR__GENERIC}) >/dev/null 2>&1; then
+            if (
+                expr 1 \> 0
+                exit ${SCRIPT_ERROR__GENERIC}
+            ) >/dev/null 2>&1; then
                 printf "Math is mathing! "
                 printf "Math is mathing!\n"
             else
@@ -552,7 +555,10 @@ class ConditionalMainTest : MainTest() {
                 print("Command failed\n")
             """.trimIndent().createRender()
         assertRenderEquals("""
-            if (expr 1 \> 0; exit ${SCRIPT_ERROR__GENERIC}) >/dev/null 2>&1; then
+            if (
+                expr 1 \> 0
+                exit ${SCRIPT_ERROR__GENERIC}
+            ) >/dev/null 2>&1; then
                 printf "Math is mathing! "
                 printf "Math is mathing!\n"
             else
@@ -689,7 +695,7 @@ class ConditionalMainTest : MainTest() {
                 print("Command failed\n")
             """.trimIndent().createRender()
         assertRenderEquals("""
-            if bc -l <<< "1.0 < 2.0" > /dev/null && bc -l <<< "2.0 <= 1.0" > /dev/null || (bc <<< "2.0 < 3.0") >/dev/null 2>&1; then
+            if bc -l <<<"1.0 < 2.0" >/dev/null && bc -l <<<"2.0 <= 1.0" >/dev/null || (bc <<<"2.0 < 3.0") >/dev/null 2>&1; then
                 printf "Math is mathing!\n"
             else
                 printf "Command failed\n"
@@ -711,7 +717,7 @@ class ConditionalMainTest : MainTest() {
         assertRenderEquals("""
             declare one
             one=1.0
-            if bc -l <<< "${'$'}{one} < 2.0" > /dev/null && bc -l <<< "2.0 <= ${'$'}{one}" > /dev/null || (bc <<< "2.0 < 3.0") >/dev/null 2>&1; then
+            if bc -l <<<"${'$'}{one} < 2.0" >/dev/null && bc -l <<<"2.0 <= ${'$'}{one}" >/dev/null || (bc <<<"2.0 < 3.0") >/dev/null 2>&1; then
                 printf "Math is mathing!\n"
             else
                 printf "Command failed\n"
