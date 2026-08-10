@@ -18,8 +18,8 @@ class CaseBastNode(val expression: List<BastNode>, val statements: MutableList<B
         val tabs = TAB.repeat(5) // base of 3 tabs, one for the case and one for the statements
         val matcher = expression.map { it.render(options) }.joinToString("")
         val matchRender = "$TAB$matcher)\n"
-        statements.addLast(TerminalBastNode(";;", STRING))
-        val statementBlock: List<String> = statements.map { tabs + it.render(options) }
+        val statementsWithTerminator = statements + TerminalBastNode(";;", STRING)
+        val statementBlock: List<String> = statementsWithTerminator.map { tabs + it.render(options) }
         return matchRender + statementBlock.joinToString("")
     }
 }

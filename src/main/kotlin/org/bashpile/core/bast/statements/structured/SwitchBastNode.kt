@@ -1,5 +1,6 @@
 package org.bashpile.core.bast.statements.structured
 
+import org.bashpile.core.Main.Companion.callStack
 import org.bashpile.core.bast.BastNode
 import org.bashpile.core.bast.statements.StatementBastNode
 import org.bashpile.core.engine.RenderOptions
@@ -14,7 +15,12 @@ class SwitchBastNode(val matchOn: BastNode, val cases: List<BastNode>)
 
     override fun render(options: RenderOptions): String {
         val matchOnRender = matchOn.render(options)
-        val caseRenders = cases.joinToString("\n" + TAB.repeat(3)) { it.render(options) }
+        val caseRenders = cases.joinToString("\n" + TAB.repeat(3)) { case ->
+            callStack.use { stack ->
+                stack.pushStackframe()
+                case.render(options)
+            }
+        }
         return """
             case "$matchOnRender" in
             $caseRenders

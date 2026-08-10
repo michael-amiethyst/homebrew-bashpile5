@@ -1,11 +1,16 @@
 package org.bashpile.core.maintests
 
 import org.antlr.v4.runtime.misc.ParseCancellationException
+import org.bashpile.core.bast.expressions.CaseBastNode
+import org.bashpile.core.engine.RenderOptions.Companion.UNQUOTED
 import org.bashpile.core.runCommand
+import org.bashpile.core.shfmt
 import org.junit.jupiter.api.assertThrows
 import kotlin.io.path.Path
 import kotlin.io.path.readText
 import kotlin.test.Test
+import kotlin.test.assertEquals
+import kotlin.test.assertFailsWith
 
 class SwitchMainTest : MainTest() {
     override val testName = "SwitchTest"
@@ -546,6 +551,54 @@ class SwitchMainTest : MainTest() {
             esac
             
         """.trimIndent(), render).runCommand().assertRenderProduces("Other crew\n")
+    }
+
+    @Test
+    fun switch_caseVariable_isOutOfScopeAfterSwitch() {
+        assertFailsWith<IllegalStateException> { """
+                name: string = "Riker"
+                switch (name):
+                    case Riker:
+                        rank: string = "Commander"
+                        print(rank + "\n")
+                print(rank + "\n")
+            """.trimIndent().createRender()
+        }
+    }
+
+    @Test
+    fun switch_defaultVariable_isOutOfScopeAfterSwitch() {
+        assertFailsWith<IllegalStateException> { """
+                name: string = "La Forge"
+                switch (name):
+                    case Riker:
+                        print("Commander\n")
+                    default:
+                        rank: string = "Lieutenant Commander"
+                        print(rank + "\n")
+                print(rank + "\n")
+            """.trimIndent().createRender()
+        }
+    }
+
+    @Test
+    fun switch_render_isIdempotent() {
+        val bast = fixture._getBast("""
+            name: string = "Riker"
+            switch (name):
+                case Riker:
+                    print("Number 1\n")
+                default:
+                    print("Other\n")
+        """.trimIndent().byteInputStream())
+        val cases = bast.toList().filterIsInstance<CaseBastNode>()
+        val statementCounts = cases.map { it.statements.size }
+
+        val firstRender = bast.render(UNQUOTED).shfmt()
+        val secondRender = bast.render(UNQUOTED).shfmt()
+
+        assertEquals(firstRender, secondRender)
+        assertEquals(statementCounts, cases.map { it.statements.size })
     }
 
     /** Test for comments */
