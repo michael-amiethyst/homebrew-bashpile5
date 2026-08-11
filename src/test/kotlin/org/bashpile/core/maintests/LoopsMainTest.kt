@@ -306,7 +306,6 @@ class LoopsMainTest : MainTest() {
         """.trimIndent().createRender()
         assertRenderEquals("""
             cat "$filename" | $sed -e 's/\r\n/\n/g' | $sed -ze '/\n$/!s/$/\n$/g' | while IFS='' read -r line; do
-                # loop variables (Bashpile generated)
                 # body
                 printf "${'$'}{line}\n"
             done
@@ -328,7 +327,6 @@ class LoopsMainTest : MainTest() {
         """.trimIndent().createRender()
         assertRenderEquals("""
             cat "$filename" | $sed -e 's/\r\n/\n/g' | $sed -ze '/\n$/!s/$/\n$/g' | while IFS='' read -r line; do
-                # loop variables (Bashpile generated)
                 # body
                 printf "${'$'}{line}\n"
             done
@@ -441,7 +439,6 @@ class LoopsMainTest : MainTest() {
             """
             cd src/test/resources/data
             cat "labeled_lines.txt" | $sed -e 's/\r\n/\n/g' | $sed -ze '/\n$/!s/$/\n$/g' | while IFS='' read -r line; do
-                # loop variables (Bashpile generated)
                 # body
                 printf "%s" "${'$'}line" >/dev/null
                 declare __bp_var0
@@ -475,11 +472,9 @@ class LoopsMainTest : MainTest() {
         assertRenderEquals("""
             cd src/test/resources/data
             cat "labeled_lines.txt" | $sed -e 's/\r\n/\n/g' | $sed -ze '/\n$/!s/$/\n$/g' | while IFS='' read -r line; do
-                # loop variables (Bashpile generated)
                 # body
                 printf "%s" "${'$'}line" >/dev/null
                 cat "labeled_lines.txt" | $sed -e 's/\r\n/\n/g' | $sed -ze '/\n$/!s/$/\n$/g' | while IFS='' read -r line; do
-                    # loop variables (Bashpile generated)
                     # body
                     declare __bp_var0
                     __bp_var0="$(printf '.')"
@@ -518,14 +513,12 @@ class LoopsMainTest : MainTest() {
             """
             cd src/test/resources/data
             cat "labeled_lines.txt" | $sed -e 's/\r\n/\n/g' | $sed -ze '/\n$/!s/$/\n$/g' | while IFS='' read -r line; do
-                # loop variables (Bashpile generated)
                 # body
                 printf "%s" "${'$'}{line}" >/dev/null
                 declare __bp_var0
                 __bp_var0="$(printf '.')"
                 printf "$(ls -m "${'$'}{__bp_var0}" >/dev/null)"
                 cat "labeled_lines.txt" | $sed -e 's/\r\n/\n/g' | $sed -ze '/\n$/!s/$/\n$/g' | while IFS='' read -r line; do
-                    # loop variables (Bashpile generated)
                     # body
                     printf "%s" "${'$'}{line}" >/dev/null
                     declare __bp_var1

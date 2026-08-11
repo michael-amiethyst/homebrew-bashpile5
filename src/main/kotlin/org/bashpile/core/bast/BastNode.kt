@@ -142,13 +142,4 @@ abstract class BastNode(
         val index = this.parent!!.children.indexOf(this)
         this.parent!!.mutableChildren.add(index, toAdd)
     }
-
-    ///////////////////////
-    // extension methods
-    //////////////////////
-
-    /** Removes Kotlin template indentation so [render] can return valid raw Bash before the final `shfmt` pass. */
-    protected fun String.trimScriptIndent(trim: String) = this.lines().filter { it.isNotBlank() }.map {
-        it.removePrefix(trim)
-    }.joinToString("\n", postfix = "\n")
 }

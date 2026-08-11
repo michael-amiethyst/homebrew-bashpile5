@@ -27,7 +27,6 @@ class ForeachFileLineLoopBashNodeTest {
         assertEquals(
             """
             cat "file.csv" | $sed -e 's/\r\n/\n/g' | $sed -ze '/\n$/!s/$/\n$/g' | while IFS='' read -r col1; do
-                # loop variables (Bashpile generated)
                 # body
                 printf "%s" "${'$'}{col1}"
             done
@@ -45,7 +44,6 @@ class ForeachFileLineLoopBashNodeTest {
         assertEquals(
             """
             cat "file.csv" | $sed -e 's/\r\n/\n/g' | $sed -ze '/\n$/!s/$/\n$/g' | while IFS='' read -r col1; do
-                # loop variables (Bashpile generated)
                 # body
                 declare col1
                 col1="exampleValue"
