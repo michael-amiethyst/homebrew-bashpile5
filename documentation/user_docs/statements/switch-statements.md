@@ -29,6 +29,26 @@ switch (name):
         print("Other") // prints "Other"
 ```
 
+## Lexical scope
+
+Each `case` body and the `default` body has its own lexical scope. Variables declared before the switch remain
+available to the matching expression and to every branch. A variable declared inside a branch can be used by later
+statements in that branch, but it is not available in another branch or after the switch. The same variable name may
+therefore be declared independently in different branches.
+
+```Bash
+name: string = "Riker"
+switch (name):
+    case Riker:
+        rank: string = "Commander"
+        print(rank) // rank is available here
+    default:
+        rank: string = "Unknown"
+        print(rank) // a separate rank declaration
+
+// print(rank) would fail to compile because rank is out of scope
+```
+
 Glob patterns and pipes are allowed as well, and character escapes.  Such as:
 
 ```Bash
