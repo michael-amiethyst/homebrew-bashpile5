@@ -8,7 +8,7 @@ Here's some things from the "Bash Iceberg" that Bashpile will handle for you:
 * Ensuring that generated scripts run in "strict mode" to ensure that errors are caught early
 * shellcheck compatible
 * Portability (e.g. POSIX)
-* Whitespace (Bash says that spaces separate tokens but "varName = 1" will not work)
+* Generated Bash formatting (`shfmt` canonicalizes indentation and presentation whitespace)
 * Various Bash bugs (e.g. a nested subshell will have a bad exit code ignored)
 
 As a bonus example if in that arithmetic you want to use `<=`,
@@ -25,8 +25,8 @@ Also, for all of its faults mentioned above it's fast, especially if you are mak
 
 ## Quickstart
 This will install a JVM Jar, and may be a bit slow (a few seconds to compile a small program).
-1. `brew tap michael-amiethyst/core`
-2. `brew install michael-amiethyst/core/bashpile`
+1. `brew tap michael-amiethyst/bashpile5`
+2. `brew install michael-amiethyst/bashpile5/bashpile`
 3. `bashpile -c "print('Hello World')"`
    1. This will print out the Bash translation
    2. You can redirect this to a file to use the Bash directly or immediatly execute it
@@ -55,7 +55,7 @@ Prerequisite: don't have the Homebrew version installed.  Run `brew uninstall ba
 ## Language Reference
 
 * Quick compiles!  Within a second
-* White space agnostic (except for Python style indentation)
+* Bashpile source is whitespace agnostic except for Python-style block indentation
   * Bash is white space sensitive and inconsistent about it too!
 * `print("Any String here")`, [print statements](statements/print-statements.md)
 * `"string" + "concatination"` [calculation expressions](expressions/calculation-expressions.md)
@@ -81,3 +81,6 @@ Prerequisite: don't have the Homebrew version installed.  Run `brew uninstall ba
   * `arguments[splat]` -> `$*`
     * `print(arguments[splat])` prints all arguments as one would expect
     * By default it will separate with a space, to change set IFS (e.g. set to a linebreak with `l#(IFS="\n")`)
+* [Switch/Case statements](statements/switch-statements.md)
+* [Foreach-File-Line Loops](statements/foreach-file-line.md)
+* [Comments and BashpileDoc](features/comments.md)

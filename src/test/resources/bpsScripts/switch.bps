@@ -1,0 +1,4 @@
+name: string = "Riker"
+switch (name):
+    case Riker:
+        printf "Number 1"

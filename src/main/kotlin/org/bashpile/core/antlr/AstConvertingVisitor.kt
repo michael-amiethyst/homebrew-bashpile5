@@ -15,6 +15,9 @@ import org.bashpile.core.bast.expressions.shellstrings.LooseShellStringBastNode
 import org.bashpile.core.bast.expressions.shellstrings.ShellStringBastNode
 import org.bashpile.core.bast.expressions.shellstrings.VerbatimShellStringBastNode
 import org.bashpile.core.bast.statements.*
+import org.bashpile.core.bast.statements.structured.ConditionalBastNode
+import org.bashpile.core.bast.statements.structured.IfClause
+import org.bashpile.core.bast.statements.structured.SwitchBastNode
 import org.bashpile.core.engine.TypeEnum.*
 
 /**
@@ -58,18 +61,29 @@ class AstConvertingVisitor: BashpileParserBaseVisitor<BastNode>() {
         val antlrStatements = ctx.indentedStatements().statement()
         val children = antlrStatements.map { visit(it) }
         val columns = ctx.typedId().map { visit(it) as VariableReferenceBastNode }
-        return ForeachFileLineLoopBashNode(children, ctx.StringValues().text, columns)
+        val comments = ctx.Comment().map { visit(it) }
+        return ForeachFileLineLoopBashNode(children, ctx.StringValues().text, columns, comments)
     }
 
     override fun visitConditionalStatement(ctx: BashpileParser.ConditionalStatementContext): BastNode {
-        val conditions = mutableListOf(visit(ctx.expression()))
-        val blockBodies = ctx.indentedStatements().map { it.statement().map { visit(it) } }.toMutableList()
-        ctx.elseIfClauses().forEach { elseIf ->
-            conditions += visit(elseIf.expression())
-            val insertIndex = if (blockBodies.size >= 2) blockBodies.size - 1 else blockBodies.size
-            blockBodies.add(insertIndex, elseIf.indentedStatements().statement().map { visit(it) })
+        val ifComments = ctx.Comment().map { visit(it) }
+        val ifBody = listOf(ctx.indentedStatements())
+            .flatMap { ifBlock -> ifBlock.statement().map { visit(it) } }
+        val ifClause = IfClause(visit(ctx.expression()), ifComments, ifBody)
+        val elseIfClauses = ctx.elseIfClauses().map { elseIf ->
+            IfClause(visit(elseIf.expression()),
+                elseIf.Comment().map { visit(it) },
+                elseIf.indentedStatements().statement().map { visit(it) })
         }
-        return ConditionalBastNode(conditions, blockBodies)
+        val elseBlock = ctx.elseClause()?.indentedStatements()?.statement()?.map { visit(it) } ?: listOf()
+        val elseComments = ctx.elseClause()?.Comment()?.map { visit(it) } ?: listOf()
+        return ConditionalBastNode(ifClause, elseIfClauses, elseBlock, elseComments)
+    }
+
+    override fun visitSwitchStatement(ctx: BashpileParser.SwitchStatementContext): BastNode {
+        val matchingExpression = visit(ctx.expression())
+        val cases = ctx.caseClauses().map { visit(it) } + ctx.defaultCase()?.let { visit(it) }
+        return SwitchBastNode(matchingExpression, cases.filterNotNull())
     }
 
     override fun visitVariableDeclarationStatement(ctx: BashpileParser.VariableDeclarationStatementContext): BastNode {
@@ -79,11 +93,14 @@ class AstConvertingVisitor: BashpileParserBaseVisitor<BastNode>() {
         val id = ctx.typedId().Id().text
         val typeText = ctx.typedId().majorType().text
         val type = valueOf(typeText.uppercase())
-        return VariableDeclarationBastNode(id, type, readonly = readonly, export = export, child = node)
+        val comments = ctx.eol().Comment()?.map { visit(it) } ?: listOf()
+        return VariableDeclarationBastNode(
+            id, type, readonly = readonly, export = export, child = node, comments = comments)
     }
 
     override fun visitReassignmentStatement(ctx: BashpileParser.ReassignmentStatementContext): BastNode {
-        return ReassignmentBastNode(ctx.Id().text, visit(ctx.expression()))
+        val comments = ctx.eol().Comment()?.map { visit(it) } ?: listOf()
+        return ReassignmentBastNode(ctx.Id().text, visit(ctx.expression()), comments)
     }
 
     override fun visitBashpileDocStatement(ctx: BashpileParser.BashpileDocStatementContext): BastNode {
@@ -101,24 +118,20 @@ class AstConvertingVisitor: BashpileParserBaseVisitor<BastNode>() {
     override fun visitLineCommentStatement(ctx: BashpileParser.LineCommentStatementContext): BastNode {
         // does not preserve whitespace
         val commentText = ctx.text.substring(2).trimStart() // ignore initial "//" and spaces
-        return TerminalBastNode("# $commentText", STRING)
-    }
-
-    override fun visitBlockCommentStatement(ctx: BashpileParser.BlockCommentStatementContext): BastNode {
-        // does not preserve whitespace
-        val trimmedText = ctx.text.trim()
-        val text = trimmedText.substring(2, trimmedText.length - 2)
-            .split("\n")
-            .map { it.trim() }
-            .map { "# $it".trim() }
-            .joinToString("\n", postfix = "\n")
+        // trim for the case of there being no commentText
+        var text = "#"
+        if (commentText.isNotBlank()) { text += " $commentText" }
         return TerminalBastNode(text, STRING)
     }
 
     override fun visitPrintStatement(ctx: BashpileParser.PrintStatementContext): BastNode {
         val antlrExpressions = ctx.argumentList().expression()
         val nodes = antlrExpressions.map { visit(it) }
-        return PrintBastNode(nodes)
+
+        val comments = ctx.eol().Comment() ?: listOf()
+        val commentNodes = comments.map { visit(it) }
+
+        return PrintBastNode(nodes, commentNodes)
     }
 
     override fun visitExpressionStatement(ctx: BashpileParser.ExpressionStatementContext): BastNode {
@@ -158,15 +171,14 @@ class AstConvertingVisitor: BashpileParserBaseVisitor<BastNode>() {
     }
 
     override fun visitLiteral(ctx: BashpileParser.LiteralContext): BastNode {
-        val boolContext = ctx.BoolValues()
-        val stringContext = ctx.StringValues()
+        val boolContext = ctx.BoolValues()?.text
+        val stringContext = ctx.StringValues()?.text
 
         return if (boolContext != null) {
-            BooleanLiteralBastNode(boolContext.text.toBoolean())
+            BooleanLiteralBastNode(boolContext.toBoolean())
         } else if (stringContext != null) {
-            val text = stringContext.text
             // remove enclosing double or single quotes
-            val trimEnds = stringContext.text.substring(1, text.length - 1)
+            val trimEnds = stringContext.substring(1, stringContext.length - 1)
             StringLiteralBastNode(trimEnds)
         } else {
             val message = "Unknown literal type.  Numeric values should be handled in visitNumberExpression"
@@ -261,6 +273,18 @@ class AstConvertingVisitor: BashpileParserBaseVisitor<BastNode>() {
 
     // Leaf nodes (parts of expressions)
 
+    override fun visitCaseClauses(ctx: BashpileParser.CaseClausesContext): BastNode {
+        val matcher = ctx.globPattern().map { TerminalBastNode(it.text, STRING) }
+        val statements = ctx.indentedStatements().statement().map { visit(it) }
+        return CaseBastNode(matcher, statements.toMutableList())
+    }
+
+    override fun visitDefaultCase(ctx: BashpileParser.DefaultCaseContext): BastNode {
+        val defaultMatch = TerminalBastNode("*", STRING)
+        val statements = ctx.indentedStatements().statement().map { visit(it) }
+        return CaseBastNode(defaultMatch.toList(), statements.toMutableList())
+    }
+
     override fun visitShellString(ctx: BashpileParser.ShellStringContext): BastNode {
         return ShellStringBastNode(ctx.shellStringContents().map { visit(it) })
     }
@@ -304,6 +328,10 @@ class AstConvertingVisitor: BashpileParserBaseVisitor<BastNode>() {
             BashpileLexer.DollarOParen -> SubshellStartTerminalBastNode()
             BashpileLexer.OParen -> OpeningParenthesisTerminalBastNode()
             BashpileLexer.CParen -> ClosingParenthesisTerminalBastNode()
+            BashpileLexer.Comment -> TerminalBastNode(
+                node.text.replace("^//".toRegex(), "#").trim(),
+                STRING
+            )
             else -> TerminalBastNode(
                 node.text.replace("^newline$".toRegex(), "\n"),
                 STRING

@@ -22,3 +22,4 @@
 * 0.18.3 - More updates for Homebrew formula
 * 0.19.0 - Arguments and isSet/isNotSet
 * 0.20.0 - BashpileDoc, Block Comments and Line Comments now render
+* 0.21.0 - Switch statements; generated Bash is canonically formatted with shfmt

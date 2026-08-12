@@ -14,7 +14,8 @@ import org.bashpile.core.runCommand
 class ForeachFileLineLoopBashNode(
     children: List<BastNode> = listOf(),
     val doubleQuotedFilepath: String,
-    val columns: List<VariableReferenceBastNode>) : StatementBastNode(children.toMutableList())
+    val columns: List<VariableReferenceBastNode>,
+    comments: List<BastNode> = listOf()) : StatementBastNode(children.toMutableList(), comments = comments)
 {
     companion object {
         val sed: String = if ("which gsed".runCommand().second == SCRIPT_SUCCESS) "gsed" else "sed"
@@ -34,6 +35,7 @@ class ForeachFileLineLoopBashNode(
     }
 
     override fun render(options: RenderOptions): String {
+        // Read each line with `read -r`, if more than 1 column parse each line as a CSV
         callStack.use { stack ->
             stack.pushStackframe()
 
@@ -42,10 +44,13 @@ class ForeachFileLineLoopBashNode(
             }
 
             val lineVariableName = if (columns.size > 1) { "__bp_line" } else { columns[0].id!! }
+            val commentText = if (comments.isNotEmpty()) {
+                " " + comments.map { it.render(options) }.joinToString(" ")
+            } else { "" }
             val setLoopVariables = if (columns.size > 1) {
                 columns.mapIndexed { i, it -> """
                     ${it.id}=$(printf "%s" "${'$'}{__bp_line}" | gawk --csv '{print $${i + 1}}');""".trimIndent()
-                }.joinToString(prefix = "    ", separator = " ", postfix = "\n")
+                }.joinToString(prefix = "    # loop variables (Bashpile generated)\n    ", separator = " ", postfix = "\n")
             } else { "" }
             val childRenderList = children.map { child ->
                 child.render(RenderOptions.UNQUOTED).lines().filter { it.isNotBlank() }.map {
@@ -54,11 +59,12 @@ class ForeachFileLineLoopBashNode(
             }
             val childRenders = childRenderList.joinToString("").removeSuffix("\n")
             return """
-                cat $doubleQuotedFilepath | ${mungeStream()} | while IFS='' read -r $lineVariableName; do
-                $setLoopVariables$childRenders
+                cat $doubleQuotedFilepath | ${mungeStream()} | while IFS='' read -r $lineVariableName; do$commentText
+                $setLoopVariables   # body
+                $childRenders
                 done
     
-            """.trimScriptIndent("                ")
+            """.trimIndent()
         }
     }
 

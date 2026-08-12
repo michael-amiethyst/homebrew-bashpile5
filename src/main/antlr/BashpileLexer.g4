@@ -40,7 +40,8 @@ BoolValues: 'true' | 'false';
 If       : 'if';
 Else     : 'else';
 Switch   : 'switch';
-Case     : 'case';
+Case     : 'case' -> pushMode(CASE_MODE);
+Default  : 'default';
 Pass     : 'pass';
 Arguments: 'arguments';
 All      : 'all';
@@ -110,16 +111,13 @@ Whitespace    : [ \t\f] -> skip;
 EscapedNewline: '\\' '\r'? '\n' ' '* -> skip;
 BashpileDoc   : '/**' .*? '*/';
 Comment       : '//' ~[\r\n\f]*;
-BlockComment  : '/*' ( BlockComment | . )*? '*/';
 
 // small tokens
 
 Colon   : ':';
 Comma   : ',';
-// opening square bracket
-OBracket: '[';
-// closing square bracket
-CBracket: ']';
+OBracket: '['; // opening square bracket
+CBracket: ']'; // closing square bracket
 
 // strings
 
@@ -130,7 +128,7 @@ StringValues
 
 StringEscapeSequence: '\\' . | '\\' Newline;
 
-// tokens for modes
+// ShellString tokens
 
 LHashOParen  : 'l#(' -> pushMode(SHELL_STRING);
 VHashOParen  : 'v#(' -> pushMode(SHELL_STRING);
@@ -150,6 +148,14 @@ ShellStringText          : (~[\\\f()#$]
                            )+;
 ShellStringEscapeSequence: '\\' . | '\\' Newline;
 ShellStringCParen        : ')' -> type(CParen), popMode;
+
+mode CASE_MODE;
+CaseModeOBracket : '[' -> type(OBracket);
+CaseModeCBracket : ']' -> type(CBracket);
+CaseModeColon    : ':' -> type(Colon), popMode;
+CaseModeWhitespace    : [ \t\f] -> skip;
+CaseModeText : ( StringEscapeSequence | ~[\r\n\t\f': ] )+ -> type(StringValues);
+CaseModeClassBody: [a-zA-Z0-9-.]+;
 
 // fragments
 

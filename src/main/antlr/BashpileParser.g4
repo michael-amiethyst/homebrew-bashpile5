@@ -4,32 +4,26 @@ options { tokenVocab = BashpileLexer; }
 program: statement+;
 
 // statements, in descending order of complexity
+// TODO switch - ensure comments render for all statements (on conditionalStatement)
 statement
-    : Import StringValues                       # importStatement
-    | ShellLine Newline                         # shellLineStatement
-    | While expression Colon indentedStatements # whileStatement
-    | For OParen typedId (Comma typedId)* In StringValues CParen Colon indentedStatements
-                                                # foreachFileLineLoopStatement
-    | Function Id paramaters (Arrow complexType)?
-                                                # functionForwardDeclarationStatement
-    | Function Id paramaters tags? (Arrow complexType)?
-                            Colon functionBlock # functionDeclarationStatement
-    | If OParen expression CParen Colon indentedStatements (elseIfClauses)* (Else Colon indentedStatements)?
-                                                # conditionalStatement
-    | Switch expression Colon INDENT (Case expression Colon indentedStatements)+ DEDENT
-                                                # switchStatement
-    | <assoc=right> typedId (Equals expression)? Newline
-                                                # variableDeclarationStatement
-    | <assoc=right> (Id | listAccess) assignmentOperator expression Newline
-                                                # reassignmentStatement
-    | Print OParen argumentList? CParen Newline # printStatement
-    | BashpileDoc Newline                       # bashpileDocStatement
-    | Comment Newline                           # lineCommentStatement
-    | BlockComment Newline                      # blockCommentStatement
-    | expression Newline                        # expressionStatement
-    | Newline                                   # blankStmt
-    ;
+    : Import StringValues eol # importStatement
+    | ShellLine Newline # shellLineStatement
+    | While expression Colon Comment* indentedStatements # whileStatement
+    | For OParen typedId (Comma typedId)* In StringValues CParen Colon Comment* indentedStatements
+      # foreachFileLineLoopStatement
+    | Function Id paramaters (Arrow complexType)? eol # functionForwardDeclarationStatement
+    | Function Id paramaters tags? (Arrow complexType)? Colon Comment* functionBlock # functionDeclarationStatement
+    | If OParen expression CParen Colon Comment* indentedStatements (elseIfClauses)* elseClause? # conditionalStatement
+    | Switch OParen expression CParen Colon INDENT caseClauses+ defaultCase? DEDENT # switchStatement
+    | <assoc=right> typedId (Equals expression)? eol # variableDeclarationStatement
+    | <assoc=right> (Id | listAccess) assignmentOperator expression eol # reassignmentStatement
+    | Print OParen argumentList? CParen eol # printStatement
+    | BashpileDoc Newline # bashpileDocStatement
+    | Comment+ Newline # lineCommentStatement
+    | expression eol # expressionStatement
+    | Newline  # blankStmt;
 
+eol         : Comment* Newline;
 tags        : OBracket (StringValues*) CBracket;
 // like (x: str, y: str = "Jordi")
 paramaters  : OParen ( typedId (Comma typedId)* (Comma defaultedTypedId)* )? CParen
@@ -39,8 +33,19 @@ typedId     : Id Colon modifier* complexType;
 complexType : types (LessThan types MoreThan)?;
 modifier    : Exported | Readonly;
 argumentList: expression (Comma expression)*;
-elseIfClauses     : Else If OParen expression CParen Colon indentedStatements;
+elseIfClauses : Else If OParen expression CParen Colon Comment* indentedStatements;
+elseClause: Else Colon Comment* indentedStatements;
 indentedStatements: INDENT statement+ DEDENT;
+caseClauses: Case globPattern+ Colon indentedStatements;
+globPattern //: extended_pattern  // extglob: ?(p|p), *(p|p), +(p|p), @(p|p), !(p|p)
+//            //| brace_expansion   // {a,b}
+            : globCharacterSet    // [a-z]
+//            | Multiply            // *
+//            | Question            // ?
+            | literal;
+//// Character Sets: [abc], [a-zA-Z], [!0-9]
+globCharacterSet : OBracket (CaseModeClassBody | NumberValues | StringValues) CBracket;
+defaultCase: Default Colon indentedStatements;
 assignmentOperator: Equals | PlusEquals;
 
 // Force the final statement to be a return.

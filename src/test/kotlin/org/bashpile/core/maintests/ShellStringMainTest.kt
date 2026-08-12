@@ -10,7 +10,7 @@ import kotlin.test.assertEquals
 /**
  * Tests Shell Strings and Shell Lines
  */
-// TODO 0.21.0 -- make $() a subshell string, l$() a loose subshell string and #() a verbatim shellstring
+// TODO 0.22.0 -- make $() a subshell string, l$() a loose subshell string and #() a verbatim shellstring
 class ShellStringMainTest : MainTest() {
 
     override val testName = "ShellStringTest"
@@ -40,14 +40,21 @@ class ShellStringMainTest : MainTest() {
         assertEquals(SCRIPT_SUCCESS, commandResult.second)
     }
 
+    /**
+     * Render produces the blank string because Bash is weird.
+     * [https://mywiki.wooledge.org/BashFAQ/104](Bash FAQ)
+     */
     @Test
     fun getBast_shellLine_initialVar_works() {
-        val script = "test_var=5 printf \"\$test_var\"".createRender()
+        val script = """
+            test_var=0
+            test_var=1 printf "${'$'}test_var" """.trimIndent().createRender()
         assertRenderEquals("""
-            test_var=5 printf "${'$'}test_var"
+            test_var=0
+            test_var=1 printf "${'$'}test_var"
             
             """.trimIndent(), script
-        )
+        ).assertRenderProduces("0\n")
     }
 
     @Test
@@ -62,24 +69,66 @@ class ShellStringMainTest : MainTest() {
 
     @Test
     fun getBast_shellstring_works() {
-        val script = "#(printf \"newline\")".createRender()
+        val script = "'ls \"' + #(printf \".\") + '\"'".createRender()
         assertRenderEquals("""
-            $(printf "newline")
+            ls "$(printf ".")"
             
             """.trimIndent(), script
-        )
+        ).assertRenderProduces({it.contains("bin")})
     }
 
     @Test
     fun getBast_looseShellstring_works() {
-        val script = "l#(printf \"newline\"; exit 1)".createRender()
+        // loose unsets '-o pipefail' so `exit 1` is ignored
+        val script = "'ls \"' + l#(printf \".\"; exit 1) + '\"'".createRender()
         assertRenderEquals("""
-            eval "${'$'}__bp_old_options"
-            $(printf "newline"; exit 1)
-            set -euo pipefail
+            ls "$(
+                eval "${'$'}__bp_old_options"
+                printf "."
+                exit 1
+            )"
             
             """.trimIndent(), script
-        )
+        ).assertRenderProduces({ it.contains("bin") })
+    }
+
+    @Test
+    fun getBast_looseShellstring_looseIsScoped() {
+        val script = """
+            'ls "' + l#(printf "."; exit 1) + '"'
+            printf "%s" "${'$'}undefinedVar"
+            """.trimIndent().createRender()
+        assertRenderEquals("""
+            ls "$(
+                eval "${'$'}__bp_old_options"
+                printf "."
+                exit 1
+            )"
+            printf "%s" "${'$'}undefinedVar"
+            
+            """.trimIndent(), script
+        ).assertRenderProduces({ it.contains("bin") }, SCRIPT_ERROR__GENERIC)
+    }
+
+    @Test
+    fun getBast_looseShellstring_twoInOneLine_works() {
+        // TODO 0.22.0 - make test with escaped double quotes.  E.g. include `+ "\""`
+        val script = """
+            'ls "' + l#(printf "%s" "-all") + '" "' + l#(printf "."; exit 1) + '"'
+            """.trimIndent().createRender()
+        assertRenderEquals(
+            """
+            ls "$(
+                eval "${'$'}__bp_old_options"
+                printf "%s" "-all"
+            )" "$(
+                eval "${'$'}__bp_old_options"
+                printf "."
+                exit 1
+            )"
+
+            """.trimIndent(), script
+        ).assertRenderProduces({ it.contains("bin") })
     }
 
     @Test
@@ -95,17 +144,15 @@ class ShellStringMainTest : MainTest() {
     @Test
     fun getBast_shellstring_nestedSubshells_works() {
         val script = """
-            print(#(ls $(echo '.')))""".trim().createRender()
+            print(#(ls "$(printf '.')"))""".trim().createRender()
         assertRenderEquals("""
             declare __bp_var0
-            __bp_var0="$(echo '.')"
-            printf "$(ls ${'$'}{__bp_var0})"
+            __bp_var0="$(printf '.')"
+            printf "$(ls "${'$'}{__bp_var0}")"
             """.trimIndent() + "\n", script
         )
 
-        script.assertRenderProduces({
-            it.contains("bin")
-        })
+        script.assertRenderProduces({ it.contains("bin") })
     }
 
     @Test
@@ -115,8 +162,11 @@ class ShellStringMainTest : MainTest() {
         assertRenderEquals("""
             set -euo pipefail
             declare __bp_var0
-            __bp_var0="$(echo '.'; exit ${SCRIPT_ERROR__GENERIC})"
-            printf "$(ls ${'$'}{__bp_var0})"
+            __bp_var0="$(
+                echo '.'
+                exit ${SCRIPT_ERROR__GENERIC}
+            )"
+            printf "$(ls "${'$'}{__bp_var0}")"
             """.trimIndent() + "\n", script
         )
         script.assertRenderProduces({

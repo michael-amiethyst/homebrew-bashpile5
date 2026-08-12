@@ -41,6 +41,26 @@ class ConditionalMainTest : MainTest() {
     }
 
     @Test
+    fun ifStatement_withConditionalComment_works() {
+        val renderedBash = """
+            zero: integer = 0
+            if (1 > zero): // just a quick comment test
+                print("Math is mathing! ")
+                print("Math is mathing!\n")
+            """.trimIndent().createRender()
+        assertRenderEquals("""
+            declare zero
+            zero=0
+            if [ 1 -gt "${'$'}{zero}" ]; then # just a quick comment test
+                printf "Math is mathing! "
+                printf "Math is mathing!\n"
+            fi
+            
+            """.trimIndent(), renderedBash
+        ).assertRenderProduces("Math is mathing! Math is mathing!\n")
+    }
+
+    @Test
     fun ifStatement_isEmpty_works() {
         val renderedBash = """
             name: string = ""
@@ -55,6 +75,55 @@ class ConditionalMainTest : MainTest() {
             if [ -z "${'$'}{name}" ]; then
                 printf "Empty\n"
             else
+                printf "Not empty\n"
+            fi
+            
+            """.trimIndent(), renderedBash
+        ).assertRenderProduces("Empty\n")
+    }
+
+    @Test
+    fun ifStatement_ifElseIfElse_works() {
+        val renderedBash = """
+            x: integer = 1
+            if (x < 0): // negative
+                print("Negative\n")
+            else if (x == 0): // zero
+                print("Empty\n")
+            else:
+                print("Not Empty\n")
+            """.trimIndent().createRender()
+        assertRenderEquals(
+            $$"""
+            declare x
+            x=1
+            if [ "${x}" -lt 0 ]; then # negative
+                printf "Negative\n"
+            elif [ "${x}" -eq 0 ]; then # zero
+                printf "Empty\n"
+            else
+                printf "Not Empty\n"
+            fi
+            
+            """.trimIndent(), renderedBash
+        ).assertRenderProduces("Not Empty\n")
+    }
+
+    @Test
+    fun ifStatement_withElseComment_works() {
+        val renderedBash = """
+            name: string = ""
+            if (isEmpty name):
+                print("Empty\n")
+            else: // else full
+                print("Not empty\n")
+            """.trimIndent().createRender()
+        assertRenderEquals("""
+            declare name
+            name=""
+            if [ -z "${'$'}{name}" ]; then
+                printf "Empty\n"
+            else # else full
                 printf "Not empty\n"
             fi
             
@@ -462,7 +531,10 @@ class ConditionalMainTest : MainTest() {
                 print("Command failed\n")
             """.trimIndent().createRender()
         assertRenderEquals("""
-            if (expr 1 \> 0; exit ${SCRIPT_ERROR__GENERIC}) >/dev/null 2>&1; then
+            if (
+                expr 1 \> 0
+                exit ${SCRIPT_ERROR__GENERIC}
+            ) >/dev/null 2>&1; then
                 printf "Math is mathing! "
                 printf "Math is mathing!\n"
             else
@@ -483,7 +555,10 @@ class ConditionalMainTest : MainTest() {
                 print("Command failed\n")
             """.trimIndent().createRender()
         assertRenderEquals("""
-            if (expr 1 \> 0; exit ${SCRIPT_ERROR__GENERIC}) >/dev/null 2>&1; then
+            if (
+                expr 1 \> 0
+                exit ${SCRIPT_ERROR__GENERIC}
+            ) >/dev/null 2>&1; then
                 printf "Math is mathing! "
                 printf "Math is mathing!\n"
             else
@@ -620,7 +695,7 @@ class ConditionalMainTest : MainTest() {
                 print("Command failed\n")
             """.trimIndent().createRender()
         assertRenderEquals("""
-            if bc -l <<< "1.0 < 2.0" > /dev/null && bc -l <<< "2.0 <= 1.0" > /dev/null || (bc <<< "2.0 < 3.0") >/dev/null 2>&1; then
+            if bc -l <<<"1.0 < 2.0" >/dev/null && bc -l <<<"2.0 <= 1.0" >/dev/null || (bc <<<"2.0 < 3.0") >/dev/null 2>&1; then
                 printf "Math is mathing!\n"
             else
                 printf "Command failed\n"
@@ -642,7 +717,7 @@ class ConditionalMainTest : MainTest() {
         assertRenderEquals("""
             declare one
             one=1.0
-            if bc -l <<< "${'$'}{one} < 2.0" > /dev/null && bc -l <<< "2.0 <= ${'$'}{one}" > /dev/null || (bc <<< "2.0 < 3.0") >/dev/null 2>&1; then
+            if bc -l <<<"${'$'}{one} < 2.0" >/dev/null && bc -l <<<"2.0 <= ${'$'}{one}" >/dev/null || (bc <<<"2.0 < 3.0") >/dev/null 2>&1; then
                 printf "Math is mathing!\n"
             else
                 printf "Command failed\n"
