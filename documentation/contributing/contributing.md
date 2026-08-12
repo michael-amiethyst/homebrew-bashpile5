@@ -18,4 +18,7 @@ Native executable is generated to bin/bashpile
 2. Parse Bashpile script with Antlr to Antlr AST (ANTLR framework does this).
 3. Transform into Bashpile AST with AstConvertingVisitor.
 4. Run mutations on Bashpile ASTs.
-5. Render Bashpile AST as Bash script.
+5. Render the Bashpile AST as syntactically valid, unformatted Bash.
+6. Run the complete Bash script through `shfmt` for canonical presentation formatting.
+
+See [Rendering generated Bash](rendering.md) for the `BastNode.render` contract and testing guidance.

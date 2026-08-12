@@ -12,7 +12,9 @@ import java.util.function.Predicate
 
 /**
  * The base class of the BAST class hierarchy.
- * Converts this AST and children to the Bashpile text output via [render].
+ * Converts this AST and its children to Bash source via [render].
+ * [render] only needs to produce syntactically correct Bash; [org.bashpile.core.shfmt] owns final presentation
+ * formatting such as indentation, line wrapping, and optional whitespace around operators.
  * The root is created by the [AstConvertingVisitor].
  */
 abstract class BastNode(
@@ -29,6 +31,8 @@ abstract class BastNode(
     val children: List<BastNode>
         // shallow copy
         get() = mutableChildren.toList()
+
+    protected val TAB = "    "
 
     init {
         children.forEach { it.parent = this }
@@ -63,7 +67,12 @@ abstract class BastNode(
     fun asList(): List<BastNode> = listOf(this)
 
     /**
-     * Should be just string manipulation to make final Bashpile text, no logic.
+     * Produces syntactically valid Bash for this subtree.
+     *
+     * Renderers must preserve whitespace that affects Bash syntax or semantics, such as token separators, command
+     * boundaries, comments, and heredocs. They should not spend effort on presentation whitespace: the complete
+     * rendered script is passed through [org.bashpile.core.shfmt] once at the application or test boundary.
+     * This method must not invoke `shfmt` recursively because many subtree fragments are not complete Bash programs.
      */
     open fun render(options: RenderOptions): String {
         return children.joinToString("") { it.render(RenderOptions.UNQUOTED) }
@@ -133,13 +142,4 @@ abstract class BastNode(
         val index = this.parent!!.children.indexOf(this)
         this.parent!!.mutableChildren.add(index, toAdd)
     }
-
-    ///////////////////////
-    // extension methods
-    //////////////////////
-
-    /** .trimIndent fails with $childRenders so we need to munge whitespace manually */
-    protected fun String.trimScriptIndent(trim: String) = this.lines().filter { it.isNotBlank() }.map {
-        it.removePrefix(trim)
-    }.joinToString("\n", postfix = "\n")
 }

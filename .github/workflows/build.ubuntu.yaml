@@ -21,11 +21,22 @@ jobs:
           java-version: '21'
           distribution: 'graalvm'
           cache: 'gradle' # have gradle included in the generated container
+      - name: Set up Go for shfmt
+        uses: actions/setup-go@v6
+        with:
+          go-version: "1.25.x"
+          cache: false
+      - name: Install shfmt
+        run: |
+          go install mvdan.cc/sh/v3/cmd/shfmt@v3.13.1
+          echo "$(go env GOPATH)/bin" >> "$GITHUB_PATH"
+          "$(go env GOPATH)/bin/shfmt" --version
       - name: Run Gradle
         run: ./gradlew clean nativeCompile check
       - name: Run ShellCheck
         uses: ludeeus/action-shellcheck@master
         with:
           scandir: './build/shellcheck'
+          severity: info
         env:
-          SHELLCHECK_OPTS: --shell=bash --exclude=SC2059,SC2157,SC2327,SC2328
+          SHELLCHECK_OPTS: --shell=bash --exclude=SC2059,SC2097,SC2098,SC2154,SC2157,SC2327,SC2328

@@ -73,6 +73,16 @@ class BasicMainTest: MainTest() {
     }
 
     @Test
+    fun getBast_printBool_withComment_works() {
+        val render = "print(true) // the truth!".createRender()
+        assertRenderEquals("""
+            printf "true" # the truth!
+            
+            """.trimIndent(), render
+        )
+    }
+
+    @Test
     fun getBast_printBool_withParens_works() {
         val render = "print(((true)))".createRender()
         assertRenderEquals("""
@@ -120,6 +130,16 @@ class BasicMainTest: MainTest() {
         val render = "print(1.0)".createRender()
         assertRenderEquals("""
             printf "%s" "1.0"
+            
+            """.trimIndent(), render
+        )
+    }
+
+    @Test
+    fun getBast_printFloat_withComment_works() {
+        val render = "print(1.0) // decimals?".createRender()
+        assertRenderEquals("""
+            printf "%s" "1.0" # decimals?
             
             """.trimIndent(), render
         )

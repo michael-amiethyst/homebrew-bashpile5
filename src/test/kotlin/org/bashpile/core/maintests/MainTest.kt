@@ -4,6 +4,7 @@ import org.bashpile.core.Main
 import org.bashpile.core.antlr.AstConvertingVisitor.Companion.STRICT_HEADER
 import org.bashpile.core.engine.RenderOptions.Companion.UNQUOTED
 import org.bashpile.core.runCommand
+import org.bashpile.core.shfmt
 import org.junit.jupiter.api.Assumptions.assumeTrue
 import java.nio.file.Files
 import java.nio.file.Paths
@@ -34,7 +35,7 @@ abstract class MainTest {
 
     protected fun String.createRender(): String {
         val scriptStream = this.byteInputStream()
-        return fixture._getBast(scriptStream).render(UNQUOTED)
+        return fixture._getBast(scriptStream).render(UNQUOTED).shfmt()
     }
 
     protected fun assertRenderEquals(expectedBash: String, renderedBash: String): String {

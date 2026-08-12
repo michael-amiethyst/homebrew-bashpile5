@@ -1,6 +1,5 @@
 package org.bashpile.core.bast.statements
 
-import org.bashpile.core.appendIfMissing
 import org.bashpile.core.bast.BastNode
 import org.bashpile.core.engine.Subshell
 import org.bashpile.core.engine.TypeEnum
@@ -16,7 +15,7 @@ class ShellLineBastNode(children: List<BastNode> = listOf()) : StatementBastNode
 
     override fun render(options: RenderOptions): String {
         val childRenders = children.map { it.render(RenderOptions.UNQUOTED) }.joinToString("")
-        return childRenders.appendIfMissing("\n")
+        return childRenders.trim() + "\n"
     }
 
     override fun replaceChildren(nextChildren: List<BastNode>): BastNode {

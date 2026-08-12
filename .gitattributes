@@ -1,0 +1,7 @@
+# Keep Unix scripts and source files runnable under WSL.
+* text=auto eol=lf
+# Windows launcher and binary artifacts retain their required formats.
+*.bat text eol=crlf
+*.jar binary
+# This fixture intentionally verifies Windows line-ending handling.
+src/test/resources/data/example_extended_windows_line_endings.csv text eol=crlf

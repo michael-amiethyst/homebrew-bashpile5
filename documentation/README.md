@@ -4,6 +4,8 @@ YOUR Bash wizard!
 
 See [user_docs](user_docs/overview.md) for the quickstart and a language reference.
 
+See [Rendering generated Bash](contributing/rendering.md) for the `BastNode.render` contract and the `shfmt` boundary.
+
 See [Contributing](contributing/contributing.md) for helping with the project and a technical quickstart 
 
 ## Layer Diagram
@@ -24,5 +26,6 @@ A rewrite from scratch was justified for a few reasons:
 2. A Bashpile AST to avoid Regex string munging
    1. Before context only bubbled up from below in the form of Translation metadata and created a string
    2. When additional context was discovered above the Translation string was edited directly, sometimes using complex regex's
-   3. Now an AST is generated that can be modified from above easily and only rendered as Bashpile text after all context is discovered
+   3. Now an AST is generated that can be modified from above easily and only rendered as Bash after all context is discovered
+   4. The BAST renderer emits syntactically valid Bash without owning presentation whitespace; `shfmt` canonicalizes the complete script
 3. Stick to pure Kotlin for simplicity

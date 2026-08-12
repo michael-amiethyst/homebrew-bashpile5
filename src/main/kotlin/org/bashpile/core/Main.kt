@@ -42,7 +42,7 @@ class Main : CliktCommand() {
         const val VERBOSE_ENABLED_MESSAGE = "Double verbose (DEBUG) logging enabled"
         /** As in source/sink -> generates a startup message given a script filename */
         const val STARTUP_MESSAGE = "Running Bashpile compiler with script: "
-        const val VERSION = "0.20.0"
+        const val VERSION = "0.21.0"
         const val SHEBANG_HEADER = "#!/usr/bin/env bash\n\n"
         /** Singleton per Main() instance */
         lateinit var callStack: CallStack
@@ -77,6 +77,7 @@ class Main : CliktCommand() {
      * The main entry point for the Bashpile compiler.
      * This method is called by the `main` function by Clikt.
      */
+    // TODO change project to use two spaces for tabs (Google style guide)
     override fun run() {
         // guard, etc
         val scriptPath = Path.of(scriptArgument)
@@ -100,7 +101,7 @@ class Main : CliktCommand() {
             generateSequence(::readLine).joinToString("\n")
         }
         val bastRoot: BastNode = _getBast(script.byteInputStream())
-        val bash: String = bastRoot.render(RenderOptions.UNQUOTED)
+        val bash: String = bastRoot.render(RenderOptions.UNQUOTED).shfmt()
         if (!commandMode()) {
             logger.debug("Writing to STDOUT in regular (non-command) mode")
             echo(SHEBANG_HEADER + bash, false)

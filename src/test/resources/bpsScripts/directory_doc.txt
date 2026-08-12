@@ -1,0 +1,2 @@
+This directory is for keeping Bashpile scripts as a separate file (instead of embedded in the test classes).
+This is done for easy use with scripts such as bin/tokenize or bin/treeize.
