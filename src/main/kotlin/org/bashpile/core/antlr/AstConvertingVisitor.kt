@@ -124,35 +124,6 @@ class AstConvertingVisitor: BashpileParserBaseVisitor<BastNode>() {
         return TerminalBastNode(text, STRING)
     }
 
-    override fun visitBashpileDocStatement(ctx: BashpileParser.BashpileDocStatementContext): BastNode {
-        // does not preserve whitespace
-        val trimmedText = ctx.text.trim()
-        val text = trimmedText.substring(3, trimmedText.length - 2) // remove initial '/**' and trailing '*/'
-            .trim()
-            .split("\n")
-            .map { "# $it"}
-            .joinToString("\n")
-        val bar = "#".repeat(text.length)
-        return TerminalBastNode("$bar\n$text\n$bar\n", STRING)
-    }
-
-    override fun visitLineCommentStatement(ctx: BashpileParser.LineCommentStatementContext): BastNode {
-        // does not preserve whitespace
-        val commentText = ctx.text.substring(2).trimStart() // ignore initial "//" and spaces
-        return TerminalBastNode("# $commentText", STRING)
-    }
-
-    override fun visitBlockCommentStatement(ctx: BashpileParser.BlockCommentStatementContext): BastNode {
-        // does not preserve whitespace
-        val trimmedText = ctx.text.trim()
-        val text = trimmedText.substring(2, trimmedText.length - 2)
-            .split("\n")
-            .map { it.trim() }
-            .map { "# $it".trim() }
-            .joinToString("\n", postfix = "\n")
-        return TerminalBastNode(text, STRING)
-    }
-
     override fun visitPrintStatement(ctx: BashpileParser.PrintStatementContext): BastNode {
         val antlrExpressions = ctx.argumentList().expression()
         val nodes = antlrExpressions.map { visit(it) }
