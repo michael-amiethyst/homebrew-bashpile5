@@ -3,7 +3,6 @@ package org.bashpile.core
 import java.io.File
 import java.io.IOException
 import java.nio.file.Files
-import java.util.concurrent.Callable
 import java.util.concurrent.Executors
 import java.util.concurrent.TimeUnit
 import kotlin.io.path.absolutePathString
@@ -29,30 +28,32 @@ fun String.runCommand(
         Files.createTempFile("", "").writeString(this).makeExecutable().absolutePathString()
     var proc: Process? = null
     try {
-        val callable: Callable<Process> = Callable {
-            val argumentsString = arguments.joinToString(" ")
-            val proc2 = ProcessBuilder(
-                listOf("bash", "-c", "$tempFilePath $argumentsString"))
-                .directory(workingDir)
-                .redirectOutput(ProcessBuilder.Redirect.PIPE)
-                .redirectErrorStream(true)
-                .start()
+        val argumentsString = arguments.joinToString(" ")
+        val process = ProcessBuilder(
+            listOf("bash", "-c", "$tempFilePath $argumentsString"))
+            .directory(workingDir)
+            .redirectOutput(ProcessBuilder.Redirect.PIPE)
+            .redirectErrorStream(true)
+            .start()
+        proc = process
 
-            if (!proc2.waitFor(10, TimeUnit.SECONDS)) {
-                proc2.destroyForcibly()
-            }
-            return@Callable proc2
+        // Drain the merged stdout/stderr pipe to avoid a full buffer, leading to a timeout
+        val output = executors.submit<String> {
+            process.inputStream.bufferedReader().use { it.readText() }
         }
 
-        proc = executors.submit(callable).get(10, TimeUnit.SECONDS)
+        if (!process.waitFor(10, TimeUnit.SECONDS)) {
+            process.destroyForcibly()
+            process.waitFor()
+        }
 
         // strip out blank lines and lines from sdkman, add newline back
-        val text = proc.inputStream.bufferedReader().readText().trim()
+        val text = output.get(10, TimeUnit.SECONDS).trim()
         val lines = text.split("\n")
         val filteredText = lines
             .filter { !it.contains("Using java version") }
             .joinToString("\n") + "\n"
-        return Pair(filteredText, proc.exitValue())
+        return Pair(filteredText, process.exitValue())
 
     } catch(e: IOException) {
         return Pair(e.stackTraceToString(), proc?.exitValue() ?: -1)
@@ -76,22 +77,13 @@ fun String.shfmt(): String {
             ?: error("shfmt not found in PATH or known Homebrew directories")
         Files.writeString(script, this)
 
-        val process = ProcessBuilder(
-            shfmtAbsolutePath, "-ln", "bash", "-i", "4", "-ci", "-w", script.toString()
-        )
-            .redirectErrorStream(true)
-            .redirectOutput(diagnostics.toFile())
-            .start()
+        // TODO remove need for exec
+        val shfmtCommand = $$"exec \"$$shfmtAbsolutePath\" \"$@\""
+        val (messages, exitValue) = shfmtCommand
+            .runCommand(arguments = listOf("-ln", "bash", "-i", "4", "-ci", "-w", script.toString()))
 
-        if (!process.waitFor(30, TimeUnit.SECONDS)) {
-            process.destroyForcibly()
-            process.waitFor()
-            error("shfmt timed out after 30 seconds")
-        }
-
-        val messages = Files.readString(diagnostics)
-        check(process.exitValue() == SCRIPT_SUCCESS) {
-            "shfmt exited with code ${process.exitValue()}:\n$messages"
+        check(exitValue == SCRIPT_SUCCESS) {
+            "shfmt exited with code ${exitValue}:\n$messages"
         }
 
         return Files.readString(script)
