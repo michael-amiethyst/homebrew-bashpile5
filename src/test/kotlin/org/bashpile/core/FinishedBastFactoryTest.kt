@@ -65,7 +65,7 @@ class FinishedBastFactoryTest {
             unnested
         }
 
-        val render = unnestedRoot.render(RenderOptions.UNQUOTED).shfmt()
+        val render = LinuxProcess.shfmt(unnestedRoot.render(RenderOptions.UNQUOTED))
         assertEquals("""
             declare __bp_var0
             __bp_var0="$(
@@ -99,7 +99,7 @@ class FinishedBastFactoryTest {
             unnested
         }
 
-        val render = unnestedRoot.render(RenderOptions.UNQUOTED).shfmt()
+        val render = LinuxProcess.shfmt(unnestedRoot.render(RenderOptions.UNQUOTED))
         assertEquals("""
             set -euo pipefail
             declare __bp_var0

@@ -13,6 +13,35 @@ class LinuxProcess(val command: String) {
         /** Shell script success (0), all other numbers are errors.  Generally 1-255. */
         const val SCRIPT_SUCCESS = 0
         const val SCRIPT_ERROR__GENERIC = 1
+
+        fun shfmt(unformattedBash: String): String {
+            val script = Files.createTempFile("bashpile-", ".sh")
+            val diagnostics = Files.createTempFile("bashpile-shfmt-", ".log")
+
+            try {
+                // different directories for OSX Apple and Intel CPUs
+                val brewBinPaths = listOf("/home/linuxbrew/.linuxbrew/bin", "/opt/homebrew/bin", "/usr/local/bin")
+                val pathDirectories = System.getenv("PATH").orEmpty().split(File.pathSeparator) + brewBinPaths
+                val shfmtAbsolutePath = pathDirectories
+                    .asSequence()
+                    .map { File(it, "shfmt") }
+                    .firstOrNull { it.isFile && it.canExecute() }
+                    ?.absolutePath
+                    ?: error("shfmt not found in PATH or known Homebrew directories")
+                Files.writeString(script, unformattedBash)
+
+                // run command
+                val (messages, exitValue) = LinuxProcess($$"$$shfmtAbsolutePath -ln bash -i 4 -ci -w $$script").run()
+                check(exitValue == SCRIPT_SUCCESS) {
+                    "shfmt exited with code ${exitValue}:\n$messages"
+                }
+
+                return Files.readString(script)
+            } finally {
+                Files.deleteIfExists(script)
+                Files.deleteIfExists(diagnostics)
+            }
+        }
     }
 
     private val executors = Executors.newFixedThreadPool(8)

@@ -5,7 +5,6 @@ import org.bashpile.core.LinuxProcess
 import org.bashpile.core.bast.expressions.CaseBastNode
 import org.bashpile.core.engine.RenderOptions.Companion.UNQUOTED
 import org.bashpile.core.runCommand
-import org.bashpile.core.shfmt
 import org.junit.jupiter.api.assertThrows
 import kotlin.io.path.Path
 import kotlin.io.path.readText
@@ -596,8 +595,8 @@ class SwitchMainTest : MainTest() {
         val cases = bast.toList().filterIsInstance<CaseBastNode>()
         val statementCounts = cases.map { it.statements.size }
 
-        val firstRender = bast.render(UNQUOTED).shfmt()
-        val secondRender = bast.render(UNQUOTED).shfmt()
+        val firstRender = LinuxProcess.shfmt(bast.render(UNQUOTED))
+        val secondRender = LinuxProcess.shfmt(bast.render(UNQUOTED))
 
         assertEquals(firstRender, secondRender)
         assertEquals(statementCounts, cases.map { it.statements.size })
@@ -606,7 +605,6 @@ class SwitchMainTest : MainTest() {
     /** Test for comments */
     @Test
     fun switch_withDefault_withMultilineComments_atStartOfLine_works() {
-        // TODO now - make same test for /** Bashpile Doc */
         assertThrows<ParseCancellationException> {
             // mixing the end of a multiline comment and the start of statements is not supported
             """
