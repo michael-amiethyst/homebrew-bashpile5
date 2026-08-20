@@ -1,5 +1,6 @@
 package org.bashpile.core
 
+import org.bashpile.core.LinuxProcess.Companion.SCRIPT_SUCCESS
 import org.bashpile.core.antlr.AstConvertingVisitor.Companion.STRICT_HEADER
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Assumptions.assumeTrue
@@ -30,21 +31,21 @@ class SystemTest {
 
     @Test
     fun system_withBadFilename_printsHelp() {
-        val output = "$BASHPILE_EXECUTABLE BAD_FILENAME".runCommand()
+        val output = LinuxProcess("$BASHPILE_EXECUTABLE BAD_FILENAME").run()
         assertNotEquals(SCRIPT_SUCCESS, output.second)
         assertTrue(output.first.startsWith("Usage:"))
     }
 
     @Test
     fun system_withNoFilename_printsHelp() {
-        val output = BASHPILE_EXECUTABLE.runCommand()
+        val output = LinuxProcess(BASHPILE_EXECUTABLE).run()
         assertNotEquals(SCRIPT_SUCCESS, output.second)
         assertTrue(output.first.startsWith("Usage:"))
     }
 
     @Test
     fun systemWorks() {
-        val output = "$BASHPILE_EXECUTABLE '$HELLO_FILENAME'".runCommand()
+        val output = LinuxProcess("$BASHPILE_EXECUTABLE '$HELLO_FILENAME'").run()
         assertEquals(SCRIPT_SUCCESS, output.second)
         val expected = Main.SHEBANG_HEADER + STRICT_HEADER + "printf \"Hello Bashpile!\"\n"
         assertEquals(expected, output.first)
@@ -52,7 +53,7 @@ class SystemTest {
 
     @Test
     fun system_withVerbose_works() {
-        val output = "$BASHPILE_EXECUTABLE --verbose '$HELLO_FILENAME'".runCommand()
+        val output = LinuxProcess("$BASHPILE_EXECUTABLE --verbose '$HELLO_FILENAME'").run()
         assertEquals(SCRIPT_SUCCESS, output.second)
         assertTrue(output.first.contains(Main.STARTUP_MESSAGE), "Output: ${output.first}")
         assertFalse(output.first.contains(Main.VERBOSE_ENABLED_MESSAGE), "Output: ${output.first}")
@@ -61,7 +62,7 @@ class SystemTest {
 
     @Test
     fun system_withDoubleVerbose_works() {
-        val output = "$BASHPILE_EXECUTABLE -vv '$HELLO_FILENAME'".runCommand()
+        val output = LinuxProcess("$BASHPILE_EXECUTABLE -vv '$HELLO_FILENAME'").run()
         assertEquals(SCRIPT_SUCCESS, output.second)
         assertTrue(output.first.contains(Main.STARTUP_MESSAGE), "Output: ${output.first}")
         assertTrue(output.first.contains(Main.VERBOSE_ENABLED_MESSAGE), "Output: ${output.first}")
@@ -70,28 +71,28 @@ class SystemTest {
 
     @Test
     fun system_withVersion_works() {
-        val output = "$BASHPILE_EXECUTABLE --version".runCommand()
+        val output = LinuxProcess("$BASHPILE_EXECUTABLE --version").run()
         assertEquals(SCRIPT_SUCCESS, output.second)
         assertEquals(Main.VERSION + "\n", output.first)
     }
 
     @Test
     fun system_withCommandString_works() {
-        val output = "$BASHPILE_EXECUTABLE -c \"print('Hello World')\"".runCommand()
+        val output = LinuxProcess("$BASHPILE_EXECUTABLE -c \"print('Hello World')\"").run()
         assertEquals("Hello World\n", output.first)
         assertEquals(SCRIPT_SUCCESS, output.second)
     }
 
     @Test
     fun system_withCommandStdin_works() {
-        val output = "$BASHPILE_EXECUTABLE -c <<< \"print('Hello World')\"".runCommand()
+        val output = LinuxProcess("$BASHPILE_EXECUTABLE -c <<< \"print('Hello World')\"").run()
         assertEquals("Hello World\n", output.first)
         assertEquals(SCRIPT_SUCCESS, output.second)
     }
 
     @Test
     fun system_withCommandPrintfStdin_works() {
-        val output = "printf \"print('Hello World')\" | $BASHPILE_EXECUTABLE -c".runCommand()
+        val output = LinuxProcess("printf \"print('Hello World')\" | $BASHPILE_EXECUTABLE -c").run()
         assertEquals("Hello World\n", output.first)
         assertEquals(SCRIPT_SUCCESS, output.second)
     }
@@ -102,7 +103,7 @@ class SystemTest {
         assumeTrue(shebangPath.exists(), "Shebang test file not found")
         val path = shebangPath.makeExecutable()
         assumeTrue(path.isExecutable(), "Shebang test file not executable")
-        val output = path.toString().runCommand()
+        val output = LinuxProcess(path.toString()).run()
         assertEquals(SCRIPT_SUCCESS, output.second, "Script not successful, output was: ${output.first}")
         val resultLines = output.first.split("\n").filter { it.isNotBlank() }
         assertEquals("printf \"Hello Shebang!\"", resultLines.last())
@@ -110,7 +111,7 @@ class SystemTest {
 
     @Test
     fun system_withEval_works() {
-        val output = "eval \"$($SHEBANG_SCRIPT_FILENAME | tail -n 1)\"".runCommand()
+        val output = LinuxProcess("eval \"$($SHEBANG_SCRIPT_FILENAME | tail -n 1)\"").run()
         assertEquals(SCRIPT_SUCCESS, output.second)
         assertEquals("Hello Shebang!\n", output.first)
     }

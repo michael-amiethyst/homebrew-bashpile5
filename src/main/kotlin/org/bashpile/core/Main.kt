@@ -17,6 +17,8 @@ import com.google.common.annotations.VisibleForTesting
 import org.antlr.v4.runtime.CharStreams
 import org.antlr.v4.runtime.CommonTokenStream
 import org.apache.logging.log4j.LogManager
+import org.bashpile.core.LinuxProcess.Companion.SCRIPT_ERROR__GENERIC
+import org.bashpile.core.LinuxProcess.Companion.SCRIPT_SUCCESS
 import org.bashpile.core.antlr.AstConvertingVisitor
 import org.bashpile.core.antlr.ThrowingErrorListener
 import org.bashpile.core.bast.BastNode
@@ -107,7 +109,7 @@ class Main : CliktCommand() {
             echo(SHEBANG_HEADER + bash, false)
         } else {
             logger.debug("Executing compiled command mode script")
-            val commandResults = bash.runCommand()
+            val commandResults = LinuxProcess(bash).run()
             check(commandResults.second == SCRIPT_SUCCESS) {
                 "Compile failed with return code ${commandResults.second} and text:\n${commandResults.first}"
             }

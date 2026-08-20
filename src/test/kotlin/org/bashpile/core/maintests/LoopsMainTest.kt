@@ -435,8 +435,7 @@ class LoopsMainTest : MainTest() {
                 print(#(ls -m "$(printf '.')") + "\n")
                 
             """.trimIndent().createRender()
-        assertRenderEquals(
-            """
+        assertRenderEquals("""
             cd src/test/resources/data
             cat "labeled_lines.txt" | $sed -e 's/\r\n/\n/g' | $sed -ze '/\n$/!s/$/\n$/g' | while IFS='' read -r line; do
                 # body

@@ -1,8 +1,8 @@
 package org.bashpile.core.maintests
 
-import org.bashpile.core.SCRIPT_ERROR__GENERIC
-import org.bashpile.core.SCRIPT_SUCCESS
-import org.bashpile.core.runCommand
+import org.bashpile.core.LinuxProcess
+import org.bashpile.core.LinuxProcess.Companion.SCRIPT_ERROR__GENERIC
+import org.bashpile.core.LinuxProcess.Companion.SCRIPT_SUCCESS
 import java.io.File
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -35,7 +35,7 @@ class ShellStringMainTest : MainTest() {
             
             """.trimIndent(), renderedBash
         )
-        val commandResult = renderedBash.runCommand()
+        val commandResult = LinuxProcess(renderedBash).run()
         assertEquals("\n", commandResult.first)
         assertEquals(SCRIPT_SUCCESS, commandResult.second)
     }

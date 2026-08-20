@@ -1,6 +1,7 @@
 package org.bashpile.core.maintests
 
 import org.antlr.v4.runtime.misc.ParseCancellationException
+import org.bashpile.core.LinuxProcess
 import org.bashpile.core.bast.expressions.CaseBastNode
 import org.bashpile.core.engine.RenderOptions.Companion.UNQUOTED
 import org.bashpile.core.runCommand
@@ -39,7 +40,8 @@ class SwitchMainTest : MainTest() {
             esac
 
         """.trimIndent()
-        bashScript.runCommand(arguments = listOf("start")).assertRenderProduces("Starting service...\n")
+        LinuxProcess(bashScript).run(arguments = listOf("start"))
+            .assertRenderProduces("Starting service...\n")
     }
 
     @Test
@@ -76,7 +78,7 @@ class SwitchMainTest : MainTest() {
             done
 
         """.trimIndent()
-        bashScript.runCommand(arguments = listOf("--alpha")).assertRenderProduces("Processing 'alpha' option\n")
+        LinuxProcess(bashScript).run(arguments = listOf("--alpha")).assertRenderProduces("Processing 'alpha' option\n")
     }
 
     @Test
@@ -105,7 +107,7 @@ class SwitchMainTest : MainTest() {
                 esac
 
         """.trimIndent()
-        bashScript.runCommand(arguments = listOf("1.")).assertRenderProduces("Processing 'alpha' option\n")
+        LinuxProcess(bashScript).run(arguments = listOf("1.")).assertRenderProduces("Processing 'alpha' option\n")
     }
 
     /** When we implement while statements we'll handle argument parsing this way */
@@ -136,7 +138,7 @@ class SwitchMainTest : MainTest() {
             done
 
         """.trimIndent()
-        bashScript.runCommand(arguments = listOf("--delete")).assertRenderProduces("Delete flag set to: true\n")
+        LinuxProcess(bashScript).run(arguments = listOf("--delete")).assertRenderProduces("Delete flag set to: true\n")
     }
 
     @Test

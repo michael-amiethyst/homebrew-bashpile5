@@ -7,8 +7,8 @@ import org.apache.commons.io.FilenameUtils
 import org.apache.commons.lang3.StringUtils
 import org.apache.logging.log4j.LogManager
 import org.apache.logging.log4j.Logger
-import org.bashpile.core.SCRIPT_SUCCESS
-import org.bashpile.core.runCommand
+import org.bashpile.core.LinuxProcess
+import org.bashpile.core.LinuxProcess.Companion.SCRIPT_SUCCESS
 import java.io.IOException
 import java.nio.file.Files
 import java.nio.file.Path
@@ -142,7 +142,7 @@ class Lexers {
                 // may need a 'and not find with createsStatementRegex' when we add file path recognition to shell lines
                 if (COMMAND_PATTERN.matcher(command).matches() || filePattern.matcher(command).matches()) {
                     LOG.trace("Running external 'type' command on {}", command)
-                    val results = "type -t $command".runCommand()
+                    val results = LinuxProcess("type -t $command").run()
 
                     // exclude keywords like 'function'
                     val typeResults: String = results.first.trim()

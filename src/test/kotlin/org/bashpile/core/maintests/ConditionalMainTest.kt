@@ -1,6 +1,6 @@
 package org.bashpile.core.maintests
 
-import org.bashpile.core.SCRIPT_ERROR__GENERIC
+import org.bashpile.core.LinuxProcess.Companion.SCRIPT_ERROR__GENERIC
 import kotlin.test.Test
 import kotlin.test.assertFailsWith
 

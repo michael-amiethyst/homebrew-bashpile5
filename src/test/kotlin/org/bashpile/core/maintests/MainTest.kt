@@ -1,9 +1,9 @@
 package org.bashpile.core.maintests
 
+import org.bashpile.core.LinuxProcess
 import org.bashpile.core.Main
 import org.bashpile.core.antlr.AstConvertingVisitor.Companion.STRICT_HEADER
 import org.bashpile.core.engine.RenderOptions.Companion.UNQUOTED
-import org.bashpile.core.runCommand
 import org.bashpile.core.shfmt
 import org.junit.jupiter.api.Assumptions.assumeTrue
 import java.nio.file.Files
@@ -50,21 +50,21 @@ abstract class MainTest {
     }
 
     protected fun String.assumeRender(test: Predicate<String>): String {
-        assumeTrue { test.test(runCommand().first) }
+        assumeTrue { test.test(LinuxProcess(this).run().first) }
         return this
     }
 
     protected fun String.assertRenderProduces(expectedStdout: String?, expectedExitCode: Int = 0, arguments: List<String> = listOf()) {
-        runCommand(arguments = arguments).assertRenderProduces(expectedStdout, expectedExitCode)
+        LinuxProcess(this).run(arguments = arguments).assertRenderProduces(expectedStdout, expectedExitCode)
     }
 
-    protected fun Pair<String, Int>.assertRenderProduces(expectedStdout: String?, expectedExitCode: Int = 0, arguments: List<String> = listOf()) {
+    protected fun Pair<String, Int>.assertRenderProduces(expectedStdout: String?, expectedExitCode: Int = 0) {
         if (expectedStdout != null) { assertEquals(expectedStdout, first) }
         assertEquals(expectedExitCode, second)
     }
 
     protected fun String.assertRenderProduces(test: Predicate<String>, expectedExitCode: Int = 0) {
-        val results = runCommand()
+        val results = LinuxProcess(this).run()
         assertTrue(test.test(results.first))
         assertEquals(expectedExitCode, results.second)
     }
