@@ -18,8 +18,9 @@ open class ShellStringBastNode(children: List<BastNode> = listOf(), majorType: T
     constructor(contents: String) : this(TerminalBastNode(contents, STRING).asList())
 
     override fun render(options: RenderOptions): String {
-        val childRenders = children.map { it.render(options) }.joinToString("")
+        val childRenders = children.joinToString("") { it.render(options) }
         val subshell = if (options.ignoreOutput) {
+            // ignoring output, so subshell instead of actual command substitution, with $(command) syntax, is fine
             "($childRenders) >/dev/null 2>&1"
         } else { "$($childRenders)" }
         return if (options.quoted) { "\"$subshell\"" } else { subshell }

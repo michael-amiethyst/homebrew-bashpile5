@@ -62,7 +62,6 @@ private fun String.runCommandImpl(workingDir: File, arguments: List<String>): Pa
 }
 
 // TODO combine with runCommand or make LinuxProcess class
-// TODO remove WS formatting calls
 fun String.shfmt(): String {
     val script = Files.createTempFile("bashpile-", ".sh")
     val diagnostics = Files.createTempFile("bashpile-shfmt-", ".log")
@@ -71,7 +70,7 @@ fun String.shfmt(): String {
         Files.writeString(script, this)
 
         val process = ProcessBuilder(
-            "shfmt", "-ln", "bash", "-i", "4", "-ci", "-w", script.toString()
+            findShfmt(), "-ln", "bash", "-i", "4", "-ci", "-w", script.toString()
         )
             .redirectErrorStream(true)
             .redirectOutput(diagnostics.toFile())
@@ -93,4 +92,18 @@ fun String.shfmt(): String {
         Files.deleteIfExists(script)
         Files.deleteIfExists(diagnostics)
     }
+}
+
+/** Finds shfmt's absolute path, checks the existing path and Homebrew bin directories on Linux and OSX */
+private fun findShfmt(): String {
+    // different directories for OSX Apple and Intel CPUs
+    val brewBinPaths = listOf("/home/linuxbrew/.linuxbrew/bin", "/opt/homebrew/bin", "/usr/local/bin")
+    val pathDirectories = System.getenv("PATH").orEmpty().split(File.pathSeparator) + brewBinPaths
+
+    return pathDirectories
+        .asSequence()
+        .map { File(it, "shfmt") }
+        .firstOrNull { it.isFile && it.canExecute() }
+        ?.absolutePath
+        ?: error("shfmt not found in PATH or known Homebrew directories")
 }
