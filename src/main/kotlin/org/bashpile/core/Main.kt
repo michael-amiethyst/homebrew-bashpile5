@@ -42,7 +42,7 @@ class Main : CliktCommand() {
         const val VERBOSE_ENABLED_MESSAGE = "Double verbose (DEBUG) logging enabled"
         /** As in source/sink -> generates a startup message given a script filename */
         const val STARTUP_MESSAGE = "Running Bashpile compiler with script: "
-        const val VERSION = "0.21.0"
+        const val VERSION = "0.22.0"
         const val SHEBANG_HEADER = "#!/usr/bin/env bash\n\n"
         /** Singleton per Main() instance */
         lateinit var callStack: CallStack
@@ -65,7 +65,7 @@ class Main : CliktCommand() {
     private val _commandOption: String? by option("-c", "--command",
         help = "Runs the literal command or from STDIN if no argument").optionalValue("")
 
-    private val logger = LogManager.getLogger(Main::javaClass)
+    private val logger = LogManager.getLogger(Main::class.java)
 
     init {
         versionOption(VERSION, names = setOf("--version"), help = "Show the application version and exit.",
