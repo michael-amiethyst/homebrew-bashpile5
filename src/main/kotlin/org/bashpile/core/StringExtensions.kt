@@ -19,6 +19,8 @@ fun String.stripFirstLine(): String = this.lines().drop(1).joinToString("\n")
 
 /**
  * Returns stdout/stderr and the exit code.
+ *
+ * @param arguments Args to send to a Bash block, for a single command bake them into the receiver string.
  */
 fun String.runCommand(
     workingDir: File? = File(System.getProperty("user.dir")),
@@ -68,7 +70,6 @@ fun String.shfmt(): String {
         // different directories for OSX Apple and Intel CPUs
         val brewBinPaths = listOf("/home/linuxbrew/.linuxbrew/bin", "/opt/homebrew/bin", "/usr/local/bin")
         val pathDirectories = System.getenv("PATH").orEmpty().split(File.pathSeparator) + brewBinPaths
-
         val shfmtAbsolutePath = pathDirectories
             .asSequence()
             .map { File(it, "shfmt") }
@@ -77,11 +78,8 @@ fun String.shfmt(): String {
             ?: error("shfmt not found in PATH or known Homebrew directories")
         Files.writeString(script, this)
 
-        // TODO remove need for exec
-        val shfmtCommand = $$"exec \"$$shfmtAbsolutePath\" \"$@\""
-        val (messages, exitValue) = shfmtCommand
-            .runCommand(arguments = listOf("-ln", "bash", "-i", "4", "-ci", "-w", script.toString()))
-
+        // run command
+        val (messages, exitValue) = $$"$$shfmtAbsolutePath -ln bash -i 4 -ci -w $$script".runCommand()
         check(exitValue == SCRIPT_SUCCESS) {
             "shfmt exited with code ${exitValue}:\n$messages"
         }
