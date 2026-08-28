@@ -306,7 +306,7 @@ class AstConvertingVisitor: BashpileParserBaseVisitor<BastNode>() {
         return LooseShellStringBastNode(ctx.shellStringContents().map { visit(it) })
     }
 
-    override fun visitVerbatimShellString(ctx: BashpileParser.VerbatimShellStringContext): BastNode {
+    override fun visitRawBash(ctx: BashpileParser.RawBashContext): BastNode {
         return RawBashBastNode(ctx.shellStringContents().map { visit(it) })
     }
 

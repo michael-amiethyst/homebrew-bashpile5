@@ -89,7 +89,7 @@ expression
     // other levels
     | shellString                       # shellStringExpression
     | looseShellString                  # looseShellStringExpression
-    | verbatimShellString               # verbatimShellStringExpression
+    | rawBash               # verbatimShellStringExpression
     | Id OParen argumentList? CParen    # functionCallExpression
     | argumentsBuiltin                  # argumentsBuiltinExpression
     | ListOf (OParen CParen | OParen expression (Comma expression)* CParen)
@@ -102,9 +102,9 @@ literal : StringValues | NumberValues | BoolValues;
 types    : Boolean | Integer | Float | String | List | Map | Reference;
 
 // shellString, Bashpile's version of a subshell
-shellString        : HashOParen shellStringContents* CParen;
-looseShellString   : LHashOParen shellStringContents* CParen;
-verbatimShellString: VHashOParen shellStringContents* CParen;
+shellString : HashOParen shellStringContents* CParen;
+looseShellString : LHashOParen shellStringContents* CParen;
+rawBash: BOParen shellStringContents* CParen;
 shellStringContents: DollarOParen shellStringContents* CParen
                    | OParen shellStringContents* CParen
                    | ShellStringText

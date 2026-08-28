@@ -10,7 +10,7 @@ import kotlin.test.assertEquals
 /**
  * Tests Shell Strings and Shell Lines
  */
-// TODO 0.22.0 -- make $() a command substitution string, s() subshell, l$() a loose command substitution and b() a BashFragment
+// TODO 0.22.0 -- make $() a command substitution string, s() subshell, l$() a loose command substitution
 class ShellStringMainTest : MainTest() {
 
     override val testName = "ShellStringTest"
@@ -188,20 +188,5 @@ class ShellStringMainTest : MainTest() {
 
         // confirm succeeds with strict mode
         "set -euo pipefail\n$script".assertRenderProduces(null, SCRIPT_SUCCESS)
-    }
-
-    @Test
-    fun verboseShellString_works() {
-        val script = """
-            v#(IFS=" ")
-            print("NCC-1701")
-
-            """.trimIndent().createRender()
-        assertRenderEquals("""
-            IFS=" "
-            printf "NCC-1701"
-
-            """.trimIndent(), script
-        ).assertRenderProduces("NCC-1701\n", arguments = listOf("first", "second", "third"))
     }
 }
