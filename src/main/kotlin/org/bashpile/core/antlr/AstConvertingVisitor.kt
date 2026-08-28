@@ -140,7 +140,7 @@ class AstConvertingVisitor: BashpileParserBaseVisitor<BastNode>() {
     }
 
     override fun visitExpressionStatement(ctx: BashpileParser.ExpressionStatementContext): BastNode {
-        return InternalBastNode(ctx.children.map { visit(it) })
+        return ExpressionStatementBastNode(ctx.children.map { visit(it) })
     }
 
     ///////////////////////////////////

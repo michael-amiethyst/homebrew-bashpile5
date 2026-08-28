@@ -9,6 +9,20 @@ class StringConcatenationBastNode(children: List<BastNode>)
 {
     // TODO check if other option overrides should be modifications instead
     override fun render(options: RenderOptions): String {
+        val containsRawBash = children.any { child ->
+            child.toList().any { it is RawBashBastNode }
+        }
+        if (containsRawBash) {
+            return children.joinToString("") { child ->
+                val childOptions = if (child.toList().any { it is RawBashBastNode }) {
+                    options.unquoted()
+                } else {
+                    options.quoted()
+                }
+                child.render(childOptions)
+            }
+        }
+
         val childRenders = children.joinToString("") { it.render(options.unquoted()) }
         return if (options.quoted) {
             """

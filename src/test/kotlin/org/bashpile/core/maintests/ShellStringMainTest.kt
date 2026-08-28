@@ -68,7 +68,7 @@ class ShellStringMainTest : MainTest() {
 
     @Test
     fun getBast_shellstring_works() {
-        val script = "'ls \"' + $(printf \".\") + '\"'".createRender()
+        val script = "b(ls ) + $(printf \".\")".createRender()
         assertRenderEquals("""
             ls "$(printf ".")"
             
@@ -79,7 +79,7 @@ class ShellStringMainTest : MainTest() {
     @Test
     fun getBast_looseShellstring_works() {
         // loose unsets '-o pipefail' so `exit 1` is ignored
-        val script = "'ls \"' + l$(printf \".\"; exit 1) + '\"'".createRender()
+        val script = "b(ls ) + l$(printf \".\"; exit 1)".createRender()
         assertRenderEquals("""
             ls "$(
                 eval "${'$'}__bp_old_options"
@@ -94,7 +94,7 @@ class ShellStringMainTest : MainTest() {
     @Test
     fun getBast_looseShellstring_looseIsScoped() {
         val script = """
-            'ls "' + l$(printf "."; exit 1) + '"'
+            b(ls ) + l$(printf "."; exit 1)
             printf "%s" "${'$'}undefinedVar"
             """.trimIndent().createRender()
         assertRenderEquals("""
@@ -113,7 +113,7 @@ class ShellStringMainTest : MainTest() {
     fun getBast_looseShellstring_twoInOneLine_works() {
         // TODO 0.22.0 - make test with escaped double quotes.  E.g. include `+ "\""`
         val script = """
-            'ls "' + l$(printf "%s" "-all") + '" "' + l$(printf "."; exit 1) + '"'
+            b(ls ) + l$(printf "%s" "-all") + b( ) + l$(printf "."; exit 1)
             """.trimIndent().createRender()
         assertRenderEquals(
             """

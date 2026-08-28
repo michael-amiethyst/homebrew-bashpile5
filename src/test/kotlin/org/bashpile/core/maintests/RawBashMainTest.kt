@@ -27,7 +27,7 @@ class RawBashMainTest : MainTest() {
     @Test
     fun rawBash_expression_withSubshell_works() {
         val script = $$"""
-            "true && " + b((export HELLO="Hello World"; printf "%s" "$HELLO"))
+            b(true && ) + b((export HELLO="Hello World"; printf "%s" "$HELLO"))
             b(set +u; printf "%s" "$HELLO"; set -u) // should be blank
 
             """.trimIndent().createRender()

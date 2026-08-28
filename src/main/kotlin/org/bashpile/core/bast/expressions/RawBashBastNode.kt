@@ -11,7 +11,7 @@ import org.bashpile.core.engine.RenderOptions
  */
 class RawBashBastNode(children: List<BastNode> = listOf()) : BastNode(children.toMutableList()) {
     override fun render(options: RenderOptions): String {
-        return children.joinToString("") { it.render(options) }
+        return children.joinToString("") { it.render(options.unquoted()) }
     }
 
     override fun replaceChildren(nextChildren: List<BastNode>): RawBashBastNode {

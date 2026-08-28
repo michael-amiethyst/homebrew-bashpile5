@@ -7,9 +7,10 @@ import org.bashpile.core.engine.Subshell
 
 class LooseShellStringBastNode(children: List<BastNode> = listOf()) : ShellStringBastNode(children), Subshell {
     override fun render(options: RenderOptions): String {
-        val strictRender = super.render(options)
+        val strictRender = super.render(options.unquoted())
         val regex = "^(\\$?\\()".toRegex() // match start of string, possibly a '$' and a '('
-        return strictRender.replaceFirst(regex, "$1eval \"\\$$OLD_OPTIONS\"; ")
+        val looseRender = strictRender.replaceFirst(regex, "$1eval \"\\$$OLD_OPTIONS\"; ")
+        return if (options.quoted) { "\"$looseRender\"" } else { looseRender }
     }
 
     override fun replaceChildren(nextChildren: List<BastNode>): LooseShellStringBastNode {
