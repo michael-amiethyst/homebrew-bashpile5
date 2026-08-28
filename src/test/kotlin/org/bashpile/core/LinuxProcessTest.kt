@@ -20,6 +20,16 @@ class LinuxProcessTest {
         assertEquals(SCRIPT_SUCCESS, result.second)
     }
 
+    @Test
+    fun run_withLargeStdin_doesNotDeadlock() {
+        val stdin = "0123456789abcdef".repeat(64 * 1024)
+
+        val result = LinuxProcess("cat").run(stdin = stdin)
+
+        assertEquals(stdin + "\n", result.first)
+        assertEquals(SCRIPT_SUCCESS, result.second)
+    }
+
     /** Compiled 'print("Hello World")' @ Version 0.14.0 */
     @Test
     fun run_withFullProgram_works() {

@@ -572,7 +572,7 @@ class SwitchMainTest : MainTest() {
             declare name
             name="La Forge"
             case "${name}" in # which // crew
-                Riker) 
+                Riker)
                     # Jonathan Frakes
                     printf "Number 1\n"
                     printf "Trombone player\n"
@@ -580,7 +580,7 @@ class SwitchMainTest : MainTest() {
                 Picard)
                     printf "The Captain"
                     ;;
-                *) 
+                *)
                     # Lower Decks
                     printf "Other crew\n"
                     ;;

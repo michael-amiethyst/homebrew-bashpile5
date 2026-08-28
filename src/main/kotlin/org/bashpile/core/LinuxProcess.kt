@@ -15,32 +15,23 @@ class LinuxProcess(val command: String) {
         const val SCRIPT_ERROR__GENERIC = 1
 
         fun shfmt(unformattedBash: String): String {
-            val script = Files.createTempFile("bashpile-", ".sh")
-            val diagnostics = Files.createTempFile("bashpile-shfmt-", ".log")
+            val brewBinPaths = listOf("/home/linuxbrew/.linuxbrew/bin", "/opt/homebrew/bin", "/usr/local/bin")
+            val pathDirectories = System.getenv("PATH").orEmpty().split(File.pathSeparator) + brewBinPaths
+            val shfmtAbsolutePath = pathDirectories
+                .asSequence()
+                .map { File(it, "shfmt") }
+                .firstOrNull { it.isFile && it.canExecute() }
+                ?.absolutePath
+                ?: error("shfmt not found in PATH or known Homebrew directories")
 
-            try {
-                // different directories for OSX Apple and Intel CPUs
-                val brewBinPaths = listOf("/home/linuxbrew/.linuxbrew/bin", "/opt/homebrew/bin", "/usr/local/bin")
-                val pathDirectories = System.getenv("PATH").orEmpty().split(File.pathSeparator) + brewBinPaths
-                val shfmtAbsolutePath = pathDirectories
-                    .asSequence()
-                    .map { File(it, "shfmt") }
-                    .firstOrNull { it.isFile && it.canExecute() }
-                    ?.absolutePath
-                    ?: error("shfmt not found in PATH or known Homebrew directories")
-                Files.writeString(script, unformattedBash)
-
-                // run command
-                val (messages, exitValue) = LinuxProcess($$"$$shfmtAbsolutePath -ln bash -i 4 -ci -w $$script").run()
-                check(exitValue == SCRIPT_SUCCESS) {
-                    "shfmt exited with code ${exitValue}:\n$messages"
-                }
-
-                return Files.readString(script)
-            } finally {
-                Files.deleteIfExists(script)
-                Files.deleteIfExists(diagnostics)
+            // run command
+            val (processOutput, exitValue) =
+                LinuxProcess($$"$$shfmtAbsolutePath -ln bash -i 4 -ci -").run(stdin = unformattedBash)
+            check(exitValue == SCRIPT_SUCCESS) {
+                "shfmt exited with code ${exitValue}:\n$processOutput"
             }
+
+            return processOutput
         }
     }
 
@@ -50,10 +41,12 @@ class LinuxProcess(val command: String) {
      * Returns stdout/stderr and the exit code.
      *
      * @param arguments Args to send to a Bash block, for a single command bake them into the receiver string.
+     * @param stdin Text to write to the process's standard input.
      */
     fun run(
         workingDir: File? = File(System.getProperty("user.dir")),
-        arguments: List<String> = listOf()
+        arguments: List<String> = listOf(),
+        stdin: String = ""
     ): Pair<String, Int> {
         val tempFilePath =
             Files.createTempFile("", "").writeString(command).makeExecutable().absolutePathString()
@@ -73,10 +66,18 @@ class LinuxProcess(val command: String) {
                 process.inputStream.bufferedReader().use { it.readText() }
             }
 
+            // Write stdin concurrently with draining output. A process such as `cat` may block writing
+            // stdout before it has consumed all stdin, so handling either stream synchronously can deadlock.
+            val input = executors.submit {
+                process.outputStream.bufferedWriter().use { it.write(stdin) }
+            }
+
             if (!process.waitFor(10, TimeUnit.SECONDS)) {
                 process.destroyForcibly()
                 process.waitFor()
             }
+
+            input.get(10, TimeUnit.SECONDS)
 
             // strip out blank lines and lines from sdkman, add newline back
             val text = output.get(10, TimeUnit.SECONDS).trim()
