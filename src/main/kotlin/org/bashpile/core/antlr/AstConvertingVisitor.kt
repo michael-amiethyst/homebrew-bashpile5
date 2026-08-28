@@ -80,10 +80,15 @@ class AstConvertingVisitor: BashpileParserBaseVisitor<BastNode>() {
         return ConditionalBastNode(ifClause, elseIfClauses, elseBlock, elseComments)
     }
 
+    /**
+     * @see [AstConvertingVisitor.visitCaseClauses]
+     * @see [AstConvertingVisitor.visitDefaultCase]
+     */
     override fun visitSwitchStatement(ctx: BashpileParser.SwitchStatementContext): BastNode {
         val matchingExpression = visit(ctx.expression())
+        val expressionComments = ctx.Comment()?.map { visit(it) } ?: listOf()
         val cases = ctx.caseClauses().map { visit(it) } + ctx.defaultCase()?.let { visit(it) }
-        return SwitchBastNode(matchingExpression, cases.filterNotNull())
+        return SwitchBastNode(matchingExpression, cases.filterNotNull(), expressionComments)
     }
 
     override fun visitVariableDeclarationStatement(ctx: BashpileParser.VariableDeclarationStatementContext): BastNode {
@@ -273,16 +278,24 @@ class AstConvertingVisitor: BashpileParserBaseVisitor<BastNode>() {
 
     // Leaf nodes (parts of expressions)
 
+    /**
+     * @see [AstConvertingVisitor.visitSwitchStatement]
+     * @see [AstConvertingVisitor.visitDefaultCase]
+     */
     override fun visitCaseClauses(ctx: BashpileParser.CaseClausesContext): BastNode {
         val matcher = ctx.globPattern().map { TerminalBastNode(it.text, STRING) }
+        val comments = ctx.Comment().map {
+            TerminalBastNode(it.text.replace("^//".toRegex(), "#"), STRING) }
         val statements = ctx.indentedStatements().statement().map { visit(it) }
-        return CaseBastNode(matcher, statements.toMutableList())
+        return CaseBastNode(matcher, statements.toMutableList(), comments)
     }
 
     override fun visitDefaultCase(ctx: BashpileParser.DefaultCaseContext): BastNode {
         val defaultMatch = TerminalBastNode("*", STRING)
+        val comments = ctx.Comment().map {
+            TerminalBastNode(it.text.replace("^//".toRegex(), "#"), STRING) }
         val statements = ctx.indentedStatements().statement().map { visit(it) }
-        return CaseBastNode(defaultMatch.toList(), statements.toMutableList())
+        return CaseBastNode(defaultMatch.toList(), statements.toMutableList(), comments)
     }
 
     override fun visitShellString(ctx: BashpileParser.ShellStringContext): BastNode {

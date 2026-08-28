@@ -32,6 +32,7 @@ abstract class BastNode(
         // shallow copy
         get() = mutableChildren.toList()
 
+    // TODO remove TAB, shfmt handles it now
     protected val TAB = "    "
 
     init {

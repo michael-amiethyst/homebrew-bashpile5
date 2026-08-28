@@ -14,7 +14,7 @@ statement
     | Function Id paramaters (Arrow complexType)? eol # functionForwardDeclarationStatement
     | Function Id paramaters tags? (Arrow complexType)? Colon Comment* functionBlock # functionDeclarationStatement
     | If OParen expression CParen Colon Comment* indentedStatements (elseIfClauses)* elseClause? # conditionalStatement
-    | Switch OParen expression CParen Colon INDENT caseClauses+ defaultCase? DEDENT # switchStatement
+    | Switch OParen expression CParen Colon Comment* INDENT caseClauses+ defaultCase? DEDENT # switchStatement
     | <assoc=right> typedId (Equals expression)? eol # variableDeclarationStatement
     | <assoc=right> (Id | listAccess) assignmentOperator expression eol # reassignmentStatement
     | Print OParen argumentList? CParen eol # printStatement
@@ -36,7 +36,7 @@ argumentList: expression (Comma expression)*;
 elseIfClauses : Else If OParen expression CParen Colon Comment* indentedStatements;
 elseClause: Else Colon Comment* indentedStatements;
 indentedStatements: INDENT statement+ DEDENT;
-caseClauses: Case globPattern+ Colon indentedStatements;
+caseClauses: Case globPattern+ Colon Comment* indentedStatements;
 globPattern //: extended_pattern  // extglob: ?(p|p), *(p|p), +(p|p), @(p|p), !(p|p)
 //            //| brace_expansion   // {a,b}
             : globCharacterSet    // [a-z]
@@ -45,7 +45,7 @@ globPattern //: extended_pattern  // extglob: ?(p|p), *(p|p), +(p|p), @(p|p), !(
             | literal;
 //// Character Sets: [abc], [a-zA-Z], [!0-9]
 globCharacterSet : OBracket (CaseModeClassBody | NumberValues | StringValues) CBracket;
-defaultCase: Default Colon indentedStatements;
+defaultCase: Default Colon Comment* indentedStatements;
 assignmentOperator: Equals | PlusEquals;
 
 // Force the final statement to be a return.

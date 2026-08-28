@@ -555,6 +555,41 @@ class SwitchMainTest : MainTest() {
     }
 
     @Test
+    fun switch_withDefault_withCommentsEverywhere_works() {
+        val render: String = """
+            name: string = "La Forge"
+            switch (name): // which // crew
+                case Riker: // Jonathan Frakes
+                    printf "Number 1\n"
+                    print("Trombone player\n")
+                case Picard:
+                    printf "The Captain"
+                default: // Lower Decks
+                    print("Other crew\n")
+        """.trimIndent().createRender()
+        assertRenderEquals(
+            $$"""
+            declare name
+            name="La Forge"
+            case "${name}" in # which // crew
+                Riker) 
+                    # Jonathan Frakes
+                    printf "Number 1\n"
+                    printf "Trombone player\n"
+                    ;;
+                Picard)
+                    printf "The Captain"
+                    ;;
+                *) 
+                    # Lower Decks
+                    printf "Other crew\n"
+                    ;;
+            esac
+            
+        """.trimIndent(), render).runCommand().assertRenderProduces("Other crew\n")
+    }
+
+    @Test
     fun switch_caseVariable_isOutOfScopeAfterSwitch() {
         assertFailsWith<IllegalStateException> { """
                 name: string = "Riker"
@@ -604,7 +639,7 @@ class SwitchMainTest : MainTest() {
 
     /** Test for comments */
     @Test
-    fun switch_withDefault_withMultilineComments_atStartOfLine_works() {
+    fun switch_withDefault_withMultilineComments_atStartOfLine_fails() {
         assertThrows<ParseCancellationException> {
             // mixing the end of a multiline comment and the start of statements is not supported
             """
