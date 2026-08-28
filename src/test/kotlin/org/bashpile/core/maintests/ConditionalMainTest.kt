@@ -83,7 +83,7 @@ class ConditionalMainTest : MainTest() {
     }
 
     @Test
-    fun ifStatement_ifElseIfElse_works() {
+    fun ifStatement_ifElseIfElse_withComment_works() {
         val renderedBash = """
             x: integer = 1
             if (x < 0): // negative

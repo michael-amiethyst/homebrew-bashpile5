@@ -4,7 +4,6 @@ options { tokenVocab = BashpileLexer; }
 program: statement+;
 
 // statements, in descending order of complexity
-// TODO switch - ensure comments render for all statements (on conditionalStatement)
 statement
     : Import StringValues eol # importStatement
     | ShellLine Newline # shellLineStatement
