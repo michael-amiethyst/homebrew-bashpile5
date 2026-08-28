@@ -17,4 +17,7 @@ data class RenderOptions(
 
     fun quoted(): RenderOptions =
         RenderOptions(quoted = true, ignoreOutput = ignoreOutput, integerArithmeticContext = integerArithmeticContext)
+
+    fun unquoted(): RenderOptions =
+        RenderOptions(quoted = false, ignoreOutput = ignoreOutput, integerArithmeticContext = integerArithmeticContext)
 }

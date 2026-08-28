@@ -206,10 +206,11 @@ class ConditionalMainTest : MainTest() {
             else:
                 print("Not Equal\n")
             """.trimIndent().createRender()
-        assertRenderEquals("""
+        assertRenderEquals(
+            $$"""
             declare name
             name=""
-            if [ "value" == "${'$'}{name}value" ]; then
+            if [ "value" == "${name}value" ]; then
                 printf "Equal\n"
             else
                 printf "Not Equal\n"

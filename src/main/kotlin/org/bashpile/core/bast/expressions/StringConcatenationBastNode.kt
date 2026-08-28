@@ -7,8 +7,9 @@ import org.bashpile.core.engine.RenderOptions
 class StringConcatenationBastNode(children: List<BastNode>)
     : BastNode(children.toMutableList(), majorType = STRING)
 {
+    // TODO check if other option overrides should be modifications instead
     override fun render(options: RenderOptions): String {
-        val childRenders = children.map { it.render(RenderOptions.UNQUOTED) }.joinToString("")
+        val childRenders = children.joinToString("") { it.render(options.unquoted()) }
         return if (options.quoted) {
             """
                 "$childRenders"
