@@ -10,7 +10,6 @@ import kotlin.test.assertEquals
 /**
  * Tests Shell Strings and Shell Lines
  */
-// TODO 0.22.0 -- make $() a command substitution string, s() subshell, l$() a loose command substitution
 class ShellStringMainTest : MainTest() {
 
     override val testName = "ShellStringTest"
@@ -69,7 +68,7 @@ class ShellStringMainTest : MainTest() {
 
     @Test
     fun getBast_shellstring_works() {
-        val script = "'ls \"' + #(printf \".\") + '\"'".createRender()
+        val script = "'ls \"' + $(printf \".\") + '\"'".createRender()
         assertRenderEquals("""
             ls "$(printf ".")"
             
@@ -80,7 +79,7 @@ class ShellStringMainTest : MainTest() {
     @Test
     fun getBast_looseShellstring_works() {
         // loose unsets '-o pipefail' so `exit 1` is ignored
-        val script = "'ls \"' + l#(printf \".\"; exit 1) + '\"'".createRender()
+        val script = "'ls \"' + l$(printf \".\"; exit 1) + '\"'".createRender()
         assertRenderEquals("""
             ls "$(
                 eval "${'$'}__bp_old_options"
@@ -95,7 +94,7 @@ class ShellStringMainTest : MainTest() {
     @Test
     fun getBast_looseShellstring_looseIsScoped() {
         val script = """
-            'ls "' + l#(printf "."; exit 1) + '"'
+            'ls "' + l$(printf "."; exit 1) + '"'
             printf "%s" "${'$'}undefinedVar"
             """.trimIndent().createRender()
         assertRenderEquals("""
@@ -114,7 +113,7 @@ class ShellStringMainTest : MainTest() {
     fun getBast_looseShellstring_twoInOneLine_works() {
         // TODO 0.22.0 - make test with escaped double quotes.  E.g. include `+ "\""`
         val script = """
-            'ls "' + l#(printf "%s" "-all") + '" "' + l#(printf "."; exit 1) + '"'
+            'ls "' + l$(printf "%s" "-all") + '" "' + l$(printf "."; exit 1) + '"'
             """.trimIndent().createRender()
         assertRenderEquals(
             """
@@ -134,7 +133,7 @@ class ShellStringMainTest : MainTest() {
     @Test
     fun getBast_shellstring_withConcat_works() {
         val script = """
-            print("Hello " + #(printf 'shellstring!'))""".trim().createRender()
+            print("Hello " + $(printf 'shellstring!'))""".trim().createRender()
         assertRenderEquals("""
             printf "Hello $(printf 'shellstring!')"
             """.trimIndent() + "\n", script
@@ -144,7 +143,7 @@ class ShellStringMainTest : MainTest() {
     @Test
     fun getBast_shellstring_nestedSubshells_works() {
         val script = """
-            print(#(ls "$(printf '.')"))""".trim().createRender()
+            print($(ls "$(printf '.')"))""".trim().createRender()
         assertRenderEquals("""
             declare __bp_var0
             __bp_var0="$(printf '.')"
@@ -159,14 +158,15 @@ class ShellStringMainTest : MainTest() {
     fun getBast_shellstring_nestedSubshells_withInnerError_fails() {
         val pathname = "src/test/resources/bpsScripts/nestedSubshells.bps"
         val script =  File(pathname).readText().trim().createRender()
-        assertRenderEquals("""
+        assertRenderEquals(
+            $$"""
             set -euo pipefail
             declare __bp_var0
             __bp_var0="$(
                 echo '.'
-                exit ${SCRIPT_ERROR__GENERIC}
+                exit $$SCRIPT_ERROR__GENERIC
             )"
-            printf "$(ls "${'$'}{__bp_var0}")"
+            printf "$(ls "${__bp_var0}")"
             """.trimIndent() + "\n", script
         )
         script.assertRenderProduces({
@@ -176,7 +176,7 @@ class ShellStringMainTest : MainTest() {
     @Test
     fun getBast_shellstring_withShellStringConcat_works() {
         val script = """
-            print(#(printf "$(printf 'Hello ') $(printf 'shellstring!')"))""".trim().createRender()
+            print($(printf "$(printf 'Hello ') $(printf 'shellstring!')"))""".trim().createRender()
         assertRenderEquals("""
             declare __bp_var0
             __bp_var0="$(printf 'Hello ')"

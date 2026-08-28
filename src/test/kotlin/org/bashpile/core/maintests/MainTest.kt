@@ -34,7 +34,8 @@ abstract class MainTest {
 
     protected fun String.createRender(): String {
         val scriptStream = this.byteInputStream()
-        return LinuxProcess.shfmt(fixture._getBast(scriptStream).render(UNQUOTED))
+        val renderedBash = fixture._getBast(scriptStream).render(UNQUOTED)
+        return LinuxProcess.shfmt(renderedBash)
     }
 
     protected fun assertRenderEquals(expectedBash: String, renderedBash: String): String {

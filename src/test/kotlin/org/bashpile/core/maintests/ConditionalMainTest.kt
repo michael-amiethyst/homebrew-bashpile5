@@ -11,7 +11,7 @@ class ConditionalMainTest : MainTest() {
     @Test
     fun conditionals_works() {
         val renderedBash = """
-            #(ls some_random_file_that_does_not_exist.txt) or true
+            $(ls some_random_file_that_does_not_exist.txt) or true
             """.trimIndent().createRender()
         assertRenderEquals("""
             (ls some_random_file_that_does_not_exist.txt) >/dev/null 2>&1 || true
@@ -249,7 +249,7 @@ class ConditionalMainTest : MainTest() {
         val renderedBash = """
             name: string = ""
             input1: string = "value"
-            if ("value" == (name + "value") and input1 == #(printf "value")):
+            if ("value" == (name + "value") and input1 == $(printf "value")):
                 print("Equal\n")
             else:
                 print("Not Equal\n")
@@ -294,7 +294,7 @@ class ConditionalMainTest : MainTest() {
     @Test
     fun ifStatement_notEquals_withShellString_works() {
         val renderedBash = """
-            if ("value" == #(ls)):
+            if ("value" == $(ls)):
                 print("Equal\n")
             else:
                 print("Not Equal\n")
@@ -524,7 +524,7 @@ class ConditionalMainTest : MainTest() {
     @Test
     fun ifElseStatement_withFailedShellString_works() {
         val renderedBash = """
-            if (#(expr 1 \> 0; exit ${SCRIPT_ERROR__GENERIC})):
+            if ($(expr 1 \> 0; exit ${SCRIPT_ERROR__GENERIC})):
                 print("Math is mathing! ")
                 print("Math is mathing!\n")
             else:
@@ -548,7 +548,7 @@ class ConditionalMainTest : MainTest() {
     @Test
     fun ifElseStatement_withFailedShellString_andParens_works() {
         val renderedBash = """
-            if ((#(expr 1 \> 0; exit ${SCRIPT_ERROR__GENERIC}))):
+            if (($(expr 1 \> 0; exit ${SCRIPT_ERROR__GENERIC}))):
                 print("Math is mathing! ")
                 print("Math is mathing!\n")
             else:
@@ -620,7 +620,7 @@ class ConditionalMainTest : MainTest() {
             zero: integer = 0
             if (1 < zero):
                 print("Math is not mathing\n")
-            else if (#(expr "${'$'}{zero}" \< 1)):
+            else if ($(expr "${'$'}{zero}" \< 1)):
                 print("Math is mathing! ")
                 print("Math is mathing!\n")
             else:
@@ -668,7 +668,7 @@ class ConditionalMainTest : MainTest() {
     fun ifElseStatement_withAndOr_works() {
         val renderedBash = """
             two: integer = 2
-            if (1 < two and two <= 1 or #(printf "1")):
+            if (1 < two and two <= 1 or $(printf "1")):
                 print("Math is mathing!\n")
             else:
                 print("Command failed\n")
@@ -689,7 +689,7 @@ class ConditionalMainTest : MainTest() {
     @Test
     fun ifElseStatement_withAndOr_literalFloats_works() {
         val renderedBash = """
-            if (1.0 < 2.0 and 2.0 <= 1.0 or #(bc <<< "2.0 < 3.0")):
+            if (1.0 < 2.0 and 2.0 <= 1.0 or $(bc <<< "2.0 < 3.0")):
                 print("Math is mathing!\n")
             else:
                 print("Command failed\n")
@@ -709,7 +709,7 @@ class ConditionalMainTest : MainTest() {
     fun ifElseStatement_withAndOr_floatVariable_works() {
         val renderedBash = """
             one: float = 1.0
-            if (one < 2.0 and 2.0 <= one or #(bc <<< "2.0 < 3.0")):
+            if (one < 2.0 and 2.0 <= one or $(bc <<< "2.0 < 3.0")):
                 print("Math is mathing!\n")
             else:
                 print("Command failed\n")
@@ -757,7 +757,7 @@ class ConditionalMainTest : MainTest() {
     fun ifElseStatement_withTypeCastSubtractionAndEquals_works() {
         val renderedBash = """
             a: integer = 1
-            if (#(printf "11") as integer - a == 10):
+            if ($(printf "11") as integer - a == 10):
                 print("It tracks\n")
             else:
                 print("Lame\n")

@@ -130,9 +130,8 @@ StringEscapeSequence: '\\' . | '\\' Newline;
 
 // ShellString tokens
 
-LHashOParen  : 'l#(' -> pushMode(SHELL_STRING);
 BOParen      : 'b(' -> pushMode(SHELL_STRING);
-HashOParen   : '#(' -> pushMode(SHELL_STRING);
+LDollarOParen: 'l$(' -> pushMode(SHELL_STRING);
 DollarOParen : '$(' -> pushMode(SHELL_STRING);
 
 // modes

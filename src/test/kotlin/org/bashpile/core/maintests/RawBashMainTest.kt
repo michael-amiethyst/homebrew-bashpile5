@@ -25,15 +25,22 @@ class RawBashMainTest : MainTest() {
     }
 
     @Test
-    fun rawBash_expression_works() {
-        val script = """
-            print(b($(expr 1 + 1)))
+    fun rawBash_expression_withSubshell_works() {
+        val script = $$"""
+            "true && " + b((export HELLO="Hello World"; printf "%s" "$HELLO"))
+            b(set +u; printf "%s" "$HELLO"; set -u) // should be blank
 
             """.trimIndent().createRender()
-        assertRenderEquals("""
-            printf "$(expr 1 + 1)"
+        assertRenderEquals($$"""
+            true && (
+                export HELLO="Hello World"
+                printf "%s" "$HELLO"
+            )
+            set +u
+            printf "%s" "$HELLO"
+            set -u
 
             """.trimIndent(), script
-        ).assertRenderProduces("2\n")
+        ).assertRenderProduces("Hello World\n")
     }
 }

@@ -99,12 +99,12 @@ expression
     ;
 
 literal : StringValues | NumberValues | BoolValues;
-types    : Boolean | Integer | Float | String | List | Map | Reference;
+types   : Boolean | Integer | Float | String | List | Map | Reference;
 
 // shellString, Bashpile's version of a subshell
-shellString : HashOParen shellStringContents* CParen;
-looseShellString : LHashOParen shellStringContents* CParen;
-rawBash: BOParen shellStringContents* CParen;
+shellString      : DollarOParen shellStringContents* CParen;
+looseShellString : LDollarOParen shellStringContents* CParen;
+rawBash          : BOParen shellStringContents* CParen;
 shellStringContents: DollarOParen shellStringContents* CParen
                    | OParen shellStringContents* CParen
                    | ShellStringText
@@ -112,7 +112,7 @@ shellStringContents: DollarOParen shellStringContents* CParen
 
 // full list at https://tldp.org/LDP/Bash-Beginners-Guide/html/sect_07_01.html
 unaryPrimary: BashUnaryOperator | IsEmpty | NotEmpty
-| Exists | DoesNotExist | RegularFileExists | DirectoryExists;
+            | Exists | DoesNotExist | RegularFileExists | DirectoryExists;
 
 // one line means logically equal precidence (e.g. LessThan in the same as MoreThanOrEquals)
 binaryPrimary: LessThan | LessThanOrEquals | MoreThan | MoreThanOrEquals | IsEqual | IsNotEqual;
