@@ -10,7 +10,7 @@ import kotlin.test.assertEquals
 /**
  * Tests Shell Strings and Shell Lines
  */
-// TODO 0.22.0 -- make $() a subshell string, l$() a loose subshell string and #() a verbatim shellstring
+// TODO 0.22.0 -- make $() a command substitution string, s() subshell, l$() a loose command substitution and b() a BashFragment
 class ShellStringMainTest : MainTest() {
 
     override val testName = "ShellStringTest"

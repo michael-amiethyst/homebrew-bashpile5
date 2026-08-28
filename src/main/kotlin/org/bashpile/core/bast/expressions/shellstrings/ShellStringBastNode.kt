@@ -8,7 +8,8 @@ import org.bashpile.core.engine.TypeEnum
 import org.bashpile.core.engine.TypeEnum.STRING
 
 /**
- * A Shell String is the Bashpile equivalent of a Bash subshell (i.e., $() syntax).  It represents an expression.
+ * A Shell String is the Bashpile equivalent of a Bash Command Substitution (i.e., $() syntax).
+ * It represents an expression.
  * A full line of bash is a [org.bashpile.core.bast.statements.ShellLineBastNode].
  */
 open class ShellStringBastNode(children: List<BastNode> = listOf(), majorType: TypeEnum = STRING)

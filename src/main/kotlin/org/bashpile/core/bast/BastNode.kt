@@ -63,9 +63,7 @@ abstract class BastNode(
     /** Converts this node to a list of size 1 */
     fun asList(): List<BastNode> = listOf(this)
 
-    /**
-     * Produces syntactically valid Bash for this subtree.  Does not handle whitespace formatting.
-     */
+    /** Produces syntactically valid Bash for this subtree.  Does not handle whitespace formatting. */
     open fun render(options: RenderOptions): String {
         return children.joinToString("") { it.render(RenderOptions.UNQUOTED) }
     }

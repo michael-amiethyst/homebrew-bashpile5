@@ -13,7 +13,7 @@ import org.bashpile.core.bast.expressions.arithmetic.UnaryCrementArithmeticBastN
 import org.bashpile.core.bast.expressions.literals.*
 import org.bashpile.core.bast.expressions.shellstrings.LooseShellStringBastNode
 import org.bashpile.core.bast.expressions.shellstrings.ShellStringBastNode
-import org.bashpile.core.bast.expressions.shellstrings.VerbatimShellStringBastNode
+import org.bashpile.core.bast.expressions.shellstrings.RawBashBastNode
 import org.bashpile.core.bast.statements.*
 import org.bashpile.core.bast.statements.structured.ConditionalBastNode
 import org.bashpile.core.bast.statements.structured.IfClause
@@ -307,7 +307,7 @@ class AstConvertingVisitor: BashpileParserBaseVisitor<BastNode>() {
     }
 
     override fun visitVerbatimShellString(ctx: BashpileParser.VerbatimShellStringContext): BastNode {
-        return VerbatimShellStringBastNode(ctx.shellStringContents().map { visit(it) })
+        return RawBashBastNode(ctx.shellStringContents().map { visit(it) })
     }
 
     override fun visitShellStringContents(ctx: BashpileParser.ShellStringContentsContext): BastNode {
