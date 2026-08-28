@@ -22,7 +22,7 @@ class ConditionalBastNode(
         val renderedIfBody = callStack.use { stack ->
             stack.pushStackframe()
             ifClause.body.joinToString("\n") { statement ->
-                statement.render(UNQUOTED).trimEnd().prependIndent(TAB)
+                statement.render(UNQUOTED).trimEnd()
             }
         }
         val renderedComments = if (comments.isNotEmpty()) {
@@ -36,7 +36,7 @@ class ConditionalBastNode(
             val renderedStatements = callStack.use { stack ->
                 stack.pushStackframe()
                 elseBody.joinToString("\n") {
-                    statement -> statement.render(UNQUOTED).trimEnd().prependIndent(TAB)
+                    statement -> statement.render(UNQUOTED).trimEnd()
                 }
             }
 
@@ -54,7 +54,7 @@ class ConditionalBastNode(
                     .joinToString(" ") { it.render(UNQUOTED) }
                     .let { if (it.isBlank()) "" else " $it" }
                 val body = elseIf.body.joinToString("\n") { statement ->
-                    statement.render(UNQUOTED).trimEnd().prependIndent(TAB)
+                    statement.render(UNQUOTED).trimEnd()
                 }
 
                 "\nelif $condition; then$comments\n$body"

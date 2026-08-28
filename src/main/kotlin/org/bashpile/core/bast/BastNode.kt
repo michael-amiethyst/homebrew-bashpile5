@@ -13,8 +13,7 @@ import java.util.function.Predicate
 /**
  * The base class of the BAST class hierarchy.
  * Converts this AST and its children to Bash source via [render].
- * [render] only needs to produce syntactically correct Bash; [org.bashpile.core.shfmt] owns final presentation
- * formatting such as indentation, line wrapping, and optional whitespace around operators.
+ * [render] only needs to produce syntactically correct Bash; a call to `shfmt` handles the formatting.
  * The root is created by the [AstConvertingVisitor].
  */
 abstract class BastNode(
@@ -31,9 +30,6 @@ abstract class BastNode(
     val children: List<BastNode>
         // shallow copy
         get() = mutableChildren.toList()
-
-    // TODO remove TAB, shfmt handles it now
-    protected val TAB = "    "
 
     init {
         children.forEach { it.parent = this }
@@ -68,12 +64,7 @@ abstract class BastNode(
     fun asList(): List<BastNode> = listOf(this)
 
     /**
-     * Produces syntactically valid Bash for this subtree.
-     *
-     * Renderers must preserve whitespace that affects Bash syntax or semantics, such as token separators, command
-     * boundaries, comments, and heredocs. They should not spend effort on presentation whitespace: the complete
-     * rendered script is passed through [org.bashpile.core.shfmt] once at the application or test boundary.
-     * This method must not invoke `shfmt` recursively because many subtree fragments are not complete Bash programs.
+     * Produces syntactically valid Bash for this subtree.  Does not handle whitespace formatting.
      */
     open fun render(options: RenderOptions): String {
         return children.joinToString("") { it.render(RenderOptions.UNQUOTED) }

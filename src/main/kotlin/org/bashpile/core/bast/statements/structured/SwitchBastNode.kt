@@ -23,7 +23,7 @@ class SwitchBastNode(val matchOn: BastNode, val cases: List<BastNode>, val expre
     override fun render(options: RenderOptions): String {
         val matchOnRender = matchOn.render(options)
         val commentsRender = expressionComments.joinToString(" ") { it.render(options) }
-        val caseRenders = cases.joinToString("\n" + TAB.repeat(3)) { case ->
+        val caseRenders = cases.joinToString("\n") { case ->
             callStack.use { stack ->
                 stack.pushStackframe()
                 case.render(options)

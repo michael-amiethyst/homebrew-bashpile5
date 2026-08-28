@@ -16,7 +16,7 @@ class CaseBastNode(val expression: List<BastNode>, val statements: MutableList<B
     override fun render(options: RenderOptions): String {
         val matcher = expression.joinToString("") { it.render(options) }
         val commentsRender = comments.joinToString(" ", postfix = "\n") { it.render(options) }.ifBlank { "" }
-        val matchRender = "$TAB$matcher)\n$commentsRender"
+        val matchRender = "$matcher)\n$commentsRender"
         val statementsWithTerminator = statements + TerminalBastNode(";;", STRING)
         val statementBlock: List<String> = statementsWithTerminator.map { it.render(options) }
         return matchRender + statementBlock.joinToString("")
