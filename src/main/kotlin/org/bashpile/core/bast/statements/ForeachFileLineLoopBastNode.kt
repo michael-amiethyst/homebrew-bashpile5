@@ -1,24 +1,33 @@
 package org.bashpile.core.bast.statements
 
 import org.bashpile.core.LinuxProcess
-import org.bashpile.core.LinuxProcess.Companion.SCRIPT_SUCCESS
 import org.bashpile.core.Main.Companion.callStack
 import org.bashpile.core.bast.BastNode
 import org.bashpile.core.bast.expressions.VariableReferenceBastNode
 import org.bashpile.core.engine.RenderOptions
 import org.bashpile.core.engine.TypeEnum.EMPTY
+import java.io.File
 
 /**
  * for(FirstName: string, LastName: string in 'src/test/resources/example.csv')
  */
-class ForeachFileLineLoopBashNode(
+class ForeachFileLineLoopBastNode(
     children: List<BastNode> = listOf(),
     val doubleQuotedFilepath: String,
     val columns: List<VariableReferenceBastNode>,
     comments: List<BastNode> = listOf()) : StatementBastNode(children.toMutableList(), comments = comments)
 {
     companion object {
-        val sed: String = if (LinuxProcess("which gsed").run().second == SCRIPT_SUCCESS) "gsed" else "sed"
+        val sed: String = run {
+            val shellPath = System.getenv("PATH").orEmpty().split(File.pathSeparator)
+            val possibleSedPaths = shellPath + LinuxProcess.brewBinPaths
+            possibleSedPaths
+                .asSequence()
+                .map { File(it, "gsed") }
+                .firstOrNull { it.isFile && it.canExecute() }
+                ?.absolutePath
+                ?: "sed"
+        }
     }
 
     init {
@@ -30,8 +39,8 @@ class ForeachFileLineLoopBashNode(
         }
     }
 
-    override fun replaceChildren(nextChildren: List<BastNode>): ForeachFileLineLoopBashNode {
-        return ForeachFileLineLoopBashNode(nextChildren.map { it.deepCopy() }, doubleQuotedFilepath, columns)
+    override fun replaceChildren(nextChildren: List<BastNode>): ForeachFileLineLoopBastNode {
+        return ForeachFileLineLoopBastNode(nextChildren.map { it.deepCopy() }, doubleQuotedFilepath, columns)
     }
 
     override fun render(options: RenderOptions): String {
@@ -45,17 +54,16 @@ class ForeachFileLineLoopBashNode(
 
             val lineVariableName = if (columns.size > 1) { "__bp_line" } else { columns[0].id!! }
             val commentText = if (comments.isNotEmpty()) {
-                " " + comments.map { it.render(options) }.joinToString(" ")
+                " " + comments.joinToString(" ") { it.render(options) }
             } else { "" }
             val setLoopVariables = if (columns.size > 1) {
-                columns.mapIndexed { i, it -> """
-                    ${it.id}=$(printf "%s" "${'$'}{__bp_line}" | gawk --csv '{print $${i + 1}}');""".trimIndent()
+                columns.mapIndexed { i, it -> $$"""
+                    $${it.id}=$(printf "%s" "${__bp_line}" | gawk --csv '{print $$${i + 1}}');""".trimIndent()
                 }.joinToString(prefix = "    # loop variables (Bashpile generated)\n    ", separator = " ", postfix = "\n")
             } else { "" }
             val childRenderList = children.map { child ->
-                child.render(RenderOptions.UNQUOTED).lines().filter { it.isNotBlank() }.map {
-                    "    $it"
-                }.joinToString("\n", postfix = "\n")
+                child.render(RenderOptions.UNQUOTED).lines().filter { it.isNotBlank() }
+                    .joinToString("\n", postfix = "\n") { "    $it" }
             }
             val childRenders = childRenderList.joinToString("").removeSuffix("\n")
             return """
@@ -76,7 +84,7 @@ class ForeachFileLineLoopBashNode(
         val convertWindowsLineEndings = "-e 's/\\r\\n/\\n/g'"
 
         // -z causes '$' to means EOF, not end of line.
-        // for files that do not end with a newline ('/\n$/!s') replace EOF with \n EOF
+        // for files that do not end with a newline (/\n$/!s) replace EOF with \n EOF
         val appendTrailingNewline = """
                 -ze '/\n$/!s/$/\n$/g'""".trimIndent()
 

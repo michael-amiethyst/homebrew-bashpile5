@@ -45,13 +45,13 @@ class SwitchMainTest : MainTest() {
 
     @Test
     fun bashArguments_withGetopt_worksAsExpected() {
-        val bashScript = """
+        val bashScript = $$"""
             VALID_ARGS=$(getopt -o abg:d: --long alpha,beta,gamma:,delta: -- "$@")
             if [[ $? -ne 0 ]]; then
                 exit 1;
             fi
 
-            eval set -- "${'$'}VALID_ARGS"
+            eval set -- "$VALID_ARGS"
             while [ : ]; do
               case "$1" in
                 -a | --alpha)

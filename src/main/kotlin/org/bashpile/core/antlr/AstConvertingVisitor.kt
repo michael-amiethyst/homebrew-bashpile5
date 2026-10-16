@@ -62,7 +62,7 @@ class AstConvertingVisitor: BashpileParserBaseVisitor<BastNode>() {
         val children = antlrStatements.map { visit(it) }
         val columns = ctx.typedId().map { visit(it) as VariableReferenceBastNode }
         val comments = ctx.Comment().map { visit(it) }
-        return ForeachFileLineLoopBashNode(children, ctx.StringValues().text, columns, comments)
+        return ForeachFileLineLoopBastNode(children, ctx.StringValues().text, columns, comments)
     }
 
     override fun visitConditionalStatement(ctx: BashpileParser.ConditionalStatementContext): BastNode {

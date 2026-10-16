@@ -1,6 +1,6 @@
 package org.bashpile.core.maintests
 
-import org.bashpile.core.bast.statements.ForeachFileLineLoopBashNode.Companion.sed
+import org.bashpile.core.bast.statements.ForeachFileLineLoopBastNode.Companion.sed
 import org.bashpile.core.runCommand
 import kotlin.test.Test
 import kotlin.test.assertFailsWith

@@ -4,7 +4,7 @@ import org.bashpile.core.LinuxProcess
 import org.bashpile.core.Main
 import org.bashpile.core.bast.expressions.VariableReferenceBastNode
 import org.bashpile.core.bast.expressions.literals.StringLiteralBastNode
-import org.bashpile.core.bast.statements.ForeachFileLineLoopBashNode.Companion.sed
+import org.bashpile.core.bast.statements.ForeachFileLineLoopBastNode.Companion.sed
 import org.bashpile.core.engine.CallStack
 import org.bashpile.core.engine.RenderOptions.Companion.UNQUOTED
 import org.bashpile.core.engine.TypeEnum.EMPTY
@@ -13,7 +13,7 @@ import kotlin.test.BeforeTest
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
-class ForeachFileLineLoopBashNodeTest {
+class ForeachFileLineLoopBastNodeTest {
     @BeforeTest
     fun init() {
         Main.callStack = CallStack()
@@ -22,7 +22,7 @@ class ForeachFileLineLoopBashNodeTest {
     @Test
     fun render_withPrint_works() {
         val child = PrintBastNode(VariableReferenceBastNode("col1", STRING))
-        val fixture = ForeachFileLineLoopBashNode(
+        val fixture = ForeachFileLineLoopBastNode(
             child.asList(),"\"file.csv\"", listOf(VariableReferenceBastNode("col1", STRING)))
         assertEquals(
             """
@@ -39,7 +39,7 @@ class ForeachFileLineLoopBashNodeTest {
     fun render_withVariableDeclaration_works() {
         val child = VariableDeclarationBastNode(
             "col1", STRING, EMPTY, child = StringLiteralBastNode("exampleValue"))
-        val fixture = ForeachFileLineLoopBashNode(
+        val fixture = ForeachFileLineLoopBastNode(
             child.asList(),"\"file.csv\"", listOf(VariableReferenceBastNode("col1", STRING)))
         assertEquals(
             """
