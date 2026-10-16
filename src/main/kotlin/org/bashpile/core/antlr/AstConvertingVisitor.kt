@@ -77,7 +77,7 @@ class AstConvertingVisitor: BashpileParserBaseVisitor<BastNode>() {
         }
         val elseBlock = ctx.elseClause()?.indentedStatements()?.statement()?.map { visit(it) } ?: listOf()
         val elseComments = ctx.elseClause()?.Comment()?.map { visit(it) } ?: listOf()
-        return ConditionalBastNode(ifClause, elseIfClauses, elseBlock, elseComments)
+        return ConditionalBastNode(ifClause, elseIfClauses, elseBlock to elseComments)
     }
 
     /**
@@ -368,4 +368,3 @@ private fun BashpileParser.TypedIdContext.majorType(): BashpileParser.TypesConte
 private fun TerminalNode.typeIndex(): Int {
     return symbol.type
 }
-

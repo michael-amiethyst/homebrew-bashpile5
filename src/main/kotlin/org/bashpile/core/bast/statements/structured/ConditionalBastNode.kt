@@ -9,13 +9,13 @@ import org.bashpile.core.engine.RenderOptions.Companion.UNQUOTED
 
 /** If-elseif-else */
 class ConditionalBastNode(
-    // TODO change else to double-record
     val ifClause: IfClause, val elseIfClauses: List<IfClause>,
-    val elseBody: List<BastNode>, val elseComments: List<BastNode>
-) : StatementBastNode(ifClause.toBastList() + elseIfClauses.flatMap { it.toBastList() } + elseBody, comments = ifClause.comments) {
+    /** The else body and its leading comments, respectively. */
+    val elseClause: Pair<List<BastNode>, List<BastNode>>
+) : StatementBastNode(ifClause.toBastList() + elseIfClauses.flatMap { it.toBastList() } + elseClause.first, comments = ifClause.comments) {
 
     override fun replaceChildren(nextChildren: List<BastNode>): BastNode {
-        return ConditionalBastNode(ifClause, elseIfClauses.map { it.deepCopy() }, elseBody, elseComments)
+        return ConditionalBastNode(ifClause, elseIfClauses.map { it.deepCopy() }, elseClause)
     }
 
     override fun render(options: RenderOptions): String {
@@ -28,6 +28,7 @@ class ConditionalBastNode(
         val renderedComments = if (comments.isNotEmpty()) {
             " " + comments.joinToString(" ") { it.render(options) }
         } else { "" }
+        val (elseBody, elseComments) = elseClause
         val renderedElseBody = if (elseBody.isNotEmpty()) {
             val renderedElseComment = if (elseComments.isNotEmpty()) {
                 " " + elseComments.joinToString(" ") { it.render(options) }
