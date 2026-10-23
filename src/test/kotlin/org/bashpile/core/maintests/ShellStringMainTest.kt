@@ -111,23 +111,41 @@ class ShellStringMainTest : MainTest() {
 
     @Test
     fun getBast_looseShellstring_twoInOneLine_works() {
-        // TODO 0.22.0 - make test with escaped double quotes.  E.g. include `+ "\""`
         val script = """
             b(ls ) + l$(printf "%s" "-all") + b( ) + l$(printf "."; exit 1)
             """.trimIndent().createRender()
         assertRenderEquals(
-            """
+            $$"""
             ls "$(
-                eval "${'$'}__bp_old_options"
+                eval "$__bp_old_options"
                 printf "%s" "-all"
             )" "$(
-                eval "${'$'}__bp_old_options"
+                eval "$__bp_old_options"
                 printf "."
                 exit 1
             )"
 
             """.trimIndent(), script
         ).assertRenderProduces({ it.contains("bin") })
+    }
+
+    @Test
+    fun getBast_looseShellstring_twoInOneLine_withEscapedDoubleQuote_works() {
+        val script = """
+            b(printf "%s" ) + l$(printf "%s" "") + b( ) + "\"" + b( ) + l$(printf "%s" "")
+            """.trimIndent().createRender()
+        assertRenderEquals(
+            $$"""
+            printf "%s" "$(
+                eval "$__bp_old_options"
+                printf "%s" ""
+            )" "\"" "$(
+                eval "$__bp_old_options"
+                printf "%s" ""
+            )"
+
+            """.trimIndent(), script
+        ).assertRenderProduces("\"\n")
     }
 
     @Test
