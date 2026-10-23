@@ -7,6 +7,7 @@ import com.github.ajalt.clikt.core.CliktCommand
 import com.github.ajalt.clikt.core.CliktError
 import com.github.ajalt.clikt.core.PrintHelpMessage
 import com.github.ajalt.clikt.core.main
+import com.github.ajalt.clikt.core.terminal
 import com.github.ajalt.clikt.parameters.arguments.argument
 import com.github.ajalt.clikt.parameters.arguments.optional
 import com.github.ajalt.clikt.parameters.options.counted
@@ -104,9 +105,11 @@ class Main : CliktCommand() {
         }
         val bastRoot: BastNode = _getBast(script.byteInputStream())
         val bash: String = LinuxProcess.shfmt(bastRoot.render(RenderOptions.UNQUOTED))
+        // preserves source whitespace while keeping Clikt's configured terminal (and its test capture)
+        val terminalPrint = { x: String -> currentContext.terminal.rawPrint(x) }
         if (!commandMode()) {
             logger.debug("Writing to STDOUT in regular (non-command) mode")
-            echo(SHEBANG_HEADER + bash, false)
+            terminalPrint(SHEBANG_HEADER + bash)
         } else {
             logger.debug("Executing compiled command mode script")
             val commandResults = LinuxProcess(bash).run()
@@ -114,7 +117,7 @@ class Main : CliktCommand() {
                 "Compile failed with return code ${commandResults.second} and text:\n${commandResults.first}"
             }
             logger.trace("Writing to STDOUT in command mode")
-            echo(commandResults.first)
+            terminalPrint(commandResults.first)
         }
 
         endProgram()

@@ -13,10 +13,11 @@ class LinuxProcess(val command: String) {
         /** Shell script success (0), all other numbers are errors.  Generally 1-255. */
         const val SCRIPT_SUCCESS = 0
         const val SCRIPT_ERROR__GENERIC = 1
+        val systemPaths = System.getenv("PATH").orEmpty().split(File.pathSeparator)
         val brewBinPaths = listOf("/home/linuxbrew/.linuxbrew/bin", "/opt/homebrew/bin", "/usr/local/bin")
 
         fun shfmt(unformattedBash: String): String {
-            val pathDirectories = System.getenv("PATH").orEmpty().split(File.pathSeparator) + brewBinPaths
+            val pathDirectories = systemPaths + brewBinPaths
             val shfmtAbsolutePath = pathDirectories
                 .asSequence()
                 .map { File(it, "shfmt") }

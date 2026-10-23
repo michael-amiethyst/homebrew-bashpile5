@@ -2,10 +2,12 @@ package org.bashpile.core.maintests
 
 import org.antlr.v4.runtime.misc.ParseCancellationException
 import org.bashpile.core.LinuxProcess
+import org.bashpile.core.LinuxProcess.Companion.brewBinPaths
 import org.bashpile.core.bast.expressions.CaseBastNode
 import org.bashpile.core.engine.RenderOptions.Companion.UNQUOTED
 import org.bashpile.core.runCommand
 import org.junit.jupiter.api.assertThrows
+import java.io.File
 import kotlin.io.path.Path
 import kotlin.io.path.readText
 import kotlin.test.Test
@@ -15,6 +17,21 @@ import kotlin.test.assertFailsWith
 class SwitchMainTest : MainTest() {
     override val testName = "SwitchTest"
     val bpsScriptsDir = "src/test/resources/bpsScripts"
+
+    /**
+     * Get Homebrew's GNU getopt executable
+     */
+    private fun getoptPath(): String {
+        return (brewBinPaths + "/opt/homebrew/opt/gnu-getopt/bin" + LinuxProcess.systemPaths)
+            .asSequence()
+            .map {
+                print("$it/getopt\n")
+                File(it, "getopt")
+            }
+            .firstOrNull { it.isFile && it.canExecute() }
+            ?.absolutePath
+            ?: error("getopt not found in PATH or known Homebrew directories")
+    }
 
     @Test
     fun bashSwitch_worksAsExpected() {
@@ -46,9 +63,10 @@ class SwitchMainTest : MainTest() {
     @Test
     fun bashArguments_withGetopt_worksAsExpected() {
         val bashScript = $$"""
-            VALID_ARGS=$(getopt -o abg:d: --long alpha,beta,gamma:,delta: -- "$@")
+            VALID_ARGS=$($${getoptPath()} -o abg:d: --long alpha,beta,gamma:,delta: -- "$@")
             if [[ $? -ne 0 ]]; then
-                exit 1;
+                printf "getopt option parsing failed"
+                exit 1
             fi
 
             eval set -- "$VALID_ARGS"
