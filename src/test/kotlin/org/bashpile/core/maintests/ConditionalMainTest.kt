@@ -255,12 +255,13 @@ class ConditionalMainTest : MainTest() {
             else:
                 print("Not Equal\n")
             """.trimIndent().createRender()
-        assertRenderEquals("""
+        assertRenderEquals(
+            $$"""
             declare name
             name=""
             declare input1
             input1="value"
-            if [ "value" == "${'$'}{name}value" ] && [ "${'$'}{input1}" == "$(printf "value")" ]; then
+            if [ "value" == "${name}value" ] && [ "${input1}" == "$(printf "value" 2>/dev/null)" ]; then
                 printf "Equal\n"
             else
                 printf "Not Equal\n"
@@ -301,7 +302,7 @@ class ConditionalMainTest : MainTest() {
                 print("Not Equal\n")
             """.trimIndent().createRender()
         assertRenderEquals("""
-            if [ "value" == "$(ls)" ]; then
+            if [ "value" == "$(ls 2>/dev/null)" ]; then
                 printf "Equal\n"
             else
                 printf "Not Equal\n"
@@ -766,7 +767,7 @@ class ConditionalMainTest : MainTest() {
         assertRenderEquals("""
             declare a
             a=1
-            if [ $(($(printf "11") - a)) -eq 10 ]; then
+            if [ $(($(printf "11" 2>/dev/null) - a)) -eq 10 ]; then
                 printf "It tracks\n"
             else
                 printf "Lame\n"
@@ -774,5 +775,17 @@ class ConditionalMainTest : MainTest() {
             
             """.trimIndent(), renderedBash
         ).assertRenderProduces("It tracks\n")
+    }
+
+    @Test
+    fun ifElseStatement_withTypeCastSubtractionAndEquals_suppressesShellStringStderr() {
+        val renderedBash = """
+            a: integer = 1
+            if ($(printf "11"; printf "STDERR_LEAK\\n" >&2 2>/dev/null) as integer - a == 10):
+                print("It tracks\n")
+            else:
+                print("Lame\n")
+            """.trimIndent().createRender()
+        renderedBash.assertRenderProduces("It tracks\n")
     }
 }
