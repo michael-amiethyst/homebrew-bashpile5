@@ -14,7 +14,7 @@ class ShellLineBastNode(children: List<BastNode> = listOf()) : StatementBastNode
     constructor(contents: String) : this(TerminalBastNode(contents, TypeEnum.UNKNOWN).asList())
 
     override fun render(options: RenderOptions): String {
-        val childRenders = children.map { it.render(RenderOptions.UNQUOTED) }.joinToString("")
+        val childRenders = children.map { it.render(options.unquoted()) }.joinToString("")
         return childRenders.trim() + "\n"
     }
 

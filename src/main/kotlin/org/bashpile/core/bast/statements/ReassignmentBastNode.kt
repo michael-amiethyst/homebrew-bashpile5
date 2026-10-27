@@ -21,8 +21,8 @@ class ReassignmentBastNode(id: String, child: BastNode, comments: List<BastNode>
         }
 
         // body
-        val childRender = children[0].render(RenderOptions.QUOTED)
-        val commentRenders = comments.map { it.render(RenderOptions.QUOTED) }
+        val childRender = children[0].render(options.quoted())
+        val commentRenders = comments.map { it.render(options.quoted()) }
             .joinToString(" ", " ").ifBlank { "" }
         return """
             $id=$childRender$commentRenders

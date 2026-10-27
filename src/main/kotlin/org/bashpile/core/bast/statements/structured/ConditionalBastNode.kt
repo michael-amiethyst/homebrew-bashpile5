@@ -4,8 +4,6 @@ import org.bashpile.core.Main.Companion.callStack
 import org.bashpile.core.bast.BastNode
 import org.bashpile.core.bast.statements.StatementBastNode
 import org.bashpile.core.engine.RenderOptions
-import org.bashpile.core.engine.RenderOptions.Companion.IGNORE_OUTPUT
-import org.bashpile.core.engine.RenderOptions.Companion.UNQUOTED
 
 /** If-elseif-else */
 class ConditionalBastNode(
@@ -22,7 +20,7 @@ class ConditionalBastNode(
         val renderedIfBody = callStack.use { stack ->
             stack.pushStackframe()
             ifClause.body.joinToString("\n") { statement ->
-                statement.render(UNQUOTED).trimEnd()
+                statement.render(options.unquoted()).trimEnd()
             }
         }
         val renderedComments = if (comments.isNotEmpty()) {
@@ -37,7 +35,7 @@ class ConditionalBastNode(
             val renderedStatements = callStack.use { stack ->
                 stack.pushStackframe()
                 elseBody.joinToString("\n") {
-                    statement -> statement.render(UNQUOTED).trimEnd()
+                    statement -> statement.render(options.unquoted()).trimEnd()
                 }
             }
 
@@ -50,18 +48,18 @@ class ConditionalBastNode(
         val renderedElseIfBodies = elseIfClauses.joinToString("") { elseIf ->
             callStack.use { stack ->
                 stack.pushStackframe()
-                val condition = elseIf.condition.render(IGNORE_OUTPUT)
+                val condition = elseIf.condition.render(options.ignoreOutput())
                 val comments = elseIf.comments
-                    .joinToString(" ") { it.render(UNQUOTED) }
+                    .joinToString(" ") { it.render(options.unquoted()) }
                     .let { if (it.isBlank()) "" else " $it" }
                 val body = elseIf.body.joinToString("\n") { statement ->
-                    statement.render(UNQUOTED).trimEnd()
+                    statement.render(options.unquoted()).trimEnd()
                 }
 
                 "\nelif $condition; then$comments\n$body"
             }
         }
-        return "if ${ifClause.condition.render(IGNORE_OUTPUT)}; then$renderedComments\n" +
+        return "if ${ifClause.condition.render(options.ignoreOutput())}; then$renderedComments\n" +
                 "$renderedIfBody$renderedElseIfBodies$renderedElseBody\n" +
                 "fi\n"
     }

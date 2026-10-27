@@ -65,7 +65,7 @@ abstract class BastNode(
 
     /** Produces syntactically valid Bash for this subtree.  Does not handle whitespace formatting. */
     open fun render(options: RenderOptions): String {
-        return children.joinToString("") { it.render(RenderOptions.UNQUOTED) }
+        return children.joinToString("") { it.render(options.unquoted()) }
     }
 
     fun deepCopy(): BastNode {

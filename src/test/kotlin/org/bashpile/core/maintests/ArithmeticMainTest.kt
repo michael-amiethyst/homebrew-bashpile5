@@ -85,12 +85,13 @@ class ArithmeticMainTest : MainTest() {
                 four: string = "4"
                 i: integer = 6 / four as integer
                 print(i)""".trimIndent().createRender()
-        assertRenderEquals("""
+        assertRenderEquals(
+            $$"""
                 declare four
                 four="4"
                 declare i
                 i=$((6 / four))
-                printf "%s" "${'$'}{i}"
+                printf "%s" "${i}"
 
             """.trimIndent(), render
         )
@@ -103,12 +104,13 @@ class ArithmeticMainTest : MainTest() {
                 four: string = "4"
                 i: float = 6 / four as float
                 print(i)""".trimIndent().createRender()
-        assertRenderEquals("""
+        assertRenderEquals(
+            $$"""
                 declare four
                 four="4"
                 declare i
-                i="$(bc -l <<<"6 / ${'$'}{four}")"
-                printf "%s" "${'$'}{i}"
+                i="$(bc -l <<<"6 / ${four}")"
+                printf "%s" "${i}"
 
             """.trimIndent(), render
         )

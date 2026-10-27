@@ -62,7 +62,7 @@ class ForeachFileLineLoopBastNode(
                 }.joinToString(prefix = "    # loop variables (Bashpile generated)\n    ", separator = " ", postfix = "\n")
             } else { "" }
             val childRenderList = children.map { child ->
-                child.render(RenderOptions.UNQUOTED).lines().filter { it.isNotBlank() }
+                child.render(options.unquoted()).lines().filter { it.isNotBlank() }
                     .joinToString("\n", postfix = "\n") { "    $it" }
             }
             val childRenders = childRenderList.joinToString("").removeSuffix("\n")
