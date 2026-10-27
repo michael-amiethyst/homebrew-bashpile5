@@ -7,7 +7,6 @@ import org.bashpile.core.engine.RenderOptions
 class StringConcatenationBastNode(children: List<BastNode>)
     : BastNode(children.toMutableList(), majorType = STRING)
 {
-    // TODO check if other option overrides should be modifications instead
     override fun render(options: RenderOptions): String {
         val containsRawBash = children.any { child ->
             child.toList().any { it is RawBashBastNode }

@@ -21,13 +21,13 @@ class VariableDeclarationBastNode(
 ) : StatementBastNode(child.toList(), id, type, comments = comments)
 {
     override fun render(options: RenderOptions): String {
-        Main.Companion.callStack.addVariableInfo(id!!, majorType(), subtype, readonly)
+        Main.callStack.addVariableInfo(id!!, majorType(), subtype, readonly)
         var exportFlags = ""
         if (export) { exportFlags += "x" }
         val flags = if (exportFlags.isNotEmpty()) "-$exportFlags " else ""
         val childRender = children[0].render(options.quoted())
         val commentRenders = comments
-            .map { it.render(RenderOptions.UNQUOTED) }.joinToString(" ", " ").ifBlank { "" }
+            .map { it.render(options.unquoted()) }.joinToString(" ", " ").ifBlank { "" }
         return """
             declare $flags$id$commentRenders
             $id=$childRender

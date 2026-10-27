@@ -3,7 +3,6 @@ package org.bashpile.core.bast.statements
 import org.bashpile.core.bast.BastNode
 import org.bashpile.core.bast.expressions.VariableReferenceBastNode
 import org.bashpile.core.engine.RenderOptions
-import org.bashpile.core.engine.RenderOptions.Companion.UNQUOTED
 import org.bashpile.core.engine.TypeEnum.*
 
 /** This is a Print Statement node */
@@ -16,7 +15,7 @@ class PrintBastNode(children: List<BastNode> = listOf(), comments: List<BastNode
     override fun render(options: RenderOptions): String {
         val printfArguments = mutableListOf<String>()
         val childRenders = children.map {
-            val render = it.render(UNQUOTED)
+            val render = it.render(options.unquoted())
             val notNumeric = !immediateImportantDescendants().areNumbers()
             if (it !is VariableReferenceBastNode && notNumeric) {
                 render
@@ -28,7 +27,7 @@ class PrintBastNode(children: List<BastNode> = listOf(), comments: List<BastNode
         }.joinToString("")
 
         val renderedArguments = printfArguments.joinToString("") { " \"$it\"" }
-        val renderedComments = this.comments.map { it.render(UNQUOTED) }
+        val renderedComments = this.comments.map { it.render(options.unquoted()) }
             .joinToString(" ", " ").ifBlank { "" }
         return "printf \"$childRenders\"$renderedArguments$renderedComments\n"
     }

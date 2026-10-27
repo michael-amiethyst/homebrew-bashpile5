@@ -24,7 +24,7 @@ open class ShellStringBastNode(children: List<BastNode> = listOf(), majorType: T
             // ignoring output, so subshell instead of actual command substitution, with $(command) syntax, is fine
             "($childRenders) >/dev/null 2>&1"
         } else { "$($childRenders)" }
-        return if (options.quoted) { "\"$subshell\"" } else { subshell }
+        return if (options.quoted && !options.ignoreOutput) { "\"$subshell\"" } else { subshell }
     }
 
     override fun replaceChildren(nextChildren: List<BastNode>): ShellStringBastNode {
