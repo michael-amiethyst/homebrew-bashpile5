@@ -80,11 +80,11 @@ class ShellStringMainTest : MainTest() {
     fun getBast_looseShellstring_works() {
         // loose unsets '-o pipefail' so `exit 1` is ignored
         val script = "b(ls ) + l$(printf \".\"; exit 1)".createRender()
-        assertRenderEquals("""
+        assertRenderEquals($$"""
             ls "$(
-                eval "${'$'}__bp_old_options"
-                printf "."
-                exit 1
+              eval "$__bp_old_options"
+              printf "."
+              exit 1
             )"
             
             """.trimIndent(), script
@@ -93,17 +93,17 @@ class ShellStringMainTest : MainTest() {
 
     @Test
     fun getBast_looseShellstring_looseIsScoped() {
-        val script = """
+        val script = $$"""
             b(ls ) + l$(printf "."; exit 1)
-            printf "%s" "${'$'}undefinedVar"
+            printf "%s" "$undefinedVar"
             """.trimIndent().createRender()
-        assertRenderEquals("""
+        assertRenderEquals($$"""
             ls "$(
-                eval "${'$'}__bp_old_options"
-                printf "."
-                exit 1
+              eval "$__bp_old_options"
+              printf "."
+              exit 1
             )"
-            printf "%s" "${'$'}undefinedVar"
+            printf "%s" "$undefinedVar"
             
             """.trimIndent(), script
         ).assertRenderProduces({ it.contains("bin") }, SCRIPT_ERROR__GENERIC)
@@ -117,12 +117,12 @@ class ShellStringMainTest : MainTest() {
         assertRenderEquals(
             $$"""
             ls "$(
-                eval "$__bp_old_options"
-                printf "%s" "-all"
+              eval "$__bp_old_options"
+              printf "%s" "-all"
             )" "$(
-                eval "$__bp_old_options"
-                printf "."
-                exit 1
+              eval "$__bp_old_options"
+              printf "."
+              exit 1
             )"
 
             """.trimIndent(), script
@@ -137,11 +137,11 @@ class ShellStringMainTest : MainTest() {
         assertRenderEquals(
             $$"""
             printf "%s" "$(
-                eval "$__bp_old_options"
-                printf "%s" ""
+              eval "$__bp_old_options"
+              printf "%s" ""
             )" "\"" "$(
-                eval "$__bp_old_options"
-                printf "%s" ""
+              eval "$__bp_old_options"
+              printf "%s" ""
             )"
 
             """.trimIndent(), script
@@ -162,10 +162,10 @@ class ShellStringMainTest : MainTest() {
     fun getBast_shellstring_nestedSubshells_works() {
         val script = """
             print($(ls "$(printf '.')"))""".trim().createRender()
-        assertRenderEquals("""
+        assertRenderEquals($$"""
             declare __bp_var0
             __bp_var0="$(printf '.')"
-            printf "$(ls "${'$'}{__bp_var0}")"
+            printf "$(ls "${__bp_var0}")"
             """.trimIndent() + "\n", script
         )
 
@@ -181,8 +181,8 @@ class ShellStringMainTest : MainTest() {
             set -euo pipefail
             declare __bp_var0
             __bp_var0="$(
-                echo '.'
-                exit $$SCRIPT_ERROR__GENERIC
+              echo '.'
+              exit $$SCRIPT_ERROR__GENERIC
             )"
             printf "$(ls "${__bp_var0}")"
             """.trimIndent() + "\n", script

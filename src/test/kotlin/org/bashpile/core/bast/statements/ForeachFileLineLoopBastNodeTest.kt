@@ -27,8 +27,8 @@ class ForeachFileLineLoopBastNodeTest {
         assertEquals(
             """
             cat "file.csv" | $sed -e 's/\r\n/\n/g' | $sed -ze '/\n$/!s/$/\n$/g' | while IFS='' read -r col1; do
-                # body
-                printf "%s" "${'$'}{col1}"
+              # body
+              printf "%s" "${'$'}{col1}"
             done
 
         """.trimIndent(), LinuxProcess.shfmt(fixture.render(UNQUOTED)))
@@ -44,9 +44,9 @@ class ForeachFileLineLoopBastNodeTest {
         assertEquals(
             """
             cat "file.csv" | $sed -e 's/\r\n/\n/g' | $sed -ze '/\n$/!s/$/\n$/g' | while IFS='' read -r col1; do
-                # body
-                declare col1
-                col1="exampleValue"
+              # body
+              declare col1
+              col1="exampleValue"
             done
 
         """.trimIndent(), LinuxProcess.shfmt(fixture.render(UNQUOTED)))

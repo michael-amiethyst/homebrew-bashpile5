@@ -166,9 +166,9 @@ class SwitchMainTest : MainTest() {
             declare name
             name="Riker"
             case "${'$'}{name}" in
-                Riker)
-                    printf "Number 1"
-                    ;;
+              Riker)
+                printf "Number 1"
+                ;;
             esac
             
         """.trimIndent(), render).runCommand().assertRenderProduces("Number 1\n")
@@ -182,12 +182,12 @@ class SwitchMainTest : MainTest() {
             declare name
             name="Riker"
             case "${'$'}{name}" in
-                Riker)
-                    printf "Number 1"
-                    ;;
-                Picard)
-                    printf "The Captain"
-                    ;;
+              Riker)
+                printf "Number 1"
+                ;;
+              Picard)
+                printf "The Captain"
+                ;;
             esac
             
         """.trimIndent(), render).runCommand().assertRenderProduces("Number 1\n")
@@ -209,16 +209,16 @@ class SwitchMainTest : MainTest() {
             declare five
             five=5
             if [ 4 -lt "${'$'}{five}" ]; then
-                declare name
-                name="Riker"
-                case "${'$'}{name}" in
-                    Riker)
-                        printf "Number 1"
-                        ;;
-                    Picard)
-                        printf "The Captain"
-                        ;;
-                esac
+              declare name
+              name="Riker"
+              case "${'$'}{name}" in
+                Riker)
+                  printf "Number 1"
+                  ;;
+                Picard)
+                  printf "The Captain"
+                  ;;
+              esac
             fi
             
         """.trimIndent(), render).runCommand().assertRenderProduces("Number 1\n")
@@ -239,13 +239,13 @@ class SwitchMainTest : MainTest() {
             declare name
             name="Riker"
             case "${'$'}{name}" in
-                Riker)
-                    printf "Number 1\n"
-                    printf "Trombone player\n"
-                    ;;
-                Picard)
-                    printf "The Captain"
-                    ;;
+              Riker)
+                printf "Number 1\n"
+                printf "Trombone player\n"
+                ;;
+              Picard)
+                printf "The Captain"
+                ;;
             esac
             
         """.trimIndent(), render).runCommand().assertRenderProduces("Number 1\nTrombone player\n")
@@ -258,12 +258,12 @@ class SwitchMainTest : MainTest() {
             declare starbaseNumber
             starbaseNumber=1
             case "${'$'}{starbaseNumber}" in
-                1)
-                    printf "Earth\n"
-                    ;;
-                80)
-                    printf "The Lower Decks one\n"
-                    ;;
+              1)
+                printf "Earth\n"
+                ;;
+              80)
+                printf "The Lower Decks one\n"
+                ;;
             esac
             
         """.trimIndent(), render).runCommand().assertRenderProduces("Earth\n")
@@ -284,13 +284,13 @@ class SwitchMainTest : MainTest() {
             declare starbaseNumber
             starbaseNumber=1.0
             case "${'$'}{starbaseNumber}" in
-                1.0)
-                    printf "Earth"
-                    printf ", the first one"
-                    ;;
-                80.0)
-                    printf "The Lower Decks one\n"
-                    ;;
+              1.0)
+                printf "Earth"
+                printf ", the first one"
+                ;;
+              80.0)
+                printf "The Lower Decks one\n"
+                ;;
             esac
             
         """.trimIndent(), render).runCommand().assertRenderProduces("Earth, the first one\n")
@@ -303,13 +303,13 @@ class SwitchMainTest : MainTest() {
             declare starbaseNumber
             starbaseNumber=1.0
             case "${'$'}{starbaseNumber}" in
-                [1][.][0-1])
-                    printf "Earth"
-                    printf ", the first one"
-                    ;;
-                80.0)
-                    printf "The Lower Decks one\n"
-                    ;;
+              [1][.][0-1])
+                printf "Earth"
+                printf ", the first one"
+                ;;
+              80.0)
+                printf "The Lower Decks one\n"
+                ;;
             esac
             
         """.trimIndent(), render).runCommand().assertRenderProduces("Earth, the first one\n")
@@ -329,13 +329,13 @@ class SwitchMainTest : MainTest() {
             declare starbaseNumber
             starbaseNumber=1.0
             case "${'$'}{starbaseNumber}" in
-                1.[0-1])
-                    printf "Earth"
-                    printf ", the first one"
-                    ;;
-                80.0)
-                    printf "The Lower Decks one\n"
-                    ;;
+              1.[0-1])
+                printf "Earth"
+                printf ", the first one"
+                ;;
+              80.0)
+                printf "The Lower Decks one\n"
+                ;;
             esac
             
         """.trimIndent(), render).runCommand().assertRenderProduces("Earth, the first one\n")
@@ -355,13 +355,13 @@ class SwitchMainTest : MainTest() {
             declare starbaseNumber
             starbaseNumber=1.0
             case "${'$'}{starbaseNumber}" in
-                1*)
-                    printf "Earth"
-                    printf ", the first one"
-                    ;;
-                80.0)
-                    printf "The Lower Decks one\n"
-                    ;;
+              1*)
+                printf "Earth"
+                printf ", the first one"
+                ;;
+              80.0)
+                printf "The Lower Decks one\n"
+                ;;
             esac
             
         """.trimIndent(), render).runCommand().assertRenderProduces("Earth, the first one\n")
@@ -381,13 +381,13 @@ class SwitchMainTest : MainTest() {
             declare starbaseNumber
             starbaseNumber=1.0
             case "${'$'}{starbaseNumber}" in
-                1?0)
-                    printf "Earth"
-                    printf ", the first one"
-                    ;;
-                80.0)
-                    printf "The Lower Decks one\n"
-                    ;;
+              1?0)
+                printf "Earth"
+                printf ", the first one"
+                ;;
+              80.0)
+                printf "The Lower Decks one\n"
+                ;;
             esac
             
         """.trimIndent(), render).runCommand().assertRenderProduces("Earth, the first one\n")
@@ -407,13 +407,13 @@ class SwitchMainTest : MainTest() {
             declare starbaseNumber
             starbaseNumber="1.0:"
             case "${'$'}{starbaseNumber}" in
-                1.[0-1]\:)
-                    printf "Earth"
-                    printf ", the first one"
-                    ;;
-                80.0)
-                    printf "The Lower Decks one\n"
-                    ;;
+              1.[0-1]\:)
+                printf "Earth"
+                printf ", the first one"
+                ;;
+              80.0)
+                printf "The Lower Decks one\n"
+                ;;
             esac
             
         """.trimIndent(), render).runCommand().assertRenderProduces("Earth, the first one\n")
@@ -433,13 +433,13 @@ class SwitchMainTest : MainTest() {
             declare starbaseNumber
             starbaseNumber="1.2"
             case "${'$'}{starbaseNumber}" in
-                1.[0-1]\: | 1.2)
-                    printf "Earth"
-                    printf ", the first one"
-                    ;;
-                80.0)
-                    printf "The Lower Decks one\n"
-                    ;;
+              1.[0-1]\: | 1.2)
+                printf "Earth"
+                printf ", the first one"
+                ;;
+              80.0)
+                printf "The Lower Decks one\n"
+                ;;
             esac
             
         """.trimIndent(), render).runCommand().assertRenderProduces("Earth, the first one\n")
@@ -459,13 +459,13 @@ class SwitchMainTest : MainTest() {
             declare starbaseNumber
             starbaseNumber="1.0:"
             case "${'$'}{starbaseNumber}" in
-                1.[!2-9]\: | 1.2)
-                    printf "Earth"
-                    printf ", the first one"
-                    ;;
-                80.0)
-                    printf "The Lower Decks one\n"
-                    ;;
+              1.[!2-9]\: | 1.2)
+                printf "Earth"
+                printf ", the first one"
+                ;;
+              80.0)
+                printf "The Lower Decks one\n"
+                ;;
             esac
             
         """.trimIndent(), render).runCommand().assertRenderProduces("Earth, the first one\n")
@@ -490,19 +490,19 @@ class SwitchMainTest : MainTest() {
             declare name # We wanted to see if colon and pipe worked
             name="La Forge:|"
             case "${'$'}{name}" in
-                Riker)
-                    printf "Number 1\n" # new lines needed
-                    printf "Trombone player\n"
-                    ;;
-                Picard)
-                    printf "The Captain"
-                    ;;
-                La\ For[!a]?\:\|)
-                    printf "Chief Engineer" # this prints
-                    ;;
-                *)
-                    printf "Other"
-                    ;;
+              Riker)
+                printf "Number 1\n" # new lines needed
+                printf "Trombone player\n"
+                ;;
+              Picard)
+                printf "The Captain"
+                ;;
+              La\ For[!a]?\:\|)
+                printf "Chief Engineer" # this prints
+                ;;
+              *)
+                printf "Other"
+                ;;
             esac
             
         """.trimIndent(), render).runCommand().assertRenderProduces("Chief Engineer\n")
@@ -525,16 +525,16 @@ class SwitchMainTest : MainTest() {
             declare name
             name="La Forge"
             case "${'$'}{name}" in
-                Riker)
-                    printf "Number 1\n"
-                    printf "Trombone player\n"
-                    ;;
-                Picard)
-                    printf "The Captain"
-                    ;;
-                *)
-                    printf "Other crew\n"
-                    ;;
+              Riker)
+                printf "Number 1\n"
+                printf "Trombone player\n"
+                ;;
+              Picard)
+                printf "The Captain"
+                ;;
+              *)
+                printf "Other crew\n"
+                ;;
             esac
             
         """.trimIndent(), render).runCommand().assertRenderProduces("Other crew\n")
@@ -557,16 +557,16 @@ class SwitchMainTest : MainTest() {
             declare name # A cool actor // did Reading Rainbow too
             name="La Forge"
             case "${'$'}{name}" in
-                Riker)
-                    printf "Number 1\n"
-                    printf "Trombone player\n"
-                    ;;
-                Picard)
-                    printf "The Captain"
-                    ;;
-                *)
-                    printf "Other crew\n"
-                    ;;
+              Riker)
+                printf "Number 1\n"
+                printf "Trombone player\n"
+                ;;
+              Picard)
+                printf "The Captain"
+                ;;
+              *)
+                printf "Other crew\n"
+                ;;
             esac
             
         """.trimIndent(), render).runCommand().assertRenderProduces("Other crew\n")
@@ -590,18 +590,18 @@ class SwitchMainTest : MainTest() {
             declare name
             name="La Forge"
             case "${name}" in # which // crew
-                Riker)
-                    # Jonathan Frakes
-                    printf "Number 1\n"
-                    printf "Trombone player\n"
-                    ;;
-                Picard)
-                    printf "The Captain"
-                    ;;
-                *)
-                    # Lower Decks
-                    printf "Other crew\n"
-                    ;;
+              Riker)
+                # Jonathan Frakes
+                printf "Number 1\n"
+                printf "Trombone player\n"
+                ;;
+              Picard)
+                printf "The Captain"
+                ;;
+              *)
+                # Lower Decks
+                printf "Other crew\n"
+                ;;
             esac
             
         """.trimIndent(), render).runCommand().assertRenderProduces("Other crew\n")

@@ -69,8 +69,8 @@ class FinishedBastFactoryTest {
         assertEquals("""
             declare __bp_var0
             __bp_var0="$(
-                echo '.'
-                exit $SCRIPT_ERROR__GENERIC
+              echo '.'
+              exit $SCRIPT_ERROR__GENERIC
             )"
             printf "$(ls ${'$'}{__bp_var0})"
             
@@ -104,8 +104,8 @@ class FinishedBastFactoryTest {
             set -euo pipefail
             declare __bp_var0
             __bp_var0="$(
-                echo '.'
-                exit $SCRIPT_ERROR__GENERIC
+              echo '.'
+              exit $SCRIPT_ERROR__GENERIC
             )"
             printf "$(ls ${'$'}{__bp_var0})"
             

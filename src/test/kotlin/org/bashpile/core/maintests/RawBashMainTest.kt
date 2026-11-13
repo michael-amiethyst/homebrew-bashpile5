@@ -33,8 +33,8 @@ class RawBashMainTest : MainTest() {
             """.trimIndent().createRender()
         assertRenderEquals($$"""
             true && (
-                export HELLO="Hello World"
-                printf "%s" "$HELLO"
+              export HELLO="Hello World"
+              printf "%s" "$HELLO"
             )
             set +u
             printf "%s" "$HELLO"

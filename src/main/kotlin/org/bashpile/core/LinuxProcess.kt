@@ -27,7 +27,7 @@ class LinuxProcess(val command: String) {
 
             // run command
             val (processOutput, exitValue) =
-                LinuxProcess($$"$$shfmtAbsolutePath -ln bash -i 4 -ci -").run(stdin = unformattedBash)
+                LinuxProcess($$"$$shfmtAbsolutePath -ln bash -i 2 -ci -").run(stdin = unformattedBash)
             check(exitValue == SCRIPT_SUCCESS) {
                 "shfmt exited with code ${exitValue}:\n$processOutput"
             }
