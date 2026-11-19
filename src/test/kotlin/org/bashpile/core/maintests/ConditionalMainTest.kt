@@ -28,10 +28,10 @@ class ConditionalMainTest : MainTest() {
                 print("Math is mathing! ")
                 print("Math is mathing!\n")
             """.trimIndent().createRender()
-        assertRenderEquals("""
+        assertRenderEquals($$"""
             declare zero
             zero=0
-            if [ 1 -gt "${'$'}{zero}" ]; then
+            if [ 1 -gt "${zero}" ]; then
               printf "Math is mathing! "
               printf "Math is mathing!\n"
             fi
@@ -48,10 +48,10 @@ class ConditionalMainTest : MainTest() {
               print("Math is mathing! ")
               print("Math is mathing!\n")
             """.trimIndent().createRender()
-        assertRenderEquals("""
+        assertRenderEquals($$"""
             declare zero
             zero=0
-            if [ 1 -gt "${'$'}{zero}" ]; then
+            if [ 1 -gt "${zero}" ]; then
               printf "Math is mathing! "
               printf "Math is mathing!\n"
             fi
@@ -68,10 +68,10 @@ class ConditionalMainTest : MainTest() {
                 print("Math is mathing! ")
                 print("Math is mathing!\n")
             """.trimIndent().createRender()
-        assertRenderEquals("""
+        assertRenderEquals($$"""
             declare zero
             zero=0
-            if [ 1 -gt "${'$'}{zero}" ]; then # just a quick comment test
+            if [ 1 -gt "${zero}" ]; then # just a quick comment test
               printf "Math is mathing! "
               printf "Math is mathing!\n"
             fi
@@ -89,10 +89,10 @@ class ConditionalMainTest : MainTest() {
             else:
                 print("Not empty\n")
             """.trimIndent().createRender()
-        assertRenderEquals("""
+        assertRenderEquals($$"""
             declare name
             name=""
-            if [ -z "${'$'}{name}" ]; then
+            if [ -z "${name}" ]; then
               printf "Empty\n"
             else
               printf "Not empty\n"
@@ -138,10 +138,10 @@ class ConditionalMainTest : MainTest() {
             else: // else full
                 print("Not empty\n")
             """.trimIndent().createRender()
-        assertRenderEquals("""
+        assertRenderEquals($$"""
             declare name
             name=""
-            if [ -z "${'$'}{name}" ]; then
+            if [ -z "${name}" ]; then
               printf "Empty\n"
             else # else full
               printf "Not empty\n"
@@ -160,10 +160,10 @@ class ConditionalMainTest : MainTest() {
             else:
                 print("Not empty\n")
             """.trimIndent().createRender()
-        assertRenderEquals("""
+        assertRenderEquals($$"""
             declare name
             name=""
-            if [ -z "${'$'}{name}notEmpty" ]; then
+            if [ -z "${name}notEmpty" ]; then
               printf "Empty\n"
             else
               printf "Not empty\n"
@@ -182,10 +182,10 @@ class ConditionalMainTest : MainTest() {
             else:
                 print("Empty\n")
             """.trimIndent().createRender()
-        assertRenderEquals("""
+        assertRenderEquals($$"""
             declare name
             name=""
-            if ! [ -z "${'$'}{name}value" ]; then
+            if ! [ -z "${name}value" ]; then
               printf "!Empty\n"
             else
               printf "Empty\n"
@@ -204,10 +204,10 @@ class ConditionalMainTest : MainTest() {
             else:
                 print("Not Equal\n")
             """.trimIndent().createRender()
-        assertRenderEquals("""
+        assertRenderEquals($$"""
             declare name
             name=""
-            if [ "value" == "${'$'}{name}value" ]; then
+            if [ "value" == "${name}value" ]; then
               printf "Equal\n"
             else
               printf "Not Equal\n"
@@ -250,12 +250,12 @@ class ConditionalMainTest : MainTest() {
             else:
                 print("Not Equal\n")
             """.trimIndent().createRender()
-        assertRenderEquals("""
+        assertRenderEquals($$"""
             declare name
             name=""
             declare input1
             input1="value"
-            if [ "value" == "${'$'}{name}value" ] && [ "${'$'}{input1}" == "value" ]; then
+            if [ "value" == "${name}value" ] && [ "${input1}" == "value" ]; then
               printf "Equal\n"
             else
               printf "Not Equal\n"
@@ -300,10 +300,10 @@ class ConditionalMainTest : MainTest() {
             else:
                 print("Not Equal\n")
             """.trimIndent().createRender()
-        assertRenderEquals("""
+        assertRenderEquals($$"""
             declare name
             name=""
-            if [ "value" == "${'$'}{name}value" ]; then
+            if [ "value" == "${name}value" ]; then
               printf "Equal\n"
             else
               printf "Not Equal\n"
@@ -341,10 +341,10 @@ class ConditionalMainTest : MainTest() {
             else:
                 print("Empty\n")
             """.trimIndent().createRender()
-        assertRenderEquals("""
+        assertRenderEquals($$"""
             declare name
             name="hello"
-            if [ -n "${'$'}{name}" ]; then
+            if [ -n "${name}" ]; then
               printf "Not empty\n"
             else
               printf "Empty\n"
@@ -366,12 +366,12 @@ class ConditionalMainTest : MainTest() {
             else:
                 print("Unknown\n")
             """.trimIndent().createRender()
-        assertRenderEquals("""
+        assertRenderEquals($$"""
             declare filename
-            filename="$filename"
-            if [ -e "${'$'}{filename}" ]; then
+            filename="$$filename"
+            if [ -e "${filename}" ]; then
               printf "File exists\n"
-            elif [ ! -e "${'$'}{filename}" ]; then
+            elif [ ! -e "${filename}" ]; then
               printf "File does not exist\n"
             else
               printf "Unknown\n"
@@ -393,12 +393,12 @@ class ConditionalMainTest : MainTest() {
             else:
                 print("Unknown\n")
             """.trimIndent().createRender()
-        assertRenderEquals("""
+        assertRenderEquals($$"""
             declare filename
-            filename="$filename"
-            if [ -e "${'$'}{filename}" ]; then
+            filename="$$filename"
+            if [ -e "${filename}" ]; then
               printf "File exists\n"
-            elif [ ! -e "${'$'}{filename}" ]; then
+            elif [ ! -e "${filename}" ]; then
               printf "File does not exist\n"
             else
               printf "Unknown\n"
@@ -420,12 +420,12 @@ class ConditionalMainTest : MainTest() {
             else:
                 print("Unknown\n")
             """.trimIndent().createRender()
-        assertRenderEquals("""
+        assertRenderEquals($$"""
             declare filename
-            filename="$filename"
-            if [ "${'$'}{filename}" == "$filename" ]; then
+            filename="$$filename"
+            if [ "${filename}" == "$$filename" ]; then
               printf "String compare works\n"
-            elif [ ! -e "${'$'}{filename}" ]; then
+            elif [ ! -e "${filename}" ]; then
               printf "Fail\n"
             else
               printf "Unknown\n"
@@ -448,12 +448,12 @@ class ConditionalMainTest : MainTest() {
             else:
                 print("Unknown\n")
             """.trimIndent().createRender()
-        assertRenderEquals("""
+        assertRenderEquals($$"""
             declare filename
-            filename="$filename"
-            if [ -e "${'$'}{filename}" ]; then
+            filename="$$filename"
+            if [ -e "${filename}" ]; then
               printf "File exists\n"
-            elif ! [ -e "${'$'}{filename}" ]; then
+            elif ! [ -e "${filename}" ]; then
               printf "File does not exist\n"
             else
               printf "Unknown\n"
@@ -476,12 +476,12 @@ class ConditionalMainTest : MainTest() {
             else:
                 print("Unknown\n")
             """.trimIndent().createRender()
-        assertRenderEquals("""
+        assertRenderEquals($$"""
             declare filename
-            filename="$filename"
-            if [ -e "${'$'}{filename}" ]; then
+            filename="$$filename"
+            if [ -e "${filename}" ]; then
               printf "File exists\n"
-            elif ! [ -e "${'$'}{filename}" ]; then
+            elif ! [ -e "${filename}" ]; then
               printf "File does not exist\n"
             else
               printf "Unknown\n"
@@ -504,12 +504,12 @@ class ConditionalMainTest : MainTest() {
             else:
                 print("Unknown\n")
             """.trimIndent().createRender()
-        assertRenderEquals("""
+        assertRenderEquals($$"""
             declare filename
-            filename="$filename"
-            if ! [ ! -e "${'$'}{filename}" ]; then
+            filename="$$filename"
+            if ! [ ! -e "${filename}" ]; then
               printf "File exists\n"
-            elif ! [ -e "${'$'}{filename}" ]; then
+            elif ! [ -e "${filename}" ]; then
               printf "File does not exist\n"
             else
               printf "Unknown\n"
@@ -529,10 +529,10 @@ class ConditionalMainTest : MainTest() {
                 print("Math is mathing! ")
                 print("Math is mathing!\n")
             """.trimIndent().createRender()
-        assertRenderEquals("""
+        assertRenderEquals($$"""
             declare zero
             zero=0
-            if [ 1 -lt "${'$'}{zero}" ]; then
+            if [ 1 -lt "${zero}" ]; then
               printf "Math is not mathing\n"
             else
               printf "Math is mathing! "
@@ -555,7 +555,7 @@ class ConditionalMainTest : MainTest() {
         assertRenderEquals("""
             if (
               expr 1 \> 0
-              exit ${SCRIPT_ERROR__GENERIC}
+              exit $SCRIPT_ERROR__GENERIC
             ) >/dev/null 2>&1; then
               printf "Math is mathing! "
               printf "Math is mathing!\n"
@@ -579,7 +579,7 @@ class ConditionalMainTest : MainTest() {
         assertRenderEquals("""
             if (
               expr 1 \> 0
-              exit ${SCRIPT_ERROR__GENERIC}
+              exit $SCRIPT_ERROR__GENERIC
             ) >/dev/null 2>&1; then
               printf "Math is mathing! "
               printf "Math is mathing!\n"
@@ -603,12 +603,12 @@ class ConditionalMainTest : MainTest() {
             else:
                 print("Zero is one???\n")
             """.trimIndent().createRender()
-        assertRenderEquals("""
+        assertRenderEquals($$"""
             declare zero
             zero=0
-            if [ 1 -lt "${'$'}{zero}" ]; then
+            if [ 1 -lt "${zero}" ]; then
               printf "Math is not mathing\n"
-            elif [ "${'$'}{zero}" -lt 1 ]; then
+            elif [ "${zero}" -lt 1 ]; then
               printf "Math is mathing! "
               printf "Math is mathing!\n"
             else
@@ -638,22 +638,23 @@ class ConditionalMainTest : MainTest() {
 
     @Test
     fun ifElseIfElseStatement_withShellStringInElseIf_works() {
-        val renderedBash = """
+        val renderedBash = $$"""
             zero: integer = 0
             if (1 < zero):
                 print("Math is not mathing\n")
-            else if ($(expr "${'$'}{zero}" \< 1)):
+            else if ($(expr "${zero}" \< 1)):
                 print("Math is mathing! ")
                 print("Math is mathing!\n")
             else:
                 print("Zero is one???\n")
             """.trimIndent().createRender()
-        assertRenderEquals("""
+        assertRenderEquals(
+            $$"""
             declare zero
             zero=0
-            if [ 1 -lt "${'$'}{zero}" ]; then
+            if [ 1 -lt "${zero}" ]; then
               printf "Math is not mathing\n"
-            elif (expr "${'$'}{zero}" \< 1) >/dev/null 2>&1; then
+            elif (expr "${zero}" \< 1) >/dev/null 2>&1; then
               printf "Math is mathing! "
               printf "Math is mathing!\n"
             else
@@ -673,10 +674,11 @@ class ConditionalMainTest : MainTest() {
             else:
                 print("Command failed\n")
             """.trimIndent().createRender()
-        assertRenderEquals("""
+        assertRenderEquals(
+            $$"""
             declare two
             two=2
-            if [ 1 -lt "${'$'}{two}" ] && [ "${'$'}{two}" -le 3 ]; then
+            if [ 1 -lt "${two}" ] && [ "${two}" -le 3 ]; then
               printf "Math is mathing!\n"
             else
               printf "Command failed\n"
@@ -695,10 +697,11 @@ class ConditionalMainTest : MainTest() {
             else:
                 print("Command failed\n")
             """.trimIndent().createRender()
-        assertRenderEquals("""
+        assertRenderEquals(
+            $$"""
             declare two
             two=2
-            if [ 1 -lt "${'$'}{two}" ] && [ "${'$'}{two}" -le 1 ] || (printf "1") >/dev/null 2>&1; then
+            if [ 1 -lt "${two}" ] && [ "${two}" -le 1 ] || (printf "1") >/dev/null 2>&1; then
               printf "Math is mathing!\n"
             else
               printf "Command failed\n"
@@ -736,10 +739,11 @@ class ConditionalMainTest : MainTest() {
             else:
                 print("Command failed\n")
             """.trimIndent().createRender()
-        assertRenderEquals("""
+        assertRenderEquals(
+            $$"""
             declare one
             one=1.0
-            if bc -l <<<"${'$'}{one} < 2.0" >/dev/null && bc -l <<<"2.0 <= ${'$'}{one}" >/dev/null || (bc <<<"2.0 < 3.0") >/dev/null 2>&1; then
+            if bc -l <<<"${one} < 2.0" >/dev/null && bc -l <<<"2.0 <= ${one}" >/dev/null || (bc <<<"2.0 < 3.0") >/dev/null 2>&1; then
               printf "Math is mathing!\n"
             else
               printf "Command failed\n"
@@ -760,12 +764,13 @@ class ConditionalMainTest : MainTest() {
             else:
                 print("Neither true\n")
             """.trimIndent().createRender()
-        assertRenderEquals("""
+        assertRenderEquals(
+            $$"""
             declare a
             a=true
-            if ${'$'}{a} && false; then
+            if ${a} && false; then
               printf "Both true\n"
-            elif ${'$'}{a} || false; then
+            elif ${a} || false; then
               printf "At least one true\n"
             else
               printf "Neither true\n"
