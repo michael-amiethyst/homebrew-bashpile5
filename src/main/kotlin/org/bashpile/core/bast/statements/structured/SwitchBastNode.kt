@@ -13,23 +13,24 @@ import org.bashpile.core.engine.RenderOptions
  * visible from sibling cases or after this switch. Declarations from the surrounding scope remain visible in every
  * case.
  */
-class SwitchBastNode(val matchOn: BastNode, val cases: List<BastNode>)
-    : StatementBastNode(listOf(matchOn) + cases)
+class SwitchBastNode(val matchOn: BastNode, val cases: List<BastNode>, val expressionComments: List<BastNode>)
+    : StatementBastNode(listOf(matchOn) + cases, comments = expressionComments)
 {
     override fun replaceChildren(nextChildren: List<BastNode>): BastNode {
-        return SwitchBastNode(matchOn.deepCopy(), cases.map { it.deepCopy() })
+        return SwitchBastNode(matchOn.deepCopy(), cases.map { it.deepCopy() }, comments)
     }
 
     override fun render(options: RenderOptions): String {
         val matchOnRender = matchOn.render(options)
-        val caseRenders = cases.joinToString("\n" + TAB.repeat(3)) { case ->
+        val commentsRender = expressionComments.joinToString(" ") { it.render(options) }
+        val caseRenders = cases.joinToString("\n") { case ->
             callStack.use { stack ->
                 stack.pushStackframe()
                 case.render(options)
             }
         }
         return """
-            case "$matchOnRender" in
+            case "$matchOnRender" in $commentsRender
             $caseRenders
             esac
             

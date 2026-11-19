@@ -2,8 +2,6 @@ package org.bashpile.core.bast.expressions
 
 import org.bashpile.core.bast.BastNode
 import org.bashpile.core.engine.RenderOptions
-import org.bashpile.core.engine.RenderOptions.Companion.QUOTED
-import org.bashpile.core.engine.RenderOptions.Companion.UNQUOTED
 import org.bashpile.core.engine.TypeEnum
 
 /** See also [UnaryPrimaryBastNode] */
@@ -20,6 +18,8 @@ class BinaryPrimaryBastNode(val left: BastNode, operator: String, val right: Bas
         val strings = left.majorType().coercesTo(TypeEnum.STRING) && right.majorType().coercesTo(TypeEnum.STRING)
         require(integers || floats || strings) { "Mismatched types: ${left.majorType()} and ${right.majorType()}" }
 
+        val valueOptions = options.asValue()
+
         val translatedOperator = if (!integers) {
             operator
         } else {
@@ -34,12 +34,14 @@ class BinaryPrimaryBastNode(val left: BastNode, operator: String, val right: Bas
             }
         }
         return if (integers || strings) {
-            val leftRender = left.render(QUOTED)
-            val rightRender = right.render(QUOTED)
+            val leftRender = left.render(valueOptions.quoted())
+            val rightRender = right.render(valueOptions.quoted())
             "[ $leftRender $translatedOperator $rightRender ]"
         } else {
             // floats
-            "bc -l <<< \"${left.render(UNQUOTED)} $translatedOperator ${right.render(UNQUOTED)}\" > /dev/null"
+            val leftRenders = left.render(valueOptions.unquoted())
+            val rightRenders = right.render(valueOptions.unquoted())
+            "bc -l <<< \"$leftRenders $translatedOperator $rightRenders\" > /dev/null"
         }
     }
 }

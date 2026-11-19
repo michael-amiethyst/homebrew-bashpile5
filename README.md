@@ -1,5 +1,8 @@
 # Quickstart
 
+Ensure you have installed Bashpile with brew, this will pull in prerequisites for development as well.
+Alternately run `brew install gawk gsed shfmt`.
+
 1. `./gradlew clean check` for all integration tests and native compile
    1. Ensure Java 21 by GraalVM is your JVM
    2. You may want to use [sdkman](https://sdkman.io/) (with sdkman_auto_env enabled)

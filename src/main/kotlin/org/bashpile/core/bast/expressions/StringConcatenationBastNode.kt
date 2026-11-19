@@ -8,7 +8,21 @@ class StringConcatenationBastNode(children: List<BastNode>)
     : BastNode(children.toMutableList(), majorType = STRING)
 {
     override fun render(options: RenderOptions): String {
-        val childRenders = children.map { it.render(RenderOptions.UNQUOTED) }.joinToString("")
+        val containsRawBash = children.any { child ->
+            child.toList().any { it is RawBashBastNode }
+        }
+        if (containsRawBash) {
+            return children.joinToString("") { child ->
+                val childOptions = if (child.toList().any { it is RawBashBastNode }) {
+                    options.unquoted()
+                } else {
+                    options.quoted()
+                }
+                child.render(childOptions)
+            }
+        }
+
+        val childRenders = children.joinToString("") { it.render(options.unquoted()) }
         return if (options.quoted) {
             """
                 "$childRenders"

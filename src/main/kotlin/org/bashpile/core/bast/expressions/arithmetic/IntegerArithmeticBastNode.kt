@@ -3,7 +3,6 @@ package org.bashpile.core.bast.expressions.arithmetic
 import org.bashpile.core.engine.TypeEnum.INTEGER
 import org.bashpile.core.bast.BastNode
 import org.bashpile.core.engine.RenderOptions
-import org.bashpile.core.engine.RenderOptions.Companion.INTEGER_ARITHMETIC
 
 
 /** See [FloatArithmeticBastNode] */
@@ -13,8 +12,9 @@ class IntegerArithmeticBastNode(children: List<BastNode> = listOf())
     constructor(vararg child: BastNode) : this(child.toList())
 
     override fun render(options: RenderOptions): String {
-        val childRenders = children.map { it.render(INTEGER_ARITHMETIC) }.joinToString(" ")
-        return if (!options.arithmeticContext) { "$(($childRenders))" } else { childRenders }
+        val valueOptions = options.asValue()
+        val childRenders = children.map { it.render(valueOptions.integerArithmetic()) }.joinToString(" ")
+        return if (!valueOptions.arithmeticContext) { "$(($childRenders))" } else { childRenders }
     }
 
     override fun replaceChildren(nextChildren: List<BastNode>): IntegerArithmeticBastNode {
