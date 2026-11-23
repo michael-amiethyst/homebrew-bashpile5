@@ -146,9 +146,9 @@ StringEscapeSequence: '\\' . | '\\' Newline;
 
 // ShellString tokens
 
-BOParen      : 'b(' -> pushMode(SHELL_STRING);
-LDollarOParen: 'l$(' -> pushMode(SHELL_STRING);
-DollarOParen : '$(' -> pushMode(SHELL_STRING);
+BOParen      : 'b(' -> pushMode(SHELL_STRING); // Bash section, similar to C's __ASM__
+LDollarOParen: 'l$(' -> pushMode(SHELL_STRING); // Loose shell string
+DollarOParen : '$(' -> pushMode(SHELL_STRING); // Standard shell string
 
 // modes
 
