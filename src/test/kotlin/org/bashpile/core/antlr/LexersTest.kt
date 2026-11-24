@@ -1,7 +1,7 @@
 package org.bashpile.core.antlr
 
-import org.bashpile.core.SCRIPT_SUCCESS
-import org.bashpile.core.runCommand
+import org.bashpile.core.LinuxProcess
+import org.bashpile.core.LinuxProcess.Companion.SCRIPT_SUCCESS
 import java.io.IOException
 import java.nio.file.Path
 import kotlin.test.Test
@@ -50,7 +50,7 @@ class LexersTest {
     fun relativeCommandIsLinuxCommand() {
         val command = "$bashDir/my_ls.bash"
         // must be executable to register as a command
-        assertEquals(SCRIPT_SUCCESS, "chmod +x $command".runCommand().second)
+        assertEquals(SCRIPT_SUCCESS, LinuxProcess("chmod +x $command").run().second)
         assertTrue(Lexers._isLinuxCommand(command))
     }
 

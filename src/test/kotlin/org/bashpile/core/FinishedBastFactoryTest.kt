@@ -2,19 +2,16 @@ package org.bashpile.core
 
 import org.apache.logging.log4j.LogManager
 import org.apache.logging.log4j.Logger
+import org.bashpile.core.LinuxProcess.Companion.SCRIPT_ERROR__GENERIC
 import org.bashpile.core.bast.BastNode
 import org.bashpile.core.bast.InternalBastNode
+import org.bashpile.core.bast.expressions.literals.TerminalBastNode
 import org.bashpile.core.bast.expressions.shellstrings.ShellStringBastNode
 import org.bashpile.core.bast.statements.PrintBastNode
 import org.bashpile.core.bast.statements.ShellLineBastNode
-import org.bashpile.core.engine.TypeEnum.STRING
-import org.bashpile.core.bast.expressions.literals.TerminalBastNode
 import org.bashpile.core.engine.RenderOptions
-import kotlin.test.BeforeTest
-import kotlin.test.Test
-import kotlin.test.assertEquals
-import kotlin.test.assertFalse
-import kotlin.test.assertTrue
+import org.bashpile.core.engine.TypeEnum.STRING
+import kotlin.test.*
 
 
 class FinishedBastFactoryTest {
@@ -68,12 +65,12 @@ class FinishedBastFactoryTest {
             unnested
         }
 
-        val render = unnestedRoot.render(RenderOptions.UNQUOTED).shfmt()
+        val render = LinuxProcess.shfmt(unnestedRoot.render(RenderOptions.UNQUOTED))
         assertEquals("""
             declare __bp_var0
             __bp_var0="$(
-                echo '.'
-                exit $SCRIPT_ERROR__GENERIC
+              echo '.'
+              exit $SCRIPT_ERROR__GENERIC
             )"
             printf "$(ls ${'$'}{__bp_var0})"
             
@@ -102,18 +99,18 @@ class FinishedBastFactoryTest {
             unnested
         }
 
-        val render = unnestedRoot.render(RenderOptions.UNQUOTED).shfmt()
+        val render = LinuxProcess.shfmt(unnestedRoot.render(RenderOptions.UNQUOTED))
         assertEquals("""
             set -euo pipefail
             declare __bp_var0
             __bp_var0="$(
-                echo '.'
-                exit $SCRIPT_ERROR__GENERIC
+              echo '.'
+              exit $SCRIPT_ERROR__GENERIC
             )"
             printf "$(ls ${'$'}{__bp_var0})"
             
         """.trimIndent(), render)
 
-        assertEquals(SCRIPT_ERROR__GENERIC, render.runCommand().second)
+        assertEquals(SCRIPT_ERROR__GENERIC, LinuxProcess(render).run().second)
     }
 }
