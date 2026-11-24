@@ -4,8 +4,11 @@
 # There should be a soft link from $HOMEBREW_CELLAR/bashpile-local to your project root
 #
 
-# uninstall
-brew uninstall bashpile || true
+# uninstall or tap
+if ! brew uninstall bashpile; then
+  brew tap michael-amiethyst/bashpile5
+  brew trust michael-amiethyst/bashpile5
+fi
 
 # install
 brew install --HEAD --verbose bashpile
