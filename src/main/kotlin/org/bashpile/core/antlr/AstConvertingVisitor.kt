@@ -13,7 +13,7 @@ import org.bashpile.core.bast.expressions.arithmetic.UnaryCrementArithmeticBastN
 import org.bashpile.core.bast.expressions.literals.*
 import org.bashpile.core.bast.expressions.shellstrings.LooseShellStringBastNode
 import org.bashpile.core.bast.expressions.shellstrings.ShellStringBastNode
-import org.bashpile.core.bast.expressions.shellstrings.VerbatimShellStringBastNode
+import org.bashpile.core.bast.expressions.RawBashBastNode
 import org.bashpile.core.bast.statements.*
 import org.bashpile.core.bast.statements.structured.ConditionalBastNode
 import org.bashpile.core.bast.statements.structured.IfClause
@@ -62,7 +62,7 @@ class AstConvertingVisitor: BashpileParserBaseVisitor<BastNode>() {
         val children = antlrStatements.map { visit(it) }
         val columns = ctx.typedId().map { visit(it) as VariableReferenceBastNode }
         val comments = ctx.Comment().map { visit(it) }
-        return ForeachFileLineLoopBashNode(children, ctx.StringValues().text, columns, comments)
+        return ForeachFileLineLoopBastNode(children, ctx.StringValues().text, columns, comments)
     }
 
     override fun visitConditionalStatement(ctx: BashpileParser.ConditionalStatementContext): BastNode {
@@ -77,13 +77,18 @@ class AstConvertingVisitor: BashpileParserBaseVisitor<BastNode>() {
         }
         val elseBlock = ctx.elseClause()?.indentedStatements()?.statement()?.map { visit(it) } ?: listOf()
         val elseComments = ctx.elseClause()?.Comment()?.map { visit(it) } ?: listOf()
-        return ConditionalBastNode(ifClause, elseIfClauses, elseBlock, elseComments)
+        return ConditionalBastNode(ifClause, elseIfClauses, elseBlock to elseComments)
     }
 
+    /**
+     * @see [AstConvertingVisitor.visitCaseClauses]
+     * @see [AstConvertingVisitor.visitDefaultCase]
+     */
     override fun visitSwitchStatement(ctx: BashpileParser.SwitchStatementContext): BastNode {
         val matchingExpression = visit(ctx.expression())
+        val expressionComments = ctx.Comment()?.map { visit(it) } ?: listOf()
         val cases = ctx.caseClauses().map { visit(it) } + ctx.defaultCase()?.let { visit(it) }
-        return SwitchBastNode(matchingExpression, cases.filterNotNull())
+        return SwitchBastNode(matchingExpression, cases.filterNotNull(), expressionComments)
     }
 
     override fun visitVariableDeclarationStatement(ctx: BashpileParser.VariableDeclarationStatementContext): BastNode {
@@ -135,7 +140,7 @@ class AstConvertingVisitor: BashpileParserBaseVisitor<BastNode>() {
     }
 
     override fun visitExpressionStatement(ctx: BashpileParser.ExpressionStatementContext): BastNode {
-        return InternalBastNode(ctx.children.map { visit(it) })
+        return ExpressionStatementBastNode(ctx.children.map { visit(it) })
     }
 
     ///////////////////////////////////
@@ -273,16 +278,24 @@ class AstConvertingVisitor: BashpileParserBaseVisitor<BastNode>() {
 
     // Leaf nodes (parts of expressions)
 
+    /**
+     * @see [AstConvertingVisitor.visitSwitchStatement]
+     * @see [AstConvertingVisitor.visitDefaultCase]
+     */
     override fun visitCaseClauses(ctx: BashpileParser.CaseClausesContext): BastNode {
         val matcher = ctx.globPattern().map { TerminalBastNode(it.text, STRING) }
+        val comments = ctx.Comment().map {
+            TerminalBastNode(it.text.replace("^//".toRegex(), "#"), STRING) }
         val statements = ctx.indentedStatements().statement().map { visit(it) }
-        return CaseBastNode(matcher, statements.toMutableList())
+        return CaseBastNode(matcher, statements.toMutableList(), comments)
     }
 
     override fun visitDefaultCase(ctx: BashpileParser.DefaultCaseContext): BastNode {
         val defaultMatch = TerminalBastNode("*", STRING)
+        val comments = ctx.Comment().map {
+            TerminalBastNode(it.text.replace("^//".toRegex(), "#"), STRING) }
         val statements = ctx.indentedStatements().statement().map { visit(it) }
-        return CaseBastNode(defaultMatch.toList(), statements.toMutableList())
+        return CaseBastNode(defaultMatch.toList(), statements.toMutableList(), comments)
     }
 
     override fun visitShellString(ctx: BashpileParser.ShellStringContext): BastNode {
@@ -293,8 +306,8 @@ class AstConvertingVisitor: BashpileParserBaseVisitor<BastNode>() {
         return LooseShellStringBastNode(ctx.shellStringContents().map { visit(it) })
     }
 
-    override fun visitVerbatimShellString(ctx: BashpileParser.VerbatimShellStringContext): BastNode {
-        return VerbatimShellStringBastNode(ctx.shellStringContents().map { visit(it) })
+    override fun visitRawBash(ctx: BashpileParser.RawBashContext): BastNode {
+        return RawBashBastNode(ctx.shellStringContents().map { visit(it) })
     }
 
     override fun visitShellStringContents(ctx: BashpileParser.ShellStringContentsContext): BastNode {
@@ -355,4 +368,3 @@ private fun BashpileParser.TypedIdContext.majorType(): BashpileParser.TypesConte
 private fun TerminalNode.typeIndex(): Int {
     return symbol.type
 }
-

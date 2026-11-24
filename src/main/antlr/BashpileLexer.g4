@@ -4,19 +4,35 @@ tokens { INDENT, DEDENT }
 
 @lexer::header {
   import com.yuvalshavit.antlr4.DenterHelper;
+  import org.bashpile.core.antlr.IndentationState;
   import org.bashpile.core.antlr.Lexers;
 }
 
 @lexer::members {
+  private final IndentationState indentationState = new IndentationState();
+
   private final DenterHelper denter = DenterHelper.builder()
     .nl(Newline)
     .indent(BashpileLexer.INDENT)
     .dedent(BashpileLexer.DEDENT)
-    .pullToken(BashpileLexer.super::nextToken);
+    .pullToken(this::pullTokenForDenter);
 
   @Override
   public Token nextToken() {
     return denter.nextToken();
+  }
+
+  private Token pullTokenForDenter() {
+    Token token = BashpileLexer.super.nextToken();
+    if (token.getType() == Newline) {
+      normalizeIndentation(token);
+    }
+    return token;
+  }
+
+  /** Expands tabs to Python-compatible columns before DenterHelper measures indentation. */
+  private void normalizeIndentation(Token token) {
+    Lexers.normalizeIndentation(token, _input, indentationState);
   }
 
   private boolean isLinuxCommand(CharStream input) {
@@ -106,7 +122,7 @@ IntegerValues: NON_ZERO_DIGIT DIGIT* | '0';
 FloatValues: INT_PART? FRACTION | INT_PART '.';
 
 // newlines, whitespace and comments
-Newline       : '\r'? '\n' ' '*;
+Newline       : '\r'? '\n' [ \t]*;
 Whitespace    : [ \t\f] -> skip;
 EscapedNewline: '\\' '\r'? '\n' ' '* -> skip;
 BashpileDoc   : '/**' .*? '*/';
@@ -130,10 +146,9 @@ StringEscapeSequence: '\\' . | '\\' Newline;
 
 // ShellString tokens
 
-LHashOParen  : 'l#(' -> pushMode(SHELL_STRING);
-VHashOParen  : 'v#(' -> pushMode(SHELL_STRING);
-HashOParen   : '#(' -> pushMode(SHELL_STRING);
-DollarOParen : '$(' -> pushMode(SHELL_STRING);
+BOParen      : 'b(' -> pushMode(SHELL_STRING); // Bash section, similar to C's __ASM__
+LDollarOParen: 'l$(' -> pushMode(SHELL_STRING); // Loose shell string
+DollarOParen : '$(' -> pushMode(SHELL_STRING); // Standard shell string
 
 // modes
 

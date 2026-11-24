@@ -4,7 +4,6 @@ options { tokenVocab = BashpileLexer; }
 program: statement+;
 
 // statements, in descending order of complexity
-// TODO switch - ensure comments render for all statements (on conditionalStatement)
 statement
     : Import StringValues eol # importStatement
     | ShellLine Newline # shellLineStatement
@@ -14,7 +13,7 @@ statement
     | Function Id paramaters (Arrow complexType)? eol # functionForwardDeclarationStatement
     | Function Id paramaters tags? (Arrow complexType)? Colon Comment* functionBlock # functionDeclarationStatement
     | If OParen expression CParen Colon Comment* indentedStatements (elseIfClauses)* elseClause? # conditionalStatement
-    | Switch OParen expression CParen Colon INDENT caseClauses+ defaultCase? DEDENT # switchStatement
+    | Switch OParen expression CParen Colon Comment* INDENT caseClauses+ defaultCase? DEDENT # switchStatement
     | <assoc=right> typedId (Equals expression)? eol # variableDeclarationStatement
     | <assoc=right> (Id | listAccess) assignmentOperator expression eol # reassignmentStatement
     | Print OParen argumentList? CParen eol # printStatement
@@ -36,7 +35,7 @@ argumentList: expression (Comma expression)*;
 elseIfClauses : Else If OParen expression CParen Colon Comment* indentedStatements;
 elseClause: Else Colon Comment* indentedStatements;
 indentedStatements: INDENT statement+ DEDENT;
-caseClauses: Case globPattern+ Colon indentedStatements;
+caseClauses: Case globPattern+ Colon Comment* indentedStatements;
 globPattern //: extended_pattern  // extglob: ?(p|p), *(p|p), +(p|p), @(p|p), !(p|p)
 //            //| brace_expansion   // {a,b}
             : globCharacterSet    // [a-z]
@@ -45,7 +44,7 @@ globPattern //: extended_pattern  // extglob: ?(p|p), *(p|p), +(p|p), @(p|p), !(
             | literal;
 //// Character Sets: [abc], [a-zA-Z], [!0-9]
 globCharacterSet : OBracket (CaseModeClassBody | NumberValues | StringValues) CBracket;
-defaultCase: Default Colon indentedStatements;
+defaultCase: Default Colon Comment* indentedStatements;
 assignmentOperator: Equals | PlusEquals;
 
 // Force the final statement to be a return.
@@ -90,7 +89,7 @@ expression
     // other levels
     | shellString                       # shellStringExpression
     | looseShellString                  # looseShellStringExpression
-    | verbatimShellString               # verbatimShellStringExpression
+    | rawBash               # verbatimShellStringExpression
     | Id OParen argumentList? CParen    # functionCallExpression
     | argumentsBuiltin                  # argumentsBuiltinExpression
     | ListOf (OParen CParen | OParen expression (Comma expression)* CParen)
@@ -100,12 +99,12 @@ expression
     ;
 
 literal : StringValues | NumberValues | BoolValues;
-types    : Boolean | Integer | Float | String | List | Map | Reference;
+types   : Boolean | Integer | Float | String | List | Map | Reference;
 
 // shellString, Bashpile's version of a subshell
-shellString        : HashOParen shellStringContents* CParen;
-looseShellString   : LHashOParen shellStringContents* CParen;
-verbatimShellString: VHashOParen shellStringContents* CParen;
+shellString      : DollarOParen shellStringContents* CParen;
+looseShellString : LDollarOParen shellStringContents* CParen;
+rawBash          : BOParen shellStringContents* CParen;
 shellStringContents: DollarOParen shellStringContents* CParen
                    | OParen shellStringContents* CParen
                    | ShellStringText
@@ -113,7 +112,7 @@ shellStringContents: DollarOParen shellStringContents* CParen
 
 // full list at https://tldp.org/LDP/Bash-Beginners-Guide/html/sect_07_01.html
 unaryPrimary: BashUnaryOperator | IsEmpty | NotEmpty
-| Exists | DoesNotExist | RegularFileExists | DirectoryExists;
+            | Exists | DoesNotExist | RegularFileExists | DirectoryExists;
 
 // one line means logically equal precidence (e.g. LessThan in the same as MoreThanOrEquals)
 binaryPrimary: LessThan | LessThanOrEquals | MoreThan | MoreThanOrEquals | IsEqual | IsNotEqual;

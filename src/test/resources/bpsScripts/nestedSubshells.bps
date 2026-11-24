@@ -1,2 +1,2 @@
 set -euo pipefail
-print(#(ls "$(echo '.'; exit 1)"))
+print($(ls "$(echo '.'; exit 1)"))

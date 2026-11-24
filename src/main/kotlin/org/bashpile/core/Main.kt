@@ -7,6 +7,7 @@ import com.github.ajalt.clikt.core.CliktCommand
 import com.github.ajalt.clikt.core.CliktError
 import com.github.ajalt.clikt.core.PrintHelpMessage
 import com.github.ajalt.clikt.core.main
+import com.github.ajalt.clikt.core.terminal
 import com.github.ajalt.clikt.parameters.arguments.argument
 import com.github.ajalt.clikt.parameters.arguments.optional
 import com.github.ajalt.clikt.parameters.options.counted
@@ -17,6 +18,8 @@ import com.google.common.annotations.VisibleForTesting
 import org.antlr.v4.runtime.CharStreams
 import org.antlr.v4.runtime.CommonTokenStream
 import org.apache.logging.log4j.LogManager
+import org.bashpile.core.LinuxProcess.Companion.SCRIPT_ERROR__GENERIC
+import org.bashpile.core.LinuxProcess.Companion.SCRIPT_SUCCESS
 import org.bashpile.core.antlr.AstConvertingVisitor
 import org.bashpile.core.antlr.ThrowingErrorListener
 import org.bashpile.core.bast.BastNode
@@ -42,7 +45,7 @@ class Main : CliktCommand() {
         const val VERBOSE_ENABLED_MESSAGE = "Double verbose (DEBUG) logging enabled"
         /** As in source/sink -> generates a startup message given a script filename */
         const val STARTUP_MESSAGE = "Running Bashpile compiler with script: "
-        const val VERSION = "0.21.0"
+        const val VERSION = "0.22.0"
         const val SHEBANG_HEADER = "#!/usr/bin/env bash\n\n"
         /** Singleton per Main() instance */
         lateinit var callStack: CallStack
@@ -65,7 +68,7 @@ class Main : CliktCommand() {
     private val _commandOption: String? by option("-c", "--command",
         help = "Runs the literal command or from STDIN if no argument").optionalValue("")
 
-    private val logger = LogManager.getLogger(Main::javaClass)
+    private val logger = LogManager.getLogger(Main::class.java)
 
     init {
         versionOption(VERSION, names = setOf("--version"), help = "Show the application version and exit.",
@@ -77,7 +80,6 @@ class Main : CliktCommand() {
      * The main entry point for the Bashpile compiler.
      * This method is called by the `main` function by Clikt.
      */
-    // TODO change project to use two spaces for tabs (Google style guide)
     override fun run() {
         // guard, etc
         val scriptPath = Path.of(scriptArgument)
@@ -101,18 +103,20 @@ class Main : CliktCommand() {
             generateSequence(::readLine).joinToString("\n")
         }
         val bastRoot: BastNode = _getBast(script.byteInputStream())
-        val bash: String = bastRoot.render(RenderOptions.UNQUOTED).shfmt()
+        val bash: String = LinuxProcess.shfmt(bastRoot.render(RenderOptions.UNQUOTED))
+        // preserves source whitespace while keeping Clikt's configured terminal (and its test capture)
+        val terminalPrint = { x: String -> currentContext.terminal.rawPrint(x) }
         if (!commandMode()) {
             logger.debug("Writing to STDOUT in regular (non-command) mode")
-            echo(SHEBANG_HEADER + bash, false)
+            terminalPrint(SHEBANG_HEADER + bash)
         } else {
             logger.debug("Executing compiled command mode script")
-            val commandResults = bash.runCommand()
+            val commandResults = LinuxProcess(bash).run()
             check(commandResults.second == SCRIPT_SUCCESS) {
                 "Compile failed with return code ${commandResults.second} and text:\n${commandResults.first}"
             }
             logger.trace("Writing to STDOUT in command mode")
-            echo(commandResults.first)
+            terminalPrint(commandResults.first)
         }
 
         endProgram()

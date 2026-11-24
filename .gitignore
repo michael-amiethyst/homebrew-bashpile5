@@ -2,6 +2,7 @@
 .kotlin/
 build/
 src/main/build/**
+src/main/antlr/build/**
 **/gen/**
 src/main/antlr/BashpileLexer.tokens
 !gradle/wrapper/gradle-wrapper.jar
@@ -12,6 +13,7 @@ src/main/antlr/BashpileLexer.tokens
 .idea/modules.xml
 .idea/jarRepositories.xml
 .idea/compiler.xml
+.idea/workspace.xml
 .idea/libraries/
 *.iws
 *.iml

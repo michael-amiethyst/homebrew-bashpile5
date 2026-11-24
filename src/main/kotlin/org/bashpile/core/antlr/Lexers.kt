@@ -2,13 +2,16 @@ package org.bashpile.core.antlr
 
 import com.google.common.annotations.VisibleForTesting
 import org.antlr.v4.runtime.CharStream
+import org.antlr.v4.runtime.CommonToken
+import org.antlr.v4.runtime.IntStream.EOF
+import org.antlr.v4.runtime.Token
 import org.antlr.v4.runtime.misc.Interval
 import org.apache.commons.io.FilenameUtils
 import org.apache.commons.lang3.StringUtils
 import org.apache.logging.log4j.LogManager
 import org.apache.logging.log4j.Logger
-import org.bashpile.core.SCRIPT_SUCCESS
-import org.bashpile.core.runCommand
+import org.bashpile.core.LinuxProcess
+import org.bashpile.core.LinuxProcess.Companion.SCRIPT_SUCCESS
 import java.io.IOException
 import java.nio.file.Files
 import java.nio.file.Path
@@ -34,7 +37,7 @@ class Lexers {
 
         private val WINDOWS_FILE_PATTERN: Pattern = Pattern.compile("^([A-Za-z]):\\\\([a-zA-Z_.][a-zA-Z0-9_\\-.]*)+")
 
-        private val POXIX_FILE_PATTERN: Pattern = Pattern.compile("^(?:/?[a-zA-Z_.-][a-zA-Z0-9_.\\\\-]*)+")
+        private val POSIX_FILE_PATTERN: Pattern = Pattern.compile("^(?:/?[a-zA-Z_.-][a-zA-Z0-9_.\\\\-]*)+")
 
         private val OSX_FILE_PATTERN: Pattern = Pattern.compile("^(?:/?[a-zA-Z0-9_.-][a-zA-Z0-9_.@\\\\-]*)+")
 
@@ -49,6 +52,44 @@ class Lexers {
         private val BASHPILE_KEYWORDS = listOf("return", "readonly", "unset", "else-if")
 
         private val LOG: Logger = LogManager.getLogger(Lexers::class.java)
+
+        /**
+         * Expands Python-style tabs and validates indentation before DenterHelper measures it.
+         * @param token token.text's tabs are normalized to all spaces.  Object is mutated
+         */
+        @JvmStatic
+        fun normalizeIndentation(token: Token, input: CharStream, state: IndentationState) {
+            val text = token.text
+            val lineEndingLength = if (text.startsWith("\r\n")) 2 else 1
+            val rawIndentation = text.substring(lineEndingLength)
+            var normalizedColumn = 0
+            var rawColumn = 0
+            rawIndentation.forEach { character ->
+                if (character == '\t') {
+                    val w = 8 // column width
+                    normalizedColumn = (normalizedColumn / w + 1) * w
+                } else { normalizedColumn++ }
+                rawColumn++
+            }
+
+            if (!isBlankOrCommentLine(input)) {
+                state.update(normalizedColumn, rawColumn, token.line)
+            }
+
+            // remove trailing newline and save text to a param
+            val normalizedText = text.substring(0, lineEndingLength) + " ".repeat(normalizedColumn)
+            token as CommonToken
+            token.text = normalizedText
+        }
+
+        private fun isBlankOrCommentLine(input: CharStream): Boolean {
+            val next = input.LA(1)
+            val isBlank = next in listOf('\r'.code, '\n'.code) || next == EOF
+            return isBlank ||
+                    // or comment line: //, /*, /**
+                    next == '/'.code && (input.LA(2) == '/'.code
+                                         || (input.LA(2) == '*'.code && input.LA(3) == '*'.code))
+        }
 
         /**
          * Checks if the command portion of the input Bash line is a valid Bash command.
@@ -137,12 +178,12 @@ class Lexers {
 
             try {
                 val filePattern = if (!osName.contains("mac")) {
-                    POXIX_FILE_PATTERN
+                    POSIX_FILE_PATTERN
                 } else { OSX_FILE_PATTERN }
-                // may need a 'and not find with createsStatementRegex' when we add file path recognition to shell lines
+                // may need 'and not find with createsStatementRegex' when we add file path recognition to shell lines
                 if (COMMAND_PATTERN.matcher(command).matches() || filePattern.matcher(command).matches()) {
                     LOG.trace("Running external 'type' command on {}", command)
-                    val results = "type -t $command".runCommand()
+                    val results = LinuxProcess("type -t $command").run()
 
                     // exclude keywords like 'function'
                     val typeResults: String = results.first.trim()
